@@ -8,6 +8,8 @@ import HTTP_STATUS from 'http-status-codes';
 import 'express-async-errors';
 import compression from 'compression';
 
+const PORT = 5000;
+
 export class MidCloudServer {
   private app: Application;
 
@@ -55,9 +57,20 @@ export class MidCloudServer {
 
   private globalErrorHandler(app: Application): void {}
 
-  private startServer(app: Application): void {}
+  private startServer(app: Application): void {
+    try {
+      const httpServer: http.Server = new http.Server(app);
+      this.startHttpServer(httpServer);
+    } catch(error) {
+      console.log(error);
+    }
+  }
 
-  private startHttpServer(httpServer: http.Server): void {}
+  private startHttpServer(httpServer: http.Server): void {
+    httpServer.listen(PORT, () => {
+      console.log(`Server is currently running on port ${PORT}`);
+    });
+  }
 
   private createSocketIO(httpServer: http.Server): void {}
 }
