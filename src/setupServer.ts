@@ -10,9 +10,9 @@ import { createClient } from 'redis';
 import { createAdapter } from '@socket.io/redis-adapter';
 import 'express-async-errors';
 import compression from 'compression';
-import { config } from './config';
-import appRoutes from './routes';
-import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
+import { config } from '@root/config';
+import appRoutes from '@root/routes';
+import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 import Logger from 'bunyan';
 
 const PORT = 5000;

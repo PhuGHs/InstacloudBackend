@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
-import { MidCloudServer } from './setupServer';
-import dbConnnection from './setupDB';
-import { config } from './config';
+import { MidCloudServer } from '@root/setupServer';
+import dbConnnection from '@root/setupDB';
+import { config } from '@root/config';
 
 class Application {
   public init(): void {
