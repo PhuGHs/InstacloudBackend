@@ -1,15 +1,22 @@
-import { Application, json, urlencoded, Response, Request, NextFunction } from "express";
+import { Application, json, urlencoded, Response, Request, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import cookieSession from 'cookie-session';
 import HTTP_STATUS from 'http-status-codes';
+import { Server } from 'socket.io';
+import { createClient } from 'redis';
+import { createAdapter } from '@socket.io/redis-adapter';
 import 'express-async-errors';
 import compression from 'compression';
-import { config } from "./config";
+import { config } from './config';
+import appRoutes from './routes';
+import { CustomError, IErrorResponse } from './shared/globals/helpers/error-handler';
+import Logger from 'bunyan';
 
 const PORT = 5000;
+const log: Logger = config.createLogger('SETUP SERVER');
 
 export class MidCloudServer {
   private app: Application;
@@ -51,27 +58,58 @@ export class MidCloudServer {
   private standardMiddleware(app: Application): void {
     app.use(compression());
     app.use(json({ limit: '50mb' }));
-    app.use(urlencoded({ extended: true, limit: '50mb' }))
+    app.use(urlencoded({ extended: true, limit: '50mb' }));
   }
 
-  private routeMiddleware(app: Application): void {}
+  private routeMiddleware(app: Application): void {
+    appRoutes(app);
+  }
 
-  private globalErrorHandler(app: Application): void {}
+  private globalErrorHandler(app: Application): void {
+    app.all('*', (req: Request, res: Response) => {
+      res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found.` });
+    });
+    app.use((error: IErrorResponse, req: Request, res: Response, next: NextFunction) => {
+      log.error(error);
+      if (error instanceof CustomError) {
+        return res.status(error.code).json(error.serializeErrors());
+      }
+      next();
+    });
+  }
 
-  private startServer(app: Application): void {
+  private async startServer(app: Application): Promise<void> {
     try {
       const httpServer: http.Server = new http.Server(app);
+      const socketIO: Server = await this.createSocketIO(httpServer);
+      this.socketIOConnection(socketIO);
       this.startHttpServer(httpServer);
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
   }
 
   private startHttpServer(httpServer: http.Server): void {
+    log.info(`Server has started with process ${process.pid}`);
     httpServer.listen(PORT, () => {
-      console.log(`Server is currently running on port ${PORT}`);
+      log.info(`Server is currently running on port ${PORT}`);
     });
   }
 
-  private createSocketIO(httpServer: http.Server): void {}
+  private async createSocketIO(httpServer: http.Server): Promise<Server> {
+    const io: Server = new Server(httpServer, {
+      cors: {
+        origin: config.CLIENT_URL,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+      }
+    });
+    const pubClient = createClient({ url: config.REDIS_HOST });
+    const subClient = pubClient.duplicate();
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+    io.adapter(createAdapter(pubClient, subClient));
+    return io;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private socketIOConnection(io: Server): void {}
 }
