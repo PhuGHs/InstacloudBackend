@@ -1,5 +1,6 @@
 import { Document } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { IUserDocument } from '@user/interfaces/user.interface';
 
 declare global {
   namespace Express {
@@ -21,7 +22,7 @@ export interface AuthPayload {
 
 export interface IAuthDocument extends Document {
   _id: string | ObjectId;
-  uId: string;
+  uId: number;
   username: string;
   email: string;
   password?: string;
@@ -36,10 +37,14 @@ export interface IAuthDocument extends Document {
 
 export interface ISignUpData {
   _id: ObjectId;
-  uId: string;
+  uId: number;
   email: string;
   username: string;
   password: string;
   firstname: string;
   lastname: string;
+}
+
+export interface IAuthJob {
+  value?: string | IAuthDocument | IUserDocument;
 }

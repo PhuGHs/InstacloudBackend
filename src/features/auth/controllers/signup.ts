@@ -5,7 +5,17 @@ import { IAuthDocument, ISignUpData } from '../interfaces/auth.interface';
 import { authService } from '@root/shared/services/db/auth.service';
 import { ObjectId } from 'mongodb';
 import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-methods';
+import { UploadApiResponse } from 'cloudinary';
+import { upload } from '@global/helpers/cloudinary-upload';
+import { IUserDocument } from '@root/features/users/interfaces/user.interface';
+import { UserCache } from '@root/shared/services/redis/user.cache';
+import { authQueue } from '@root/shared/services/queues/auth.queue';
+import { userQueue } from '@root/shared/services/queues/user.queue';
+import jwt from 'jsonwebtoken';
+import { config } from '@root/config';
 
+
+const userCache: UserCache = new UserCache();
 export class SignUp {
   public async user(req: Request, res: Response): Promise<void> {
     const { username, firstname, lastname, email, password, avatarImage } = req.body;
@@ -14,11 +24,32 @@ export class SignUp {
     if(existedUser) {
       throw new BadRequestError('invalid credentials!');
     }
-    //if no throw bad request error(invalid credentials)
-    //if yes, up avatar to cloudinary and save data to db and redis
+
     const authObjectId: ObjectId = new ObjectId();
     const userObjectId: ObjectId = new ObjectId();
-    res.status(HTTP_STATUS.OK).json({message: 'account is created successfully!'});
+    const uId: number = SupportiveMethods.generateRandomIntegers(12);
+    const authData: IAuthDocument = await SignUp.prototype.formSignUpData({
+      _id: authObjectId,
+      uId,
+      username,
+      email,
+      firstname,
+      lastname,
+      password
+    }) as IAuthDocument;
+    const result: UploadApiResponse = await upload(avatarImage, `${userObjectId}`, true, true) as UploadApiResponse;
+    if(result?.public_id) {
+      throw new BadRequestError('File upload error. Please try again!');
+    }
+    const userDataForCache: IUserDocument = SignUp.prototype.userData(authData, userObjectId);
+    userDataForCache.profilePicture = `https://res.cloudinary.com/daszajz9a/image/upload/v${result.version}/${result.public_id}`;
+    await userCache.saveUserToCache(`${authObjectId}`, `${uId}` , userDataForCache);
+
+    authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
+    userQueue.addUserJob('addUserToDB', { value: authData });
+    const token: string = SignUp.prototype.signToken(authData, userObjectId);
+    req.session = { jwt: token };
+    res.status(HTTP_STATUS.OK).json({message: 'User has been created successfully!', user: userDataForCache, jwt});
   }
 
   private formSignUpData(data: ISignUpData): IAuthDocument {
@@ -33,5 +64,54 @@ export class SignUp {
       password,
       createdAt: new Date()
     } as IAuthDocument;
+  }
+
+  private userData(data: IAuthDocument, userObjectId: ObjectId): IUserDocument {
+    const {_id, uId, username, email, password, firstname, lastname } = data;
+      return {
+        _id: userObjectId,
+        authId: _id,
+        uId,
+        username: SupportiveMethods.uppercaseFirstLetter(username),
+        email,
+        password,
+        profilePicture: '',
+        blocked: [],
+        blockedBy: [],
+        work: '',
+        location: '',
+        school: '',
+        quote: '',
+        bgImageVersion: '',
+        bgImageId: '',
+        followersCount: 0,
+        followingCount: 0,
+        postsCount: 0,
+        notifications: {
+          messages: true,
+          reactions: true,
+          comments: true,
+          follows: true,
+        },
+        social: {
+          facebook: '',
+          instagram: '',
+          twitter: '',
+          youtube: '',
+        }
+      } as unknown as IUserDocument;
+  }
+
+  private signToken(data: IAuthDocument, userObjectId: ObjectId) : string {
+    return jwt.sign(
+      {
+      userId: userObjectId,
+      uId: data.uId,
+      email: data.email,
+      username: data.username,
+      firstname: data.firstname,
+      lastname: data.lastname,
+      },
+    config.JWT_TOKEN!);
   }
 }
