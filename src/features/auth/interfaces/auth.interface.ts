@@ -14,6 +14,8 @@ export interface AuthPayload {
   uId: string,
   email: string,
   username: string,
+  firstname: string,
+  lastname: string,
   iat?: number
 }
 
@@ -23,6 +25,8 @@ export interface IAuthDocument extends Document {
   username: string;
   email: string;
   password?: string;
+  firstname: string;
+  lastname: string;
   createdAt: Date;
   passwordResetToken?: string;
   passwordResetExpires: number | string;
@@ -36,4 +40,6 @@ export interface ISignUpData {
   email: string;
   username: string;
   password: string;
+  firstname: string;
+  lastname: string;
 }
