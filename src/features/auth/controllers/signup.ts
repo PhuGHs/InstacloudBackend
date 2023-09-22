@@ -13,10 +13,13 @@ import { authQueue } from '@root/shared/services/queues/auth.queue';
 import { userQueue } from '@root/shared/services/queues/user.queue';
 import jwt from 'jsonwebtoken';
 import { config } from '@root/config';
+import { joiValidation } from '@root/shared/globals/decorators/joi.validation';
+import { signupSchema } from '../schemes/auth.signup.scheme';
 
 
 const userCache: UserCache = new UserCache();
 export class SignUp {
+  @joiValidation(signupSchema)
   public async user(req: Request, res: Response): Promise<void> {
     const { username, firstname, lastname, email, password, avatarImage } = req.body;
     //check if user is exist
@@ -27,7 +30,7 @@ export class SignUp {
 
     const authObjectId: ObjectId = new ObjectId();
     const userObjectId: ObjectId = new ObjectId();
-    const uId: number = SupportiveMethods.generateRandomIntegers(12);
+    const uId: string = `${SupportiveMethods.generateRandomIntegers(12)}`;
     const authData: IAuthDocument = await SignUp.prototype.formSignUpData({
       _id: authObjectId,
       uId,
@@ -73,6 +76,8 @@ export class SignUp {
         authId: _id,
         uId,
         username: SupportiveMethods.uppercaseFirstLetter(username),
+        firstname,
+        lastname,
         email,
         password,
         profilePicture: '',

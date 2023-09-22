@@ -9,7 +9,7 @@ const authSchema: Schema = new Schema(
     username: {type: String },
     firstname: {type: String },
     lastname: {type: String },
-    uId: {type: Number },
+    uId: {type: String },
     email: {type: String },
     password: {type: String },
     createdAt: {type: Date, default: Date.now },
@@ -24,11 +24,11 @@ const authSchema: Schema = new Schema(
       }
     },
     methods: {
-      async comparePasswords(password: string): Promise<boolean> {
+      async comparePassword(password: string): Promise<boolean> {
         const hashedPassword: string = this.password!;
         return compare(password, hashedPassword);
       },
-      async hashPasswords(password: string): Promise<string> {
+      async hashPassword(password: string): Promise<string> {
         return hash(password, SALT_ROUND);
       }
     }
