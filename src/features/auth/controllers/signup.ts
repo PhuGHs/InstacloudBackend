@@ -38,7 +38,7 @@ export class SignUp {
       password
     }) as IAuthDocument;
     const result: UploadApiResponse = await upload(avatarImage, `${userObjectId}`, true, true) as UploadApiResponse;
-    if(result?.public_id) {
+    if(!result?.public_id) {
       throw new BadRequestError('File upload error. Please try again!');
     }
     const userDataForCache: IUserDocument = SignUp.prototype.userData(authData, userObjectId);
@@ -46,10 +46,10 @@ export class SignUp {
     await userCache.saveUserToCache(`${authObjectId}`, `${uId}` , userDataForCache);
 
     authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
-    userQueue.addUserJob('addUserToDB', { value: authData });
+    userQueue.addUserJob('addUserToDB', { value: userDataForCache });
     const token: string = SignUp.prototype.signToken(authData, userObjectId);
     req.session = { jwt: token };
-    res.status(HTTP_STATUS.OK).json({message: 'User has been created successfully!', user: userDataForCache, jwt});
+    res.status(HTTP_STATUS.OK).json({message: 'User has been created successfully!', user: userDataForCache, token});
   }
 
   private formSignUpData(data: ISignUpData): IAuthDocument {
