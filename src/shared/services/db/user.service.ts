@@ -40,6 +40,10 @@ class UserService {
       profilePicture: 1,
     };
   }
+  public async getUserById(id: string): Promise<IUserDocument> {
+    const user: IUserDocument = await UserModel.findOne({ _id: id }) as IUserDocument;
+    return user;
+  }
 }
 
 export const userService: UserService = new UserService();

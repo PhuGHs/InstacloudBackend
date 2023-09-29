@@ -3,6 +3,7 @@ import Logger from 'bunyan';
 import { BaseCache } from './base.cache';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { ServerError } from '@global/helpers/error-handler';
+import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-methods';
 
 const log: Logger = config.createLogger('userCache');
 export class UserCache extends BaseCache {
@@ -10,7 +11,7 @@ export class UserCache extends BaseCache {
     super('userCache');
   }
 
-  public async saveUserToCache(key: string, userId: string, user: IUserDocument): Promise<void> {
+  public async saveUserToCache(key: string, userUId: string, user: IUserDocument): Promise<void> {
     const {
       _id,
       uId,
@@ -70,12 +71,40 @@ export class UserCache extends BaseCache {
         await this.client.connect();
       }
 
-      await this.client.zAdd('user', {score: parseInt(userId, 10), value: `${key}`}); //score is used to retrieve each item from the set
+      await this.client.zAdd('user', {score: parseInt(userUId, 10), value: `${key}`}); //score is used to retrieve each item from the set
       for (let i = 0; i < saveData.length; i += 2) {
         const field = saveData[i];
         const value = saveData[i + 1];
         await this.client.hSet(`users:${key}`, field, value);
       }
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again later');
+    }
+  }
+
+  public async getUserFromCache(userId: string) : Promise<IUserDocument | null> {
+    try {
+      if(!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      const response : IUserDocument = await this.client.hGetAll(`users:${userId}`) as unknown as IUserDocument;
+      response.createdAt = new Date(SupportiveMethods.parseJson(`${response.createdAt}`));
+      response.social = SupportiveMethods.parseJson(`${response.social}`);
+      response.postsCount = SupportiveMethods.parseJson(`${response.postsCount}`);
+      response.blocked = SupportiveMethods.parseJson(`${response.blocked}`);
+      response.blockedBy = SupportiveMethods.parseJson(`${response.blockedBy}`);
+      response.work = SupportiveMethods.parseJson(`${response.work}`);
+      response.school = SupportiveMethods.parseJson(`${response.school}`);
+      response.location = SupportiveMethods.parseJson(`${response.location}`);
+      response.quote = SupportiveMethods.parseJson(`${response.quote}`);
+      response.notifications = SupportiveMethods.parseJson(`${response.notifications}`);
+      response.followersCount = SupportiveMethods.parseJson(`${response.followersCount}`);
+      response.followingCount = SupportiveMethods.parseJson(`${response.followingCount}`);
+
+
+      return response;
     } catch(error) {
       log.error(error);
       throw new ServerError('Server error. Try again later');

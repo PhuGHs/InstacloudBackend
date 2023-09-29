@@ -39,20 +39,20 @@ export class SignUp {
       firstname,
       lastname,
       password
-    }) as IAuthDocument;
+    } as ISignUpData);
     const result: UploadApiResponse = await upload(avatarImage, `${userObjectId}`, true, true) as UploadApiResponse;
     if(!result?.public_id) {
       throw new BadRequestError('File upload error. Please try again!');
     }
     const userDataForCache: IUserDocument = SignUp.prototype.userData(authData, userObjectId);
     userDataForCache.profilePicture = `https://res.cloudinary.com/daszajz9a/image/upload/v${result.version}/${result.public_id}`;
-    await userCache.saveUserToCache(`${authObjectId}`, `${uId}` , userDataForCache);
+    await userCache.saveUserToCache(`${userObjectId}`, `${uId}` , userDataForCache);
 
     authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
     userQueue.addUserJob('addUserToDB', { value: userDataForCache });
     const token: string = SignUp.prototype.signToken(authData, userObjectId);
     req.session = { jwt: token };
-    res.status(HTTP_STATUS.OK).json({message: 'User has been created successfully!', user: userDataForCache, token});
+    res.status(HTTP_STATUS.CREATED).json({message: 'User has been created successfully!', user: userDataForCache, token});
   }
 
   private formSignUpData(data: ISignUpData): IAuthDocument {
@@ -78,7 +78,7 @@ export class SignUp {
         username: SupportiveMethods.uppercaseFirstLetter(username),
         firstname,
         lastname,
-        email,
+        email: SupportiveMethods.lowercase(email),
         password,
         profilePicture: '',
         blocked: [],
