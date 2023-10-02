@@ -23,6 +23,13 @@ class AuthService {
     }).exec() as IAuthDocument;
     return user;
   }
+
+  public async updateResetPasswordToken(authId: string, token: string, tokenExpiration: number): Promise<void> {
+    await AuthModel.updateOne({_id: authId }, {
+      passwordResetToken: token,
+      passwordResetExpires: tokenExpiration,
+    });
+  }
 }
 
 export const authService: AuthService = new AuthService();

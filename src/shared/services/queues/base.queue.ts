@@ -5,8 +5,9 @@ import Queue, { Job } from 'bull';
 import Logger from 'bunyan';
 import { config } from '@root/config';
 import { IAuthJob } from '@auth/interfaces/auth.interface';
+import { IEmailJob } from '@root/features/users/interfaces/user.interface';
 
-type IBaseJobData = IAuthJob
+type IBaseJobData = IAuthJob | IEmailJob;
 
 let bullAdapters : BullAdapter[] = [];
 

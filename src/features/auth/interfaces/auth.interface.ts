@@ -30,7 +30,7 @@ export interface IAuthDocument extends Document {
   lastname: string;
   createdAt: Date;
   passwordResetToken?: string;
-  passwordResetExpires: number | string;
+  passwordResetExpires?: number | string;
   comparePassword(password: string): Promise<boolean>;
   hashPassword(password: string): Promise<string>;
 }
