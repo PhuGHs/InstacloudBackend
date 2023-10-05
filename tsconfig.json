@@ -31,6 +31,8 @@
       "@worker/*": ["src/shared/workers/*"],
       "@auth/*": ["src/features/auth/*"],
       "@user/*": ["src/features/users/*"],
+      "@post/*": ["src/features/posts/*"],
+      "@reaction/*": ["src/features/reactions/*"],
     }
   }
 }
