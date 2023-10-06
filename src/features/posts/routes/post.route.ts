@@ -3,6 +3,7 @@ import express, { Router } from 'express';
 import { Create } from '@post/controllers/create-post';
 import { Update } from '@post/controllers/update-post';
 import { Delete } from '../controllers/delete-post';
+import { Get } from '../controllers/get-posts';
 
 class PostRoutes {
   private router: Router;
@@ -10,6 +11,9 @@ class PostRoutes {
     this.router = express.Router();
   }
   public routes(): Router {
+    this.router.get('/post/all/:page', authMiddleware.checkAuthentication, Get.prototype.posts);
+    this.router.get('/post/images/:page', authMiddleware.checkAuthentication, Get.prototype.postsWithImage);
+
     this.router.post('/post', authMiddleware.checkAuthentication, Create.prototype.post);
     this.router.post('/post-with-image', authMiddleware.checkAuthentication, Create.prototype.postWithImage);
 
