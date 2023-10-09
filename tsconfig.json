@@ -33,6 +33,7 @@
       "@user/*": ["src/features/users/*"],
       "@post/*": ["src/features/posts/*"],
       "@reaction/*": ["src/features/reactions/*"],
+      "@comment/*": ["src/features/comments/*"],
     }
   }
 }
