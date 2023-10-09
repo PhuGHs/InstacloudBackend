@@ -1,8 +1,10 @@
 import { Application } from 'express';
-import { serverAdapter } from './shared/services/queues/base.queue';
-import { authRoutes } from './features/auth/routes/auth.route';
-import { authMiddleware } from './shared/globals/helpers/auth-middleware';
-import { currentUserRoutes } from './features/auth/routes/currentUser.route';
+import { serverAdapter } from '@service/queues/base.queue';
+import { authRoutes } from '@auth/routes/auth.route';
+import { authMiddleware } from '@global/helpers/auth-middleware';
+import { currentUserRoutes } from '@auth/routes/currentUser.route';
+import { postRoutes } from '@post/routes/post.route';
+import { commentRoute } from '@comment/routes/comment.route';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BASE_PATH = '/api/v1';
@@ -12,7 +14,10 @@ export default (app: Application) => {
     app.use(BASE_PATH, authRoutes.routes());
     app.use(BASE_PATH, authRoutes.signOutRoutes());
 
+    //require login
+    app.use(BASE_PATH, authMiddleware.verifyUser, postRoutes.routes());
     app.use(BASE_PATH, authMiddleware.verifyUser, currentUserRoutes.routes());
+    app.use(BASE_PATH, authMiddleware.verifyUser, commentRoute.routes());
   };
   routes();
 };

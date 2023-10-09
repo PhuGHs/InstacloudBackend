@@ -6,8 +6,13 @@ import Logger from 'bunyan';
 import { config } from '@root/config';
 import { IAuthJob } from '@auth/interfaces/auth.interface';
 import { IEmailJob } from '@root/features/users/interfaces/user.interface';
+import { IPostJobData } from '@root/features/posts/interfaces/post.interface';
+import { ICommentJob } from '@root/features/comments/interfaces/comment.interface';
 
-type IBaseJobData = IAuthJob | IEmailJob;
+type IBaseJobData = IAuthJob
+                  | IEmailJob
+                  | IPostJobData
+                  | ICommentJob;
 
 let bullAdapters : BullAdapter[] = [];
 
