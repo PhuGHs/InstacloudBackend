@@ -24,7 +24,6 @@
       { "transform": "typescript-transform-paths", "afterDeclarations": "true" },
     ],
     "paths": {
-      "@root/*": ["src/*"],
       "@global/*": ["src/shared/globals/*"],
       "@service/*": ["src/shared/services/*"],
       "@socket/*": ["src/shared/sockets/*"],
@@ -34,6 +33,7 @@
       "@post/*": ["src/features/posts/*"],
       "@reaction/*": ["src/features/reactions/*"],
       "@comment/*": ["src/features/comments/*"],
+      "@root/*": ["src/*"],
     }
   }
 }
