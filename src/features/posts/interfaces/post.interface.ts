@@ -5,6 +5,7 @@ import mongoose, { Document } from 'mongoose';
 export interface IPostDocument extends Document {
   _id?: string | mongoose.Types.ObjectId;
   userId: string;
+  pId: string;
   username: string;
   email: string;
   profilePicture: string;

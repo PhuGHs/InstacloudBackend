@@ -31,7 +31,8 @@ export class PostCache extends BaseCache {
       imgId,
       imgVersion,
       reactions,
-      createdAt
+      createdAt,
+      pId
     } = createdPost;
 
     const dataToSave: string[] = [
@@ -41,6 +42,7 @@ export class PostCache extends BaseCache {
       'email', `${email}`,
       'profilePicture', `${profilePicture}`,
       'post', `${post}`,
+      'pId', `${pId}`,
       'feelings', `${feelings}`,
       'privacy', `${privacy}`,
       'gifUrl', `${gifUrl}`,

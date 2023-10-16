@@ -24,6 +24,7 @@ export class Add {
       profilePicture,
       comment,
       createdAt: new Date(),
+      reactions: {like: 0}
     } as ICommentDocument;
 
     const workerData: ICommentJob = {
@@ -33,7 +34,7 @@ export class Add {
       userFrom: req.currentUser!.userId,
       username: req.currentUser!.username
     };
-    await commentCache.addCommentToCache(postId, JSON.stringify(data));
+    await commentCache.addCommentToCache({ commentId: `${commentObjectId}`, commentData: data });
     commentQueue.addCommentJob('addCommentToDB', workerData);
     res.status(STATUS_CODE.OK).json({message: 'Your comment has been added.' });
   }

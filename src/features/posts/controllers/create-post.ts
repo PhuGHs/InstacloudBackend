@@ -9,6 +9,7 @@ import STATUS_CODE from 'http-status-codes';
 import { UploadApiResponse } from 'cloudinary';
 import { upload } from '@root/shared/globals/helpers/cloudinary-upload';
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
+import { SupportiveMethods } from '@global/helpers/supportive-methods';
 
 const postCache: PostCache = new PostCache();
 export class Create {
@@ -16,6 +17,7 @@ export class Create {
   public async post(req: Request, res: Response): Promise<void> {
     const { post, privacy, gifUrl, profilePicture, feelings } = req.body;
     const postObjectId: ObjectId = new ObjectId();
+    const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
     const userPost: IPostDocument = {
       _id: postObjectId,
       userId: req.currentUser!.userId,
@@ -23,6 +25,7 @@ export class Create {
       email: req.currentUser!.email,
       profilePicture,
       post,
+      pId,
       privacy,
       gifUrl,
       feelings,
@@ -48,7 +51,7 @@ export class Create {
   public async postWithImage(req: Request, res: Response): Promise<void> {
     const { post, privacy, gifUrl, profilePicture, feelings, image } = req.body;
     const postObjectId: ObjectId = new ObjectId();
-
+    const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
     const result: UploadApiResponse = await upload(image) as UploadApiResponse;
     if(!result?.public_id) {
       throw new BadRequestError('File upload error. Please try again!');
@@ -59,6 +62,7 @@ export class Create {
       userId: req.currentUser!.userId,
       username: req.currentUser!.username,
       email: req.currentUser!.email,
+      pId,
       profilePicture,
       post,
       privacy,
