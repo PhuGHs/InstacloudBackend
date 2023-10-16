@@ -51,11 +51,11 @@ export class CommentCache extends BaseCache {
         const field = dataToSave[i];
         const value = dataToSave[i + 1];
         await this.client.HSET(`comments:${commentId}`, field, value);
-        const commentCount: string[] = await this.client.HMGET(`posts:${postId}`, 'commentsCount');
-        let count: number = SupportiveMethods.parseJson(commentCount[0]) as number;
-        count += 1;
-        await this.client.HSET(`posts:${postId}`, 'commentsCount', count);
       }
+      const commentCount: string[] = await this.client.HMGET(`posts:${postId}`, 'commentsCount');
+      let count: number = Number(commentCount[0]);
+      count += 1;
+      await this.client.HSET(`posts:${postId}`, 'commentsCount', count);
     } catch(error) {
       log.error(error);
       throw new ServerError('Server Error. Try again!');

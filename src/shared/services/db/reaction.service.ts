@@ -47,6 +47,22 @@ class ReactionService {
           )
       ]) as unknown as [IUserDocument, IReactionDocument, ICommentDocument];
     }
+
+    public async removeReactionFromCache(reactionData: IReactionJob): Promise<void> {
+      const { postId, username } = reactionData;
+      await Promise.all([
+        ReactionModel.deleteOne({ postId, username }),
+        PostModel.updateOne({ _id: postId }, { $inc: { ['reactions.like']: -1}}, { new: true })
+      ]);
+    }
+
+    public async removeCommentReactionFromCache(reactionData: IReactionJob): Promise<void> {
+      const { commentId, username } = reactionData;
+      await Promise.all([
+        ReactionModel.deleteOne({ commentId, username }),
+        CommentsModel.updateOne({_id: commentId }, { $inc: { ['reactions.like']: -1}}, { new: true })
+      ]);
+    }
 }
 
 export const reactionService: ReactionService = new ReactionService();

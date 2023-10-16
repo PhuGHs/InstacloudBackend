@@ -3,11 +3,10 @@ import { IReactionDocument, IReactions } from '@root/features/reactions/interfac
 import { ServerError } from '@root/shared/globals/helpers/error-handler';
 import { BaseCache } from '@service/redis/base.cache';
 import Logger from 'bunyan';
-import { CommentCache } from './comment.cache';
-import { ICommentDocument } from '@comment/interfaces/comment.interface';
+import { SupportiveMethods } from '@global/helpers/supportive-methods';
+import { find } from 'lodash';
 
 const log: Logger = config.createLogger('reactionCache');
-const commentCache: CommentCache = new CommentCache();
 export class ReactionCache extends BaseCache {
   constructor() {
     super('reactionCache');
@@ -25,19 +24,78 @@ export class ReactionCache extends BaseCache {
     }
   }
 
-  public async addCommentReactionToCache(postId: string, commentId: string, reaction: IReactionDocument, reactions: IReactions): Promise<void> {
+  public async addCommentReactionToCache(commentId: string, reaction: IReactionDocument, reactions: IReactions): Promise<void> {
     try {
       if(!this.client.isOpen) {
         this.client.connect();
       }
       await this.client.LPUSH(`reactions:${commentId}`, JSON.stringify(reaction));
-      const comment: ICommentDocument[] = await commentCache.getSingleCommentFromAPostFromCache(postId, commentId) as ICommentDocument[];
-      comment[0].reactions = reactions;
-      // await this.client.LREM(`comments:${postId}`, 1, )
-      await this.client.HSET(`comments:${postId}`, 'reactions', JSON.stringify(reactions));
+      await this.client.HSET(`comments:${commentId}`, 'reactions', JSON.stringify(reactions));
     } catch(error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');
     }
+  }
+
+  public async removeReactionFromCache(key: string, username: string, postReactions: IReactions): Promise<void> {
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      const response: string[] = await this.client.LRANGE(`reactions:${key}`, 0, -1);
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      const userPreviousReaction: IReactionDocument = this.getPreviousPostReaction(response, username, key) as IReactionDocument;
+      multi.LREM(`reactions:${key}`, 1, JSON.stringify(userPreviousReaction));
+      await multi.exec();
+      await this.client.HSET(`posts:${key}`, 'reactions', JSON.stringify(postReactions));
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async removeCommentReactionFromCache(key: string, username: string, commentReactions: IReactions): Promise<void> {
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      const response: string[] = await this.client.LRANGE(`reactions:${key}`, 0, -1);
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      const userPreviousReaction: IReactionDocument = this.getPreviousCommentReaction(response, username, key) as IReactionDocument;
+      multi.LREM(`reactions:${key}`, 1, JSON.stringify(userPreviousReaction));
+      await multi.exec();
+      await this.client.HSET(`comments:${key}`, 'reactions', JSON.stringify(commentReactions));
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  private getPreviousPostReaction(response: string[], username: string, postId: string): IReactionDocument | undefined {
+    const list: IReactionDocument[] = [];
+    for(const item of response) {
+      const reactionItem: IReactionDocument = SupportiveMethods.parseJson(item) as IReactionDocument;
+      if(reactionItem.postId == postId) {
+        list.push(reactionItem);
+      }
+    }
+
+    return find(list, (listItem:  IReactionDocument) => {
+      return listItem.username === username;
+    });
+  }
+
+  private getPreviousCommentReaction(response: string[], username: string, commentId: string): IReactionDocument | undefined {
+    const list: IReactionDocument[] = [];
+    for(const item of response) {
+      const reactionItem: IReactionDocument = SupportiveMethods.parseJson(item) as IReactionDocument;
+      if(reactionItem.commentId == commentId) {
+        list.push(reactionItem);
+      }
+    }
+
+    return find(list, (listItem:  IReactionDocument) => {
+      return listItem.username === username;
+    });
   }
 }

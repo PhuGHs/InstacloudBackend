@@ -7,6 +7,8 @@ class ReactionQueue extends BaseQueue {
     super('reactionQueue');
     this.processJob('addPostReactionToDB', 5, reactionWorker.addPostReactionToDB);
     this.processJob('addCommentReactionToDB', 5, reactionWorker.addCommentReactionToDB);
+    this.processJob('removePostReactionFromDB', 5, reactionWorker.removePostReactionFromDB);
+    this.processJob('removeCommentReactionFromDB', 5, reactionWorker.removeCommentReactionFromDB);
   }
 
   public addReactionJob(name: string, data: IReactionJob): void {

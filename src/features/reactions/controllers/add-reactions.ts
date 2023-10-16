@@ -36,7 +36,7 @@ export class Add {
 
   @joiValidation(addCommentReactionSchema)
   public async commentReaction(req: Request, res: Response): Promise<void> {
-    const { postId, commentId, userTo, profilePicture, postReactions } = req.body;
+    const { commentId, userTo, profilePicture, postReactions } = req.body;
     const reactionObjectId: ObjectId = new ObjectId();
     const reactionDocument: IReactionDocument = {
       _id: reactionObjectId,
@@ -53,7 +53,7 @@ export class Add {
       userFrom: req.currentUser!.userId,
       reactionObject: reactionDocument
     };
-    await reactionCache.addCommentReactionToCache(postId, commentId, reactionDocument, postReactions);
+    await reactionCache.addCommentReactionToCache(commentId, reactionDocument, postReactions);
     reactionQueue.addReactionJob('addCommentReactionToDB', reactionJob);
     res.status(STATUS_CODE.OK).json({ message: 'Your comment reaction has been added.' });
   }
