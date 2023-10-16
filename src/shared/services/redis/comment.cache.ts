@@ -144,4 +144,53 @@ export class CommentCache extends BaseCache {
       throw new ServerError('Server error. Try again');
     }
   }
+
+  public async updateACommentInCache(commentId: string, updatedComment: ICommentDocument): Promise<ICommentDocument> {
+    const { comment, profilePicture } = updatedComment;
+    const dataToSave: string[] = [
+      'profilePicture', `${profilePicture}`,
+      'comment', `${comment}`
+    ];
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      for (let i = 0; i < dataToSave.length; i += 2) {
+        const field = dataToSave[i];
+        const value = dataToSave[i + 1];
+        await this.client.HSET(`comments:${commentId}`, field, value);
+      }
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      multi.HGETALL(`comments:${commentId}`);
+
+      const reply = await multi.exec() as unknown as ICommentDocument[];
+      reply[0].reactions = SupportiveMethods.parseJson(`${reply[0].reactions}`);
+      reply[0].createdAt = SupportiveMethods.parseJson(`${reply[0].createdAt}`);
+
+      return reply[0];
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
+    }
+  }
+
+  public async deleteAComment(commentId: string, postId: string): Promise<void> {
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      const commentsCount: string | undefined = await this.client.HGET(`posts:${postId}`, 'commentsCount');
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      multi.ZREM('comment', `${commentId}`);
+      multi.DEL(`comments:${commentId}`);
+      //remove reactions as well
+      const number: number = parseInt(commentsCount!, 10) - 1;
+      multi.HSET(`posts:${postId}`, 'commentsCount', number);
+
+      await multi.exec();
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again');
+    }
+  }
 }

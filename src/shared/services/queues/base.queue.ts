@@ -7,14 +7,15 @@ import { config } from '@root/config';
 import { IAuthJob } from '@auth/interfaces/auth.interface';
 import { IEmailJob } from '@root/features/users/interfaces/user.interface';
 import { IPostJobData } from '@root/features/posts/interfaces/post.interface';
-import { ICommentJob } from '@root/features/comments/interfaces/comment.interface';
+import { ICommentJob, IUpdateCommentJob } from '@root/features/comments/interfaces/comment.interface';
 import { IReactionJob } from '@reaction/interfaces/reaction.interface';
 
 type IBaseJobData = IAuthJob
                   | IEmailJob
                   | IPostJobData
                   | ICommentJob
-                  | IReactionJob;
+                  | IReactionJob
+                  | IUpdateCommentJob;
 
 let bullAdapters : BullAdapter[] = [];
 

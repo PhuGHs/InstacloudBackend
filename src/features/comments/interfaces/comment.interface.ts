@@ -23,6 +23,13 @@ export interface ICommentJob {
   comment: ICommentDocument;
 }
 
+export interface IUpdateCommentJob {
+  key?: string;
+  value?: ICommentDocument;
+  keyOne?: string;
+  keyTwo?: string;
+}
+
 export interface ICommentNameList {
   count: number;
   names: string[];

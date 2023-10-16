@@ -1,9 +1,9 @@
 import { ICommentDocument, ICommentJob, ICommentNameList, IQueryComment } from '@comment/interfaces/comment.interface';
 import { CommentsModel } from '@root/features/comments/models/comment.schema';
-import { IPostDocument } from '@root/features/posts/interfaces/post.interface';
+import { IPostDocument, IQueryComplete, IQueryDeleted } from '@root/features/posts/interfaces/post.interface';
 import { PostModel } from '@root/features/posts/models/post.schema';
 import { IUserDocument } from '@root/features/users/interfaces/user.interface';
-import { Query } from 'mongoose';
+import { Query, UpdateQuery } from 'mongoose';
 import { UserCache } from '@service/redis/user.cache';
 
 const userCache: UserCache = new UserCache();
@@ -45,6 +45,16 @@ class CommentService {
     ]);
 
     return commentNamesList;
+  }
+
+  public async updateACommentInDB(commentId: string, updatedComment: ICommentDocument): Promise<void> {
+    await CommentsModel.updateOne({ _id: commentId} , { $set: updatedComment });
+  }
+
+  public async deleteACommentInDB(commentId: string, postId: string): Promise<void> {
+    const promisedDeleteComment: Query<IQueryComplete & IQueryDeleted, ICommentDocument> = CommentsModel.deleteOne({ _id: commentId });
+    const promisedUpdatedComment: UpdateQuery<IPostDocument> = PostModel.updateOne({ _id: postId }, { $inc: { commentsCount: -1 }});
+    await Promise.all([promisedDeleteComment, promisedUpdatedComment]);
   }
 }
 
