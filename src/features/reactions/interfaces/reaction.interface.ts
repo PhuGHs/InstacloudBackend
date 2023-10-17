@@ -28,6 +28,8 @@ export interface IReactionJob {
 export interface IQueryReaction {
   _id?: string | ObjectId;
   postId?: string | ObjectId;
+  commentId?: string | ObjectId;
+  username?: string;
 }
 
 export interface IReaction {

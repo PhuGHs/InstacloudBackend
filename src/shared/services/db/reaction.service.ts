@@ -2,7 +2,7 @@ import { ICommentDocument } from '@comment/interfaces/comment.interface';
 import { CommentsModel } from '@comment/models/comment.schema';
 import { IPostDocument } from '@post/interfaces/post.interface';
 import { PostModel } from '@post/models/post.schema';
-import { IReactionDocument, IReactionJob } from '@reaction/interfaces/reaction.interface';
+import { IQueryReaction, IReactionDocument, IReactionJob } from '@reaction/interfaces/reaction.interface';
 import { ReactionModel } from '@reaction/models/reaction.schema';
 import { UserCache } from '@service/redis/user.cache';
 import { IUserDocument } from '@user/interfaces/user.interface';
@@ -63,6 +63,32 @@ class ReactionService {
         CommentsModel.updateOne({_id: commentId }, { $inc: { ['reactions.like']: -1}}, { new: true })
       ]);
     }
+
+    public async getPostReactions(query: IQueryReaction, sort: Record<string, 1 | -1>): Promise<[IReactionDocument[], number]> {
+      const reactions: IReactionDocument[] = await ReactionModel.aggregate([
+        { $match: query},
+        { $sort: sort }
+      ]);
+
+      return [reactions, reactions.length];
+    }
+
+    public async getSingleReaction(query: IQueryReaction, sort: Record<string, 1 | -1>): Promise<IReactionDocument> {
+      const reactions: IReactionDocument[] = await ReactionModel.aggregate([
+        { $match: query},
+        { $sort: sort }
+      ]);
+
+      return reactions[0];
+    }
+
+    // public async getPostReactionByUsername(username: string): Promise<IReactionDocument[]> {
+    //   const reactions: IReactionDocument[] = await ReactionModel.aggregate([
+    //     { $match: { username: Helpers.firstLetterUppercase(username)}}
+    //   ]);
+
+    //   return reactions;
+    // }
 }
 
 export const reactionService: ReactionService = new ReactionService();

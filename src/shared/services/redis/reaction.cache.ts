@@ -98,4 +98,82 @@ export class ReactionCache extends BaseCache {
       return listItem.username === username;
     });
   }
+
+  public async getCommentReaction(commentId: string): Promise<[IReactionDocument[], number]> {
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      const list: IReactionDocument[] = [];
+      const response: string[] = await this.client.LRANGE(`reactions:${commentId}`, 0, -1);
+      const numberOfReactions: number = await this.client.LLEN(`reactions:${commentId}`);
+      for(const item of response) {
+        list.push(SupportiveMethods.parseJson(item));
+      }
+      return [list, numberOfReactions];
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async getPostReaction(postId: string): Promise<[IReactionDocument[], number]> {
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      const list: IReactionDocument[] = [];
+      const response: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1);
+      const numberOfReactions: number = await this.client.LLEN(`reactions:${postId}`);
+      for(const item of response) {
+        list.push(SupportiveMethods.parseJson(item));
+      }
+      return [list, numberOfReactions];
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async getSinglePostReaction(postId: string, username: string): Promise<IReactionDocument> {
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      const list: IReactionDocument[] = [];
+      const response: string[] = await this.client.LRANGE(`reactions:${postId}`, 0, -1);
+      for(const item of response) {
+        list.push(SupportiveMethods.parseJson(item));
+      }
+
+      const result: IReactionDocument = find(list, (listItem: IReactionDocument) => {
+        return listItem.postId === postId && listItem.username === username;
+      }) as IReactionDocument;
+      return result;
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async getSingleCommentReaction(commentId: string, username: string): Promise<IReactionDocument> {
+    try {
+      if(!this.client.isOpen) {
+        this.client.connect();
+      }
+      const list: IReactionDocument[] = [];
+      const response: string[] = await this.client.LRANGE(`reactions:${commentId}`, 0, -1);
+      for(const item of response) {
+        list.push(SupportiveMethods.parseJson(item));
+      }
+
+      const result: IReactionDocument = find(list, (listItem: IReactionDocument) => {
+        return listItem.commentId === commentId && listItem.username === username;
+      }) as IReactionDocument;
+      return result;
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
 }
