@@ -1,3 +1,4 @@
+import { IReactions } from '@reaction/interfaces/reaction.interface';
 import { ObjectId } from 'mongodb';
 import { Document } from 'mongoose';
 
@@ -10,6 +11,7 @@ export interface ICommentDocument extends Document {
   profilePicture: string;
   comment: string;
   createdAt?: Date;
+  reactions?: IReactions;
   userTo?: string | ObjectId;
 }
 
@@ -19,6 +21,13 @@ export interface ICommentJob {
   userFrom: string;
   username: string;
   comment: ICommentDocument;
+}
+
+export interface IUpdateCommentJob {
+  key?: string;
+  value?: ICommentDocument;
+  keyOne?: string;
+  keyTwo?: string;
 }
 
 export interface ICommentNameList {
@@ -33,4 +42,9 @@ export interface IQueryComment {
 
 export interface IQuerySort {
   createdAt?: number;
+}
+
+export interface ISaveCommentToCache {
+  commentId: string;
+  commentData: ICommentDocument;
 }

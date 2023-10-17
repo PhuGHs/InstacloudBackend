@@ -8,6 +8,7 @@ const postSchema: Schema = new Schema({
   profilePicture: { type: String },
   post: { type: String, default: '' },
   imgVersion: { type: String, default: '' },
+  pId: {type: String},
   imgId: { type: String, default: '' },
   feelings: { type: String, default: '' },
   gifUrl: { type: String, default: '' },

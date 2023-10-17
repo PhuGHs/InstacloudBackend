@@ -4,12 +4,15 @@ import STATUS_CODE from 'http-status-codes';
 import { ICommentDocument, ICommentNameList } from '@comment/interfaces/comment.interface';
 import { commentService } from '@service/db/comment.service';
 import mongoose from 'mongoose';
+import { config } from '@root/config';
+import Logger from 'bunyan';
 
+const log: Logger = config.createLogger('checkCache');
 const commentCache: CommentCache = new CommentCache();
 export class Get {
   public async comments(req: Request, res: Response): Promise<void> {
     const { postId } = req.params;
-    const cachedComment: ICommentDocument[] =  await commentCache.getCommentsFromCache(postId);
+    const cachedComment: ICommentDocument[] =  await commentCache.getCommentsFromCache('comment', postId);
     const comments: ICommentDocument[] = cachedComment.length ? cachedComment :
     await commentService.getCommentsFromDB({ postId: new mongoose.Types.ObjectId(postId)}, { createdAt: -1});
 
@@ -18,8 +21,8 @@ export class Get {
 
   public async commentNames(req: Request, res: Response): Promise<void> {
     const { postId } = req.params;
-    const cachedComment: ICommentNameList[] = await commentCache.getCommentUsernamesFromCache(postId);
-    const commentNames: ICommentNameList[] = cachedComment.length ? cachedComment :
+    const cachedComment: ICommentNameList[] = await commentCache.getCommentUsernamesFromCache('comment', postId);
+    const commentNames: ICommentNameList[] = cachedComment[0].names.length ? cachedComment :
     await commentService.getCommentNamesFromDB({ postId: new mongoose.Types.ObjectId(postId) }, { createdAt: -1});
 
     res.status(STATUS_CODE.OK).json({ message: 'Post comment names', commentNames});

@@ -31,7 +31,8 @@ export class PostCache extends BaseCache {
       imgId,
       imgVersion,
       reactions,
-      createdAt
+      createdAt,
+      pId
     } = createdPost;
 
     const dataToSave: string[] = [
@@ -41,6 +42,7 @@ export class PostCache extends BaseCache {
       'email', `${email}`,
       'profilePicture', `${profilePicture}`,
       'post', `${post}`,
+      'pId', `${pId}`,
       'feelings', `${feelings}`,
       'privacy', `${privacy}`,
       'gifUrl', `${gifUrl}`,
@@ -63,7 +65,7 @@ export class PostCache extends BaseCache {
         await this.client.HSET(`posts:${key}`, field, value);
       }
 
-      const count: number = parseInt(postCount[0], 10) + 1;
+      const count: number = Number(postCount[0]) + 1;
       await this.client.HSET(`users:${currentUserId}`, 'postsCount', count);
     } catch(error) {
       log.error(error);

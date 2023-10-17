@@ -5,6 +5,7 @@ export interface IReactionDocument extends Document {
   _id?: string | ObjectId;
   username: string;
   postId: string;
+  commentId?: string;
   profilePicture: string;
   createdAt?: Date;
   userTo?: string | ObjectId;
@@ -16,18 +17,19 @@ export interface IReactions {
 }
 
 export interface IReactionJob {
-  postId: string;
+  postId?: string;
+  commentId?: string;
   username: string;
-  previousReaction: string;
   userTo?: string;
   userFrom?: string;
-  type?: string;
   reactionObject?: IReactionDocument;
 }
 
 export interface IQueryReaction {
   _id?: string | ObjectId;
   postId?: string | ObjectId;
+  commentId?: string | ObjectId;
+  username?: string;
 }
 
 export interface IReaction {

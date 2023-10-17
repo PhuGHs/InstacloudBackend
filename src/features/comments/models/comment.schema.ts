@@ -8,6 +8,9 @@ const commentSchema: Schema = new Schema({
   firstname: { type: String },
   lastname: {type: String },
   profilePicture: { type: String },
+  reactions: {
+    like: { type: Number, default: 0 }
+  },
   createdAt: { type: Date, default: Date.now() }
 });
 
