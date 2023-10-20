@@ -1,11 +1,14 @@
 import { ICommentDocument } from '@comment/interfaces/comment.interface';
 import { CommentsModel } from '@comment/models/comment.schema';
+import { INotificationDocument } from '@notification/interfaces/notification.interface';
+import { NotificationModel } from '@notification/models/notification.schema';
 import { IPostDocument } from '@post/interfaces/post.interface';
 import { PostModel } from '@post/models/post.schema';
 import { IQueryReaction, IReactionDocument, IReactionJob } from '@reaction/interfaces/reaction.interface';
 import { ReactionModel } from '@reaction/models/reaction.schema';
 import { UserCache } from '@service/redis/user.cache';
 import { IUserDocument } from '@user/interfaces/user.interface';
+import mongoose from 'mongoose';
 
 const userCache: UserCache = new UserCache();
 
@@ -27,6 +30,28 @@ class ReactionService {
             }
           )
       ]) as unknown as [IUserDocument, IReactionDocument, IPostDocument];
+
+      //send notification
+      if(response[0].notifications.reactions && userTo !== userFrom) {
+        const notificationModel: INotificationDocument = new NotificationModel();
+        const notification = await notificationModel.insertNotification({
+          userFrom: userFrom!,
+          userTo: userTo!,
+          message: `${username} liked your post!`,
+          notificationType: 'reactions',
+          entityId: new mongoose.Types.ObjectId(postId),
+          createdItemId: new mongoose.Types.ObjectId(response[1]?._id),
+          comment: '',
+          reaction: 'like',
+          post: response[2].post,
+          imgId: response[2].imgId!,
+          imgVersion: response[2].imgVersion!,
+          gifUrl: response[2].gifUrl!,
+          createdAt: new Date()
+        });
+      }
+      //send to client using socketIO\
+
     }
 
     public async addCommentReactionToDB(reactionData: IReactionJob): Promise<void> {
@@ -46,6 +71,28 @@ class ReactionService {
             }
           )
       ]) as unknown as [IUserDocument, IReactionDocument, ICommentDocument];
+
+      //send notification
+      if(response[0].notifications.reactions && userTo !== userFrom) {
+        const notificationModel: INotificationDocument = new NotificationModel();
+        const notification = await notificationModel.insertNotification({
+          userFrom: userFrom!,
+          userTo: userTo!,
+          message: `${username} liked a comment you wrote on a post!`,
+          notificationType: 'reactions',
+          entityId: new mongoose.Types.ObjectId(commentId),
+          createdItemId: new mongoose.Types.ObjectId(response[1]?._id),
+          comment: '',
+          reaction: 'like',
+          post: '',
+          imgId: '',
+          imgVersion: '',
+          gifUrl: '',
+          createdAt: new Date()
+        });
+      }
+
+      //send to client using socketIO
     }
 
     public async removeReactionFromCache(reactionData: IReactionJob): Promise<void> {

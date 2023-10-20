@@ -1,5 +1,7 @@
 import { IFollowerData, IFollowerDocument } from '@follower/interfaces/follower.interface';
 import { FollowerModel } from '@follower/models/follower.schema';
+import { INotificationDocument } from '@notification/interfaces/notification.interface';
+import { NotificationModel } from '@notification/models/notification.schema';
 import { IQueryComplete, IQueryDeleted } from '@post/interfaces/post.interface';
 import { UserCache } from '@service/redis/user.cache';
 import { IUserDocument } from '@user/interfaces/user.interface';
@@ -13,7 +15,7 @@ class FollowerService {
     const followerObjectId: ObjectId = new mongoose.Types.ObjectId(userId);
     const followeeObjectId: ObjectId = new mongoose.Types.ObjectId(followeeId);
 
-    const following = FollowerModel.create({
+    const following = await FollowerModel.create({
       _id: followerDocumentId,
       followeeId: followeeObjectId,
       followerId: followerObjectId
@@ -37,7 +39,26 @@ class FollowerService {
     const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null] = await Promise.all([users, userCache.getUserFromCache(followeeId)]);
 
     //send notification
+    if(response[1]?.notifications.follows && userId !== followeeId) {
+      const notificationModel: INotificationDocument = new NotificationModel();
+      const notification = await notificationModel.insertNotification({
+        userFrom: userId,
+        userTo: followeeId,
+        message: `${username} is following you now!`,
+        notificationType: 'follows',
+        entityId: new mongoose.Types.ObjectId(userId),
+        createdItemId: new mongoose.Types.ObjectId(following._id),
+        comment: '',
+        reaction: '',
+        post: '',
+        imgId: '',
+        imgVersion: '',
+        gifUrl: '',
+        createdAt: new Date()
+      });
+    }
     //send to client with socketIO
+
     //send to email queue
   }
 
