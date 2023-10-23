@@ -8,7 +8,7 @@ class NotificationRoute {
     this.router = express.Router();
   }
   public routes(): Router {
-    this.router.post('/notification', authMiddleware.checkAuthentication, Update.prototype.notification);
+    this.router.patch('/notification/:notificationId', authMiddleware.checkAuthentication, Update.prototype.notification);
     return this.router;
   }
 }
