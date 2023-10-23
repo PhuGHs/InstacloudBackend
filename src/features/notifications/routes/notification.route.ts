@@ -1,4 +1,6 @@
 import { authMiddleware } from '@global/helpers/auth-middleware';
+import { Delete } from '@notification/controllers/delete-notification';
+import { Get } from '@notification/controllers/get-notifications';
 import { Update } from '@notification/controllers/mark-as-seen';
 import express, { Router } from 'express';
 
@@ -9,6 +11,8 @@ class NotificationRoute {
   }
   public routes(): Router {
     this.router.patch('/notification/:notificationId', authMiddleware.checkAuthentication, Update.prototype.notification);
+    this.router.get('/notification', authMiddleware.checkAuthentication, Get.prototype.notification);
+    this.router.delete('/notification/:notificationId', authMiddleware.checkAuthentication, Delete.prototype.notification);
     return this.router;
   }
 }

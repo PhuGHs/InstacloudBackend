@@ -15,6 +15,10 @@ class NotificationService {
   public async markNotificationAsSeen(notificationId: string): Promise<void> {
     await NotificationModel.updateOne({ _id: notificationId }, { $set: { read: true }});
   }
+
+  public async deleteNotificationFromDB(notificationId: string): Promise<void> {
+    await NotificationModel.deleteOne({_id: notificationId });
+  }
 }
 
 export const notificationService: NotificationService = new NotificationService();
