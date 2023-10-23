@@ -3,8 +3,10 @@ import { CommentsModel } from '@root/features/comments/models/comment.schema';
 import { IPostDocument, IQueryComplete, IQueryDeleted } from '@root/features/posts/interfaces/post.interface';
 import { PostModel } from '@root/features/posts/models/post.schema';
 import { IUserDocument } from '@root/features/users/interfaces/user.interface';
-import { Query, UpdateQuery } from 'mongoose';
+import mongoose, { Query, UpdateQuery } from 'mongoose';
 import { UserCache } from '@service/redis/user.cache';
+import { INotificationDocument } from '@notification/interfaces/notification.interface';
+import { NotificationModel } from '@notification/models/notification.schema';
 
 const userCache: UserCache = new UserCache();
 class CommentService {
@@ -20,7 +22,24 @@ class CommentService {
     const response: [ICommentDocument, IPostDocument, IUserDocument] = await Promise.all([promisedComment, promisedPost, promisedUser]);
 
     // add comment notification
-
+    if(response[2]?.notifications.comments && userTo !== userFrom) {
+      const notificationModel: INotificationDocument = new NotificationModel();
+      const notification = await notificationModel.insertNotification({
+        userFrom: userFrom,
+        userTo: userTo,
+        message: `${username} commented on a post you wrote!`,
+        notificationType: 'comments',
+        entityId: new mongoose.Types.ObjectId(postId),
+        createdItemId: new mongoose.Types.ObjectId(response[0]?._id),
+        comment: comment.comment,
+        reaction: '',
+        post: response[1].post,
+        imgId: response[1].imgId!,
+        imgVersion: response[1].imgVersion!,
+        gifUrl: response[1].gifUrl!,
+        createdAt: new Date()
+      });
+    }
 
     // send to client with SOCKETIO
 

@@ -33,6 +33,8 @@
       "@post/*": ["src/features/posts/*"],
       "@reaction/*": ["src/features/reactions/*"],
       "@comment/*": ["src/features/comments/*"],
+      "@follower/*": ["src/features/followers/*"],
+      "@notification/*": ["src/features/notifications/*"],
       "@root/*": ["src/*"],
     }
   }
