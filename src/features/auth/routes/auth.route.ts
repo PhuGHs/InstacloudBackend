@@ -1,8 +1,8 @@
 import express, { Router } from 'express';
 import { SignUp } from '@auth/controllers/signup';
-import { SignIn } from '../controllers/signin';
-import { SignOut } from '../controllers/signout';
-import { Password } from '../controllers/reset-password';
+import { SignIn } from '@auth/controllers/signin';
+import { SignOut } from '@auth/controllers/signout';
+import { Password } from '@auth/controllers/reset-password';
 
 class AuthRoutes {
   private router: Router;

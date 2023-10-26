@@ -11,6 +11,7 @@ import { ICommentJob, IUpdateCommentJob } from '@root/features/comments/interfac
 import { IReactionJob } from '@reaction/interfaces/reaction.interface';
 import { IBlockedUserJobData, IFollowerJobData } from '@follower/interfaces/follower.interface';
 import { INotificationJobData } from '@notification/interfaces/notification.interface';
+import { IFileImageJobData } from '@image/interfaces/image.interface';
 
 type IBaseJobData = IAuthJob
                   | IEmailJob
@@ -20,7 +21,8 @@ type IBaseJobData = IAuthJob
                   | IUpdateCommentJob
                   | IFollowerJobData
                   | IBlockedUserJobData
-                  | INotificationJobData;
+                  | INotificationJobData
+                  | IFileImageJobData;
 
 let bullAdapters : BullAdapter[] = [];
 

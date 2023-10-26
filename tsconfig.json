@@ -35,6 +35,7 @@
       "@comment/*": ["src/features/comments/*"],
       "@follower/*": ["src/features/followers/*"],
       "@notification/*": ["src/features/notifications/*"],
+      "@image/*": ["src/features/images/*"],
       "@root/*": ["src/*"],
     }
   }
