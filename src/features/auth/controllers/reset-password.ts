@@ -15,8 +15,8 @@ import { IResetPasswordParams } from '@root/features/users/interfaces/user.inter
 export class Password {
   public async create(req: Request, res: Response): Promise<void> {
     const { email } = req.body;
-    const user: IAuthDocument = await authService.getAuthUserByUsernameOrEmail('', email) as IAuthDocument;
-    if(!user) {
+    const user: IAuthDocument = (await authService.getAuthUserByUsernameOrEmail('', email)) as IAuthDocument;
+    if (!user) {
       throw new BadRequestError('Invalid email');
     }
 
@@ -32,17 +32,17 @@ export class Password {
       template,
       subject: 'Reset your password'
     });
-    res.status(STATUS_CODE.OK).json({ message: 'Password reset request email has been sent.'});
+    res.status(STATUS_CODE.OK).json({ message: 'Password reset request email has been sent.' });
   }
 
   public async update(req: Request, res: Response): Promise<void> {
     const { password, confirmPassword } = req.body;
     const { token } = req.params;
-    if(password !== confirmPassword) {
+    if (password !== confirmPassword) {
       throw new BadRequestError('Passwords do not match');
     }
     const user: IAuthDocument = await authService.getAuthUserByPasswordToken(token);
-    if(!user) {
+    if (!user) {
       throw new BadRequestError('The reset password token has expired or invalid');
     }
 
@@ -60,7 +60,7 @@ export class Password {
     };
 
     const template: string = resetPasswordTemplate.passwordResetConfirmationTemplate(templateParams);
-    emailQueue.addEmailJob('forgotPassword', { template, receiverEmail: user.email, subject: 'Password reset confirmation'});
-    res.status(STATUS_CODE.OK).json({ message: 'Password is updated succesfully!'});
+    emailQueue.addEmailJob('forgotPassword', { template, receiverEmail: user.email, subject: 'Password reset confirmation' });
+    res.status(STATUS_CODE.OK).json({ message: 'Password is updated succesfully!' });
   }
 }

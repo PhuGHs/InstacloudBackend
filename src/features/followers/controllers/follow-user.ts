@@ -8,7 +8,6 @@ import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import STATUS_CODE from 'http-status-codes';
 
-
 const followerCache: FollowerCache = new FollowerCache();
 const userCache: UserCache = new UserCache();
 export class Add {
@@ -16,7 +15,7 @@ export class Add {
     const { followerId } = req.params;
 
     //update follower and following count in user
-    const followingCount: Promise<void> =  followerCache.updateFollowersCountInCache(req.currentUser!.userId, 'followingCount', 1);
+    const followingCount: Promise<void> = followerCache.updateFollowersCountInCache(req.currentUser!.userId, 'followingCount', 1);
     const followersCount: Promise<void> = followerCache.updateFollowersCountInCache(followerId, 'followersCount', 1);
     await Promise.all([followingCount, followersCount]);
 
@@ -29,7 +28,6 @@ export class Add {
 
     //send addFolloweeData to client with SOCKETIO
 
-
     const addFollowerToCache: Promise<void> = followerCache.saveFollowerToCache(`following:${req.currentUser!.userId}`, followerId);
     const addFolloweeToCache: Promise<void> = followerCache.saveFollowerToCache(`followers:${followerId}`, req.currentUser!.userId);
     await Promise.all([addFolloweeToCache, addFollowerToCache]);
@@ -41,7 +39,7 @@ export class Add {
       username: req.currentUser!.username,
       followerDocumentId: followerObjectId
     });
-    res.status(STATUS_CODE.OK).json({ message: 'Following user now!'});
+    res.status(STATUS_CODE.OK).json({ message: 'Following user now!' });
   }
 
   private userData(user: IUserDocument): IFollowerData {

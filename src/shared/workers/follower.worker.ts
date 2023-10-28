@@ -11,7 +11,7 @@ class FollowerWorker {
       await followerService.addFollowerToDB(keyOne, keyTwo, username, followerDocumentId);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }
@@ -23,7 +23,7 @@ class FollowerWorker {
       await followerService.removeFollowerFromDB(keyOne, keyTwo);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }

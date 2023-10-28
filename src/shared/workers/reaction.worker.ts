@@ -11,7 +11,7 @@ class ReactionWorker {
       await reactionService.addPostReactionToDB(data);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }
@@ -23,7 +23,7 @@ class ReactionWorker {
       await reactionService.addCommentReactionToDB(data);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }
@@ -35,7 +35,7 @@ class ReactionWorker {
       await reactionService.removeReactionFromCache(data);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }
@@ -47,7 +47,7 @@ class ReactionWorker {
       await reactionService.removeCommentReactionFromCache(data);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }

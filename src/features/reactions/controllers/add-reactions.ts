@@ -7,7 +7,6 @@ import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import STATUS_CODE from 'http-status-codes';
 
-
 const reactionCache: ReactionCache = new ReactionCache();
 export class Add {
   @joiValidation(addPostReactionSchema)
@@ -20,7 +19,7 @@ export class Add {
       postId,
       profilePicture,
       createdAt: new Date(),
-      userTo,
+      userTo
     } as IReactionDocument;
     const reactionJob: IReactionJob = {
       postId,
@@ -44,7 +43,7 @@ export class Add {
       commentId,
       profilePicture,
       createdAt: new Date(),
-      userTo,
+      userTo
     } as IReactionDocument;
     const reactionJob: IReactionJob = {
       commentId,

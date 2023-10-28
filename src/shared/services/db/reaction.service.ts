@@ -13,129 +13,124 @@ import mongoose from 'mongoose';
 const userCache: UserCache = new UserCache();
 
 class ReactionService {
-    public async addPostReactionToDB(reactionData: IReactionJob): Promise<void> {
-      const { postId, username, userTo, userFrom, reactionObject } = reactionData;
-      const reactionDocument: IReactionDocument = reactionObject as IReactionDocument;
-      const response: [IUserDocument, IReactionDocument, IPostDocument] =  await Promise.all([
-        userCache.getUserFromCache(`${userTo}`),
-          ReactionModel.replaceOne({ postId, username }, reactionDocument, { upsert: true }),
-          PostModel.findOneAndUpdate(
-            { _id: postId }, {
-              $inc: {
-                ['reactions.like']: 1
-              }
-            },
-            {
-              new: true
-            }
-          )
-      ]) as unknown as [IUserDocument, IReactionDocument, IPostDocument];
+  public async addPostReactionToDB(reactionData: IReactionJob): Promise<void> {
+    const { postId, username, userTo, userFrom, reactionObject } = reactionData;
+    const reactionDocument: IReactionDocument = reactionObject as IReactionDocument;
+    const response: [IUserDocument, IReactionDocument, IPostDocument] = (await Promise.all([
+      userCache.getUserFromCache(`${userTo}`),
+      ReactionModel.replaceOne({ postId, username }, reactionDocument, { upsert: true }),
+      PostModel.findOneAndUpdate(
+        { _id: postId },
+        {
+          $inc: {
+            ['reactions.like']: 1
+          }
+        },
+        {
+          new: true
+        }
+      )
+    ])) as unknown as [IUserDocument, IReactionDocument, IPostDocument];
 
-      //send notification
-      if(response[0].notifications.reactions && userTo !== userFrom) {
-        const notificationModel: INotificationDocument = new NotificationModel();
-        const notification = await notificationModel.insertNotification({
-          userFrom: userFrom!,
-          userTo: userTo!,
-          message: `${username} liked your post!`,
-          notificationType: 'reactions',
-          entityId: new mongoose.Types.ObjectId(postId),
-          createdItemId: new mongoose.Types.ObjectId(response[1]?._id),
-          comment: '',
-          reaction: 'like',
-          post: response[2].post,
-          imgId: response[2].imgId!,
-          imgVersion: response[2].imgVersion!,
-          gifUrl: response[2].gifUrl!,
-          createdAt: new Date()
-        });
-      }
-      //send to client using socketIO\
+    //send notification
+    if (response[0].notifications.reactions && userTo !== userFrom) {
+      const notificationModel: INotificationDocument = new NotificationModel();
+      const notification = await notificationModel.insertNotification({
+        userFrom: userFrom!,
+        userTo: userTo!,
+        message: `${username} liked your post!`,
+        notificationType: 'reactions',
+        entityId: new mongoose.Types.ObjectId(postId),
+        createdItemId: new mongoose.Types.ObjectId(response[1]?._id),
+        comment: '',
+        reaction: 'like',
+        post: response[2].post,
+        imgId: response[2].imgId!,
+        imgVersion: response[2].imgVersion!,
+        gifUrl: response[2].gifUrl!,
+        createdAt: new Date()
+      });
+    }
+    //send to client using socketIO\
+  }
 
+  public async addCommentReactionToDB(reactionData: IReactionJob): Promise<void> {
+    const { commentId, username, userTo, userFrom, reactionObject } = reactionData;
+    const reactionDocument: IReactionDocument = reactionObject as IReactionDocument;
+    const response: [IUserDocument, IReactionDocument, ICommentDocument] = (await Promise.all([
+      userCache.getUserFromCache(`${userTo}`),
+      ReactionModel.replaceOne({ commentId, username }, reactionDocument, { upsert: true }),
+      CommentsModel.findOneAndUpdate(
+        { _id: commentId },
+        {
+          $inc: {
+            ['reactions.like']: 1
+          }
+        },
+        {
+          new: true
+        }
+      )
+    ])) as unknown as [IUserDocument, IReactionDocument, ICommentDocument];
+
+    //send notification
+    if (response[0].notifications.reactions && userTo !== userFrom) {
+      const notificationModel: INotificationDocument = new NotificationModel();
+      const notification = await notificationModel.insertNotification({
+        userFrom: userFrom!,
+        userTo: userTo!,
+        message: `${username} liked a comment you wrote on a post!`,
+        notificationType: 'reactions',
+        entityId: new mongoose.Types.ObjectId(commentId),
+        createdItemId: new mongoose.Types.ObjectId(response[1]?._id),
+        comment: '',
+        reaction: 'like',
+        post: '',
+        imgId: '',
+        imgVersion: '',
+        gifUrl: '',
+        createdAt: new Date()
+      });
     }
 
-    public async addCommentReactionToDB(reactionData: IReactionJob): Promise<void> {
-      const { commentId, username, userTo, userFrom, reactionObject } = reactionData;
-      const reactionDocument: IReactionDocument = reactionObject as IReactionDocument;
-      const response: [IUserDocument, IReactionDocument, ICommentDocument] =  await Promise.all([
-        userCache.getUserFromCache(`${userTo}`),
-          ReactionModel.replaceOne({ commentId, username }, reactionDocument, { upsert: true }),
-          CommentsModel.findOneAndUpdate(
-            { _id: commentId }, {
-              $inc: {
-                ['reactions.like']: 1
-              }
-            },
-            {
-              new: true
-            }
-          )
-      ]) as unknown as [IUserDocument, IReactionDocument, ICommentDocument];
+    //send to client using socketIO
+  }
 
-      //send notification
-      if(response[0].notifications.reactions && userTo !== userFrom) {
-        const notificationModel: INotificationDocument = new NotificationModel();
-        const notification = await notificationModel.insertNotification({
-          userFrom: userFrom!,
-          userTo: userTo!,
-          message: `${username} liked a comment you wrote on a post!`,
-          notificationType: 'reactions',
-          entityId: new mongoose.Types.ObjectId(commentId),
-          createdItemId: new mongoose.Types.ObjectId(response[1]?._id),
-          comment: '',
-          reaction: 'like',
-          post: '',
-          imgId: '',
-          imgVersion: '',
-          gifUrl: '',
-          createdAt: new Date()
-        });
-      }
+  public async removeReactionFromCache(reactionData: IReactionJob): Promise<void> {
+    const { postId, username } = reactionData;
+    await Promise.all([
+      ReactionModel.deleteOne({ postId, username }),
+      PostModel.updateOne({ _id: postId }, { $inc: { ['reactions.like']: -1 } }, { new: true })
+    ]);
+  }
 
-      //send to client using socketIO
-    }
+  public async removeCommentReactionFromCache(reactionData: IReactionJob): Promise<void> {
+    const { commentId, username } = reactionData;
+    await Promise.all([
+      ReactionModel.deleteOne({ commentId, username }),
+      CommentsModel.updateOne({ _id: commentId }, { $inc: { ['reactions.like']: -1 } }, { new: true })
+    ]);
+  }
 
-    public async removeReactionFromCache(reactionData: IReactionJob): Promise<void> {
-      const { postId, username } = reactionData;
-      await Promise.all([
-        ReactionModel.deleteOne({ postId, username }),
-        PostModel.updateOne({ _id: postId }, { $inc: { ['reactions.like']: -1}}, { new: true })
-      ]);
-    }
+  public async getPostReactions(query: IQueryReaction, sort: Record<string, 1 | -1>): Promise<[IReactionDocument[], number]> {
+    const reactions: IReactionDocument[] = await ReactionModel.aggregate([{ $match: query }, { $sort: sort }]);
 
-    public async removeCommentReactionFromCache(reactionData: IReactionJob): Promise<void> {
-      const { commentId, username } = reactionData;
-      await Promise.all([
-        ReactionModel.deleteOne({ commentId, username }),
-        CommentsModel.updateOne({_id: commentId }, { $inc: { ['reactions.like']: -1}}, { new: true })
-      ]);
-    }
+    return [reactions, reactions.length];
+  }
 
-    public async getPostReactions(query: IQueryReaction, sort: Record<string, 1 | -1>): Promise<[IReactionDocument[], number]> {
-      const reactions: IReactionDocument[] = await ReactionModel.aggregate([
-        { $match: query},
-        { $sort: sort }
-      ]);
+  public async getSingleReaction(query: IQueryReaction, sort: Record<string, 1 | -1>): Promise<IReactionDocument> {
+    const reactions: IReactionDocument[] = await ReactionModel.aggregate([{ $match: query }, { $sort: sort }]);
 
-      return [reactions, reactions.length];
-    }
+    return reactions[0];
+  }
 
-    public async getSingleReaction(query: IQueryReaction, sort: Record<string, 1 | -1>): Promise<IReactionDocument> {
-      const reactions: IReactionDocument[] = await ReactionModel.aggregate([
-        { $match: query},
-        { $sort: sort }
-      ]);
+  // public async getPostReactionByUsername(username: string): Promise<IReactionDocument[]> {
+  //   const reactions: IReactionDocument[] = await ReactionModel.aggregate([
+  //     { $match: { username: Helpers.firstLetterUppercase(username)}}
+  //   ]);
 
-      return reactions[0];
-    }
-
-    // public async getPostReactionByUsername(username: string): Promise<IReactionDocument[]> {
-    //   const reactions: IReactionDocument[] = await ReactionModel.aggregate([
-    //     { $match: { username: Helpers.firstLetterUppercase(username)}}
-    //   ]);
-
-    //   return reactions;
-    // }
+  //   return reactions;
+  // }
 }
 
 export const reactionService: ReactionService = new ReactionService();

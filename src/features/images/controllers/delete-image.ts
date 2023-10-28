@@ -8,6 +8,6 @@ export class Delete {
   public async image(req: Request, res: Response): Promise<void> {
     const { imageId } = req.params;
     imageQueue.addImageJob('removeImageFromDB', { key: imageId });
-    res.status(STATUS_CODE.OK).json({ message: 'The image has been removed!'});
+    res.status(STATUS_CODE.OK).json({ message: 'The image has been removed!' });
   }
 }

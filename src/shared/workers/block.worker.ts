@@ -9,14 +9,14 @@ class BlockWorker {
   async addBlockedUserToDB(job: Job, done: DoneCallback): Promise<void> {
     try {
       const { keyOne, keyTwo, type } = job.data;
-      if(type === 'block') {
+      if (type === 'block') {
         await blockService.blockUserInDB(keyOne, keyTwo);
       } else {
         await blockService.unblockUserInDB(keyOne, keyTwo);
       }
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }

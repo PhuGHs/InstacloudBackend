@@ -16,34 +16,33 @@ export class CommentCache extends BaseCache {
   }
   public async addCommentToCache(data: ISaveCommentToCache): Promise<void> {
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         this.client.connect();
       }
       const { commentId, commentData } = data;
-      const {
-        _id,
-        username,
-        firstname,
-        lastname,
-        postId,
-        profilePicture,
-        comment,
-        createdAt,
-        reactions,
-        userTo
-      } = commentData;
+      const { _id, username, firstname, lastname, postId, profilePicture, comment, createdAt, reactions, userTo } = commentData;
 
       const dataToSave: string[] = [
-        '_id', `${_id}`,
-        'username', `${username}`,
-        'firstname', `${firstname}`,
-        'lastname', `${lastname}`,
-        'postId', `${postId}`,
-        'profilePicture', `${profilePicture}`,
-        'comment', `${comment}`,
-        'createdAt', `${createdAt}`,
-        'reactions', JSON.stringify(reactions),
-        'userTo', `${userTo}`
+        '_id',
+        `${_id}`,
+        'username',
+        `${username}`,
+        'firstname',
+        `${firstname}`,
+        'lastname',
+        `${lastname}`,
+        'postId',
+        `${postId}`,
+        'profilePicture',
+        `${profilePicture}`,
+        'comment',
+        `${comment}`,
+        'createdAt',
+        `${createdAt}`,
+        'reactions',
+        JSON.stringify(reactions),
+        'userTo',
+        `${userTo}`
       ];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
       await this.client.ZADD('comment', { score: parseInt(pId[0], 10), value: commentId });
@@ -56,7 +55,7 @@ export class CommentCache extends BaseCache {
       let count: number = Number(commentCount[0]);
       count += 1;
       await this.client.HSET(`posts:${postId}`, 'commentsCount', count);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server Error. Try again!');
     }
@@ -64,24 +63,24 @@ export class CommentCache extends BaseCache {
 
   public async getCommentsFromCache(key: string, postId: string): Promise<ICommentDocument[]> {
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         this.client.connect();
       }
       const comments: ICommentDocument[] = [];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
       const reply: string[] = await this.client.ZRANGEBYSCORE(key, Number(pId[0]), Number(pId[0]));
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
-      for(const value of reply) {
+      for (const value of reply) {
         multi.HGETALL(`comments:${value}`);
       }
       const replies: CommentMultiType = await multi.exec();
-      for(const comment of replies as unknown as ICommentDocument[]) {
+      for (const comment of replies as unknown as ICommentDocument[]) {
         comment.reactions = SupportiveMethods.parseJson(`${comment.reactions}`);
         comment.createdAt = new Date(SupportiveMethods.parseJson(`${comment.createdAt}`));
         comments.push(comment);
       }
       return comments;
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
@@ -96,11 +95,11 @@ export class CommentCache extends BaseCache {
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
       const reply: string[] = await this.client.ZRANGEBYSCORE(key, Number(pId[0]), Number(pId[0]));
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
-      for(const value of reply) {
+      for (const value of reply) {
         multi.HGETALL(`comments:${value}`);
       }
       const replies: CommentMultiType = await multi.exec();
-      for(const comment of replies as unknown as ICommentDocument[]) {
+      for (const comment of replies as unknown as ICommentDocument[]) {
         list.add(comment.username);
       }
 
@@ -118,18 +117,18 @@ export class CommentCache extends BaseCache {
 
   public async getSingleCommentFromAPostFromCache(postId: string, commentId: string): Promise<ICommentDocument[]> {
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         this.client.connect();
       }
       const comments: ICommentDocument[] = [];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
       const reply: string[] = await this.client.ZRANGEBYSCORE('comment', pId[0], pId[0]);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
-      for(const value of reply) {
+      for (const value of reply) {
         multi.HGETALL(`comments:${value}`);
       }
       const replies: CommentMultiType = await multi.exec();
-      for(const comment of replies as unknown as ICommentDocument[]) {
+      for (const comment of replies as unknown as ICommentDocument[]) {
         comment.reactions = SupportiveMethods.parseJson(`${comment.reactions}`);
         comment.createdAt = new Date(SupportiveMethods.parseJson(`${comment.createdAt}`));
         comments.push(comment);
@@ -139,7 +138,7 @@ export class CommentCache extends BaseCache {
       }) as ICommentDocument;
 
       return [result];
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
@@ -147,12 +146,9 @@ export class CommentCache extends BaseCache {
 
   public async updateACommentInCache(commentId: string, updatedComment: ICommentDocument): Promise<ICommentDocument> {
     const { comment, profilePicture } = updatedComment;
-    const dataToSave: string[] = [
-      'profilePicture', `${profilePicture}`,
-      'comment', `${comment}`
-    ];
+    const dataToSave: string[] = ['profilePicture', `${profilePicture}`, 'comment', `${comment}`];
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         this.client.connect();
       }
       for (let i = 0; i < dataToSave.length; i += 2) {
@@ -163,12 +159,12 @@ export class CommentCache extends BaseCache {
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       multi.HGETALL(`comments:${commentId}`);
 
-      const reply = await multi.exec() as unknown as ICommentDocument[];
+      const reply = (await multi.exec()) as unknown as ICommentDocument[];
       reply[0].reactions = SupportiveMethods.parseJson(`${reply[0].reactions}`);
       reply[0].createdAt = SupportiveMethods.parseJson(`${reply[0].createdAt}`);
 
       return reply[0];
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
@@ -176,7 +172,7 @@ export class CommentCache extends BaseCache {
 
   public async deleteAComment(commentId: string, postId: string): Promise<void> {
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         this.client.connect();
       }
       const commentsCount: string | undefined = await this.client.HGET(`posts:${postId}`, 'commentsCount');
@@ -188,7 +184,7 @@ export class CommentCache extends BaseCache {
       multi.HSET(`posts:${postId}`, 'commentsCount', number);
 
       await multi.exec();
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }

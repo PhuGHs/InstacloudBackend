@@ -15,12 +15,15 @@ class ReactionRoutes {
     this.router.get('/post/comment/single-reaction/:commentId', authMiddleware.checkAuthentication, Get.prototype.singleCommentReaction);
     this.router.get('/post/single-reaction/:postId', authMiddleware.checkAuthentication, Get.prototype.singlePostReaction);
 
-
     this.router.post('/post/reaction', authMiddleware.checkAuthentication, Add.prototype.reaction);
     this.router.post('/post/comment/reaction', authMiddleware.checkAuthentication, Add.prototype.commentReaction);
 
     this.router.delete('/post/reaction/:postId/:postReactions', authMiddleware.checkAuthentication, Remove.prototype.postReaction);
-    this.router.delete('/post/comment/reaction/:commentId/:commentReactions', authMiddleware.checkAuthentication, Remove.prototype.commentReaction);
+    this.router.delete(
+      '/post/comment/reaction/:commentId/:commentReactions',
+      authMiddleware.checkAuthentication,
+      Remove.prototype.commentReaction
+    );
     return this.router;
   }
 }

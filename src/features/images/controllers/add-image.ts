@@ -13,8 +13,8 @@ export class Add {
   @joiValidation(addImageSchema)
   public async image(req: Request, res: Response): Promise<void> {
     const { image } = req.body;
-    const result: UploadApiResponse = await upload(image, req.currentUser!.userId, true, true) as UploadApiResponse;
-    if(!result.public_id) {
+    const result: UploadApiResponse = (await upload(image, req.currentUser!.userId, true, true)) as UploadApiResponse;
+    if (!result.public_id) {
       throw new BadRequestError('File upload error');
     }
     const createdUrl: string = `https://res.cloudinary.com/daszajz9a/image/upload/v${result.version}/${result.public_id}`;
@@ -25,6 +25,6 @@ export class Add {
       imgId: result.public_id!,
       imgVersion: result.version.toString()
     });
-    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated '});
+    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated ' });
   }
 }

@@ -11,13 +11,13 @@ declare global {
 }
 
 export interface AuthPayload {
-  userId: string,
-  uId: string,
-  email: string,
-  username: string,
-  firstname: string,
-  lastname: string,
-  iat?: number
+  userId: string;
+  uId: string;
+  email: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  iat?: number;
 }
 
 export interface IAuthDocument extends Document {

@@ -37,61 +37,82 @@ export class UserCache extends BaseCache {
       social
     } = user;
 
-    const firstList : string[] = [
-      '_id', `${_id}`,
-      'uId', `${uId}`,
-      'username', `${username}`,
-      'firstname', `${firstname}`,
-      'lastname', `${lastname}`,
-      'email', `${email}`,
-      'createdAt', `${new Date()}`,
-      'postsCount', `${postsCount}`,
+    const firstList: string[] = [
+      '_id',
+      `${_id}`,
+      'uId',
+      `${uId}`,
+      'username',
+      `${username}`,
+      'firstname',
+      `${firstname}`,
+      'lastname',
+      `${lastname}`,
+      'email',
+      `${email}`,
+      'createdAt',
+      `${new Date()}`,
+      'postsCount',
+      `${postsCount}`
     ];
 
-    const secondList : string[] = [
-        'blocked', `${JSON.stringify(blocked)}`,
-        'blockedBy', `${JSON.stringify(blockedBy)}`,
-        'profilePicture', `${profilePicture}`,
-        'followersCount', `${followersCount}`,
-        'followingCount', `${followingCount}`,
-        'notifications', `${JSON.stringify(notifications)}`,
-        'social', `${JSON.stringify(social)}`,
+    const secondList: string[] = [
+      'blocked',
+      `${JSON.stringify(blocked)}`,
+      'blockedBy',
+      `${JSON.stringify(blockedBy)}`,
+      'profilePicture',
+      `${profilePicture}`,
+      'followersCount',
+      `${followersCount}`,
+      'followingCount',
+      `${followingCount}`,
+      'notifications',
+      `${JSON.stringify(notifications)}`,
+      'social',
+      `${JSON.stringify(social)}`
     ];
 
-    const thirdList : string[] = [
-      'work', `${work}`,
-      'location', `${location}`,
-      'school', `${school}`,
-      'quote', `${quote}`,
-      'bgImageVersion', `${bgImageVersion}`,
-      'bgImageId', `${bgImageId}`,
+    const thirdList: string[] = [
+      'work',
+      `${work}`,
+      'location',
+      `${location}`,
+      'school',
+      `${school}`,
+      'quote',
+      `${quote}`,
+      'bgImageVersion',
+      `${bgImageVersion}`,
+      'bgImageId',
+      `${bgImageId}`
     ];
 
     const saveData: string[] = [...firstList, ...secondList, ...thirdList];
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         await this.client.connect();
       }
 
-      await this.client.zAdd('user', {score: parseInt(userUId, 10), value: `${key}`}); //score is used to retrieve each item from the set
+      await this.client.zAdd('user', { score: parseInt(userUId, 10), value: `${key}` }); //score is used to retrieve each item from the set
       for (let i = 0; i < saveData.length; i += 2) {
         const field = saveData[i];
         const value = saveData[i + 1];
         await this.client.hSet(`users:${key}`, field, value);
       }
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again later');
     }
   }
 
-  public async getUserFromCache(userId: string) : Promise<IUserDocument | null> {
+  public async getUserFromCache(userId: string): Promise<IUserDocument | null> {
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         await this.client.connect();
       }
 
-      const response : IUserDocument = await this.client.hGetAll(`users:${userId}`) as unknown as IUserDocument;
+      const response: IUserDocument = (await this.client.hGetAll(`users:${userId}`)) as unknown as IUserDocument;
       response.createdAt = new Date(SupportiveMethods.parseJson(`${response.createdAt}`));
       response.social = SupportiveMethods.parseJson(`${response.social}`);
       response.postsCount = SupportiveMethods.parseJson(`${response.postsCount}`);
@@ -105,9 +126,8 @@ export class UserCache extends BaseCache {
       response.followersCount = SupportiveMethods.parseJson(`${response.followersCount}`);
       response.followingCount = SupportiveMethods.parseJson(`${response.followingCount}`);
 
-
       return response;
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again later');
     }
@@ -115,14 +135,14 @@ export class UserCache extends BaseCache {
 
   public async updateSingleItemInCache(userId: string, prop: string, value: UserItem): Promise<IUserDocument> {
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         await this.client.connect();
       }
 
       await this.client.HSET(`users:${userId}`, prop, JSON.stringify(value));
-      const user: IUserDocument = await this.getUserFromCache(userId) as IUserDocument;
+      const user: IUserDocument = (await this.getUserFromCache(userId)) as IUserDocument;
       return user;
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again later');
     }

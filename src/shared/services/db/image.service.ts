@@ -9,16 +9,15 @@ class ImageService {
 
   public async getImagesFromDB(userId: string): Promise<IFileImageDocument[]> {
     const images: IFileImageDocument[] = await ImageModel.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId)}},
-      { $sort: { createdAt: -1 }}
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      { $sort: { createdAt: -1 } }
     ]);
     return images;
   }
 
   public async removeImageFromDB(imgId: string): Promise<void> {
-    await ImageModel.deleteOne({_id: imgId});
+    await ImageModel.deleteOne({ _id: imgId });
   }
 }
 
 export const imageService: ImageService = new ImageService();
-

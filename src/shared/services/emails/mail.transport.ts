@@ -6,10 +6,10 @@ import { config } from '@root/config';
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
 
 interface IMailerOptions {
-  from: string,
-  to: string,
-  subject: string,
-  html: string,
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
 }
 
 const log: Logger = config.createLogger('mailOptions');
@@ -17,7 +17,7 @@ sendGridMail.setApiKey(config.SENDGRID_API_KEY!);
 
 class MailTransport {
   public async sendEmail(receiverEmail: string, subject: string, body: string): Promise<void> {
-    if(config.NODE_ENV === 'development' || config.NODE_ENV === 'test') {
+    if (config.NODE_ENV === 'development' || config.NODE_ENV === 'test') {
       this.devEmailSender(receiverEmail, subject, body);
     } else {
       this.prodEmailSender(receiverEmail, subject, body);
@@ -30,8 +30,8 @@ class MailTransport {
       port: 587,
       secure: false,
       auth: {
-          user: config.SENDER_EMAIL,
-          pass: config.SENDER_PASSWORD,
+        user: config.SENDER_EMAIL,
+        pass: config.SENDER_PASSWORD
       }
     });
 
@@ -45,7 +45,7 @@ class MailTransport {
     try {
       await transporter.sendMail(mailOptions);
       log.info('Development email has been sent successfully!');
-    } catch(error) {
+    } catch (error) {
       log.error('Error sending email', error);
       throw new BadRequestError('Error sending email');
     }
@@ -61,7 +61,7 @@ class MailTransport {
     try {
       await sendGridMail.send(mailOptions);
       log.info('Production email has been sent successfully!');
-    } catch(error) {
+    } catch (error) {
       log.error('Email sending error', error);
       throw new BadRequestError('Email sending error');
     }

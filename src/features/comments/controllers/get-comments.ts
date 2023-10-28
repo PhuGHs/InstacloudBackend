@@ -12,28 +12,31 @@ const commentCache: CommentCache = new CommentCache();
 export class Get {
   public async comments(req: Request, res: Response): Promise<void> {
     const { postId } = req.params;
-    const cachedComment: ICommentDocument[] =  await commentCache.getCommentsFromCache('comment', postId);
-    const comments: ICommentDocument[] = cachedComment.length ? cachedComment :
-    await commentService.getCommentsFromDB({ postId: new mongoose.Types.ObjectId(postId)}, { createdAt: -1});
+    const cachedComment: ICommentDocument[] = await commentCache.getCommentsFromCache('comment', postId);
+    const comments: ICommentDocument[] = cachedComment.length
+      ? cachedComment
+      : await commentService.getCommentsFromDB({ postId: new mongoose.Types.ObjectId(postId) }, { createdAt: -1 });
 
-    res.status(STATUS_CODE.OK).json({ message: 'Post comments', comments});
+    res.status(STATUS_CODE.OK).json({ message: 'Post comments', comments });
   }
 
   public async commentNames(req: Request, res: Response): Promise<void> {
     const { postId } = req.params;
     const cachedComment: ICommentNameList[] = await commentCache.getCommentUsernamesFromCache('comment', postId);
-    const commentNames: ICommentNameList[] = cachedComment[0].names.length ? cachedComment :
-    await commentService.getCommentNamesFromDB({ postId: new mongoose.Types.ObjectId(postId) }, { createdAt: -1});
+    const commentNames: ICommentNameList[] = cachedComment[0].names.length
+      ? cachedComment
+      : await commentService.getCommentNamesFromDB({ postId: new mongoose.Types.ObjectId(postId) }, { createdAt: -1 });
 
-    res.status(STATUS_CODE.OK).json({ message: 'Post comment names', commentNames});
+    res.status(STATUS_CODE.OK).json({ message: 'Post comment names', commentNames });
   }
 
   public async singleComment(req: Request, res: Response): Promise<void> {
     const { postId, commentId } = req.params;
     const cachedComment: ICommentDocument[] = await commentCache.getSingleCommentFromAPostFromCache(postId, commentId);
-    const singleComment: ICommentDocument[] = cachedComment.length ? cachedComment :
-    await commentService.getCommentsFromDB({_id: new mongoose.Types.ObjectId(commentId)}, { createdAt: -1});
+    const singleComment: ICommentDocument[] = cachedComment.length
+      ? cachedComment
+      : await commentService.getCommentsFromDB({ _id: new mongoose.Types.ObjectId(commentId) }, { createdAt: -1 });
 
-    res.status(STATUS_CODE.OK).json({ message: 'single comment', singleComment});
+    res.status(STATUS_CODE.OK).json({ message: 'single comment', singleComment });
   }
 }

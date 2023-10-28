@@ -8,10 +8,10 @@ class UserService {
   }
   public async getUserByAuthId(authId: string): Promise<IUserDocument> {
     const user: IUserDocument[] = await UserModel.aggregate([
-      { $match: { authId: new mongoose.Types.ObjectId(authId)}},
-      { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId'}},
-      { $unwind: '$authId'},
-      { $project: this.aggregateProject()}
+      { $match: { authId: new mongoose.Types.ObjectId(authId) } },
+      { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
+      { $unwind: '$authId' },
+      { $project: this.aggregateProject() }
     ]);
     return user[0];
   }
@@ -37,11 +37,11 @@ class UserService {
       social: 1,
       bgImageVersion: 1,
       bgImageId: 1,
-      profilePicture: 1,
+      profilePicture: 1
     };
   }
   public async getUserById(id: string): Promise<IUserDocument> {
-    const user: IUserDocument = await UserModel.findOne({ _id: id }) as IUserDocument;
+    const user: IUserDocument = (await UserModel.findOne({ _id: id })) as IUserDocument;
     return user;
   }
 }

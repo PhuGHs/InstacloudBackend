@@ -55,7 +55,7 @@ class Config {
     cloudinary.v2.config({
       cloud_name: this.CLOUD_NAME,
       api_key: this.CLOUD_API_KEY,
-      api_secret: this.CLOUD_API_SECRET,
+      api_secret: this.CLOUD_API_SECRET
     });
   }
 }

@@ -10,7 +10,7 @@ class ImageWorker {
       await imageService.addImageToDB(job.data);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }
@@ -22,7 +22,7 @@ class ImageWorker {
       await imageService.removeImageFromDB(key);
       job.progress(100);
       done(null, job.data);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       done(error as Error);
     }

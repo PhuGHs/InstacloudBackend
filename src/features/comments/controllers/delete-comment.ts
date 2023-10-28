@@ -8,6 +8,6 @@ export class Delete {
     const { commentId, postId } = req.params;
     await commentCache.deleteAComment(commentId, postId);
     commentQueue.addCommentJob('deleteACommentInDB', { keyOne: commentId, keyTwo: postId });
-    res.status(STATUS_CODE.OK).json({ message: 'the comment has been deleted successfully! '});
+    res.status(STATUS_CODE.OK).json({ message: 'the comment has been deleted successfully! ' });
   }
 }

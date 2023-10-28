@@ -1,4 +1,4 @@
-import {createBullBoard} from '@bull-board/api';
+import { createBullBoard } from '@bull-board/api';
 import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import Queue, { Job } from 'bull';
@@ -13,18 +13,19 @@ import { IBlockedUserJobData, IFollowerJobData } from '@follower/interfaces/foll
 import { INotificationJobData } from '@notification/interfaces/notification.interface';
 import { IFileImageJobData } from '@image/interfaces/image.interface';
 
-type IBaseJobData = IAuthJob
-                  | IEmailJob
-                  | IPostJobData
-                  | ICommentJob
-                  | IReactionJob
-                  | IUpdateCommentJob
-                  | IFollowerJobData
-                  | IBlockedUserJobData
-                  | INotificationJobData
-                  | IFileImageJobData;
+type IBaseJobData =
+  | IAuthJob
+  | IEmailJob
+  | IPostJobData
+  | ICommentJob
+  | IReactionJob
+  | IUpdateCommentJob
+  | IFollowerJobData
+  | IBlockedUserJobData
+  | INotificationJobData
+  | IFileImageJobData;
 
-let bullAdapters : BullAdapter[] = [];
+let bullAdapters: BullAdapter[] = [];
 
 export let serverAdapter: ExpressAdapter;
 
@@ -59,11 +60,11 @@ export abstract class BaseQueue {
     });
   }
 
-  protected addJob(name: string, data: IBaseJobData) : void {
-    this.queue.add(name, data, {attempts: 3, backoff: {type: 'fixed', delay: 5000}}); // add job three times if fail, delay 5 seconds
+  protected addJob(name: string, data: IBaseJobData): void {
+    this.queue.add(name, data, { attempts: 3, backoff: { type: 'fixed', delay: 5000 } }); // add job three times if fail, delay 5 seconds
   }
 
-  protected processJob(name: string, concurrency: number, callback: Queue.ProcessCallbackFunction<void>) : void {
+  protected processJob(name: string, concurrency: number, callback: Queue.ProcessCallbackFunction<void>): void {
     this.queue.process(name, concurrency, callback);
   } // concurrency: how many jobs u want to process at a given time.
 }

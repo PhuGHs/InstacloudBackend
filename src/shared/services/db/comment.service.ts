@@ -15,14 +15,14 @@ class CommentService {
     const promisedComment: Promise<ICommentDocument> = CommentsModel.create(comment);
     const promisedPost: Query<IPostDocument, IPostDocument> = PostModel.findOneAndUpdate(
       { _id: postId },
-      { $inc: { commentsCount: 1 }},
+      { $inc: { commentsCount: 1 } },
       { new: true }
     ) as Query<IPostDocument, IPostDocument>;
     const promisedUser: Promise<IUserDocument> = userCache.getUserFromCache(userTo) as Promise<IUserDocument>;
     const response: [ICommentDocument, IPostDocument, IUserDocument] = await Promise.all([promisedComment, promisedPost, promisedUser]);
 
     // add comment notification
-    if(response[2]?.notifications.comments && userTo !== userFrom) {
+    if (response[2]?.notifications.comments && userTo !== userFrom) {
       const notificationModel: INotificationDocument = new NotificationModel();
       const notification = await notificationModel.insertNotification({
         userFrom: userFrom,
@@ -43,15 +43,11 @@ class CommentService {
 
     // send to client with SOCKETIO
 
-
     // email to user
   }
 
   public async getCommentsFromDB(query: IQueryComment, sort: Record<string, 1 | -1>): Promise<ICommentDocument[]> {
-    const comments: ICommentDocument[] = await CommentsModel.aggregate([
-      { $match: query },
-      { $sort: sort }
-    ]);
+    const comments: ICommentDocument[] = await CommentsModel.aggregate([{ $match: query }, { $sort: sort }]);
     return comments;
   }
 
@@ -59,20 +55,20 @@ class CommentService {
     const commentNamesList: ICommentNameList[] = await CommentsModel.aggregate([
       { $match: query },
       { $sort: sort },
-      { $group: { _id: null, names: { $addToSet: '$username'}, count: { $sum: 1 }}},
-      { $project: { _id: 0 }}
+      { $group: { _id: null, names: { $addToSet: '$username' }, count: { $sum: 1 } } },
+      { $project: { _id: 0 } }
     ]);
 
     return commentNamesList;
   }
 
   public async updateACommentInDB(commentId: string, updatedComment: ICommentDocument): Promise<void> {
-    await CommentsModel.updateOne({ _id: commentId} , { $set: updatedComment });
+    await CommentsModel.updateOne({ _id: commentId }, { $set: updatedComment });
   }
 
   public async deleteACommentInDB(commentId: string, postId: string): Promise<void> {
     const promisedDeleteComment: Query<IQueryComplete & IQueryDeleted, ICommentDocument> = CommentsModel.deleteOne({ _id: commentId });
-    const promisedUpdatedComment: UpdateQuery<IPostDocument> = PostModel.updateOne({ _id: postId }, { $inc: { commentsCount: -1 }});
+    const promisedUpdatedComment: UpdateQuery<IPostDocument> = PostModel.updateOne({ _id: postId }, { $inc: { commentsCount: -1 } });
     await Promise.all([promisedDeleteComment, promisedUpdatedComment]);
   }
 }

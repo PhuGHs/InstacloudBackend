@@ -9,6 +9,6 @@ export class Delete {
     const { postId } = req.params;
     postCache.deleteAPostInCache(postId, req.currentUser!.userId);
     postQueue.addPostJob('deleteAPostInDB', { keyOne: postId, keyTwo: req.currentUser!.userId });
-    res.status(STATUS_CODE.OK).json({ message: 'The post has been deleted successfully!'});
+    res.status(STATUS_CODE.OK).json({ message: 'The post has been deleted successfully!' });
   }
 }

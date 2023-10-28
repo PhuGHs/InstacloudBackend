@@ -22,7 +22,7 @@ export class FollowerCache extends BaseCache {
       }
 
       await this.client.LPUSH(key, value);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
@@ -35,7 +35,7 @@ export class FollowerCache extends BaseCache {
       }
 
       await this.client.LREM(key, 1, value);
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
@@ -47,8 +47,7 @@ export class FollowerCache extends BaseCache {
         await this.client.connect();
       }
       await this.client.HINCRBY(`users:${userId}`, prop, value);
-
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
@@ -61,8 +60,8 @@ export class FollowerCache extends BaseCache {
       }
       const list: IFollowerData[] = [];
       const response: string[] = await this.client.LRANGE(key, 0, -1);
-      for(const item of response) {
-        const user: IUserDocument = await userCache.getUserFromCache(item) as IUserDocument;
+      for (const item of response) {
+        const user: IUserDocument = (await userCache.getUserFromCache(item)) as IUserDocument;
         const data: IFollowerData = {
           _id: new mongoose.Types.ObjectId(user._id),
           uId: user.uId!,
@@ -76,7 +75,7 @@ export class FollowerCache extends BaseCache {
         list.push(data);
       }
       return list;
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
@@ -87,11 +86,11 @@ export class FollowerCache extends BaseCache {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
-      const response: string = await this.client.HGET(`users:${key}`, prop) as string;
+      const response: string = (await this.client.HGET(`users:${key}`, prop)) as string;
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       let blocked: string[] = SupportiveMethods.parseJson(response) as string[];
 
-      if(type === 'block') {
+      if (type === 'block') {
         blocked = [...blocked, value];
       } else {
         remove(blocked, (id: string) => id === value);
@@ -100,7 +99,7 @@ export class FollowerCache extends BaseCache {
 
       multi.HSET(`users:${key}`, prop, JSON.stringify(blocked));
       await multi.exec();
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again');
     }
