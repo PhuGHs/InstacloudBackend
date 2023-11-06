@@ -41,8 +41,13 @@ class UserService {
     };
   }
   public async getUserById(id: string): Promise<IUserDocument> {
-    const user: IUserDocument = (await UserModel.findOne({ _id: id })) as IUserDocument;
-    return user;
+    const user: IUserDocument[] = await UserModel.aggregate([
+      {$match: { _id: new mongoose.Types.ObjectId(id) }},
+      {$lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' }},
+      {$unwind: '$authId' },
+      {$project: this.aggregateProject() }
+    ]);
+    return user[0];
   }
 }
 
