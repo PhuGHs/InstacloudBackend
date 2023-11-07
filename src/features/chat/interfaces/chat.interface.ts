@@ -29,11 +29,9 @@ export interface IMessageData {
   conversationId: mongoose.Types.ObjectId;
   receiverId: string;
   receiverUsername: string;
-  receiverAvatarColor: string;
   receiverProfilePicture: string;
   senderUsername: string;
   senderId: string;
-  senderAvatarColor: string;
   senderProfilePicture: string;
   body: string;
   isRead: boolean;

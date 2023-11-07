@@ -36,4 +36,10 @@ export class SupportiveMethods {
     '(\\#[-a-z\\d_]*)?$','i');
     return !!pattern.test(str);
   }
+
+  static extractURLsFromString(inputString: string): string[] | null {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = inputString.match(urlRegex);
+    return urls;
+  }
 }
