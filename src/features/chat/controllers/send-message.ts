@@ -21,7 +21,7 @@ const userCache: UserCache = new UserCache();
 export class Add {
   @joiValidation(addChatSchema)
   public async message(req: Request, res: Response): Promise<void> {
-    const { conversationId, receiverId, receiverUsername, receiverProfilePicture, body, gifUrl, selectedImage, isRead } = req.body;
+    const { conversationId, receiverId, receiverUsername, receiverProfilePicture, body, gifUrl, selectedImage } = req.body;
     const messageObjectId: ObjectId = new ObjectId();
     const conversationObjectId: ObjectId = !conversationId ? new ObjectId() : new mongoose.Types.ObjectId(conversationId);
     let image = '';
@@ -46,7 +46,7 @@ export class Add {
       senderUsername: req.currentUser!.username,
       senderProfilePicture: Sender.profilePicture,
       body,
-      isRead,
+      isRead: false,
       gifUrl,
       selectedImage: image,
       reaction: [],

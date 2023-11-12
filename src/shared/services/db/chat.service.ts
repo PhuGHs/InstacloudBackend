@@ -34,8 +34,8 @@ class ChatService {
     await MessageModel.create(data);
   }
 
-  public async updateConversation(data: IConversationDocument): Promise<void> {
-
+  public async markMessagesAsSeen(senderId: string, receiverId: string): Promise<void> {
+    await MessageModel.updateMany({ receiverId: senderId, senderId: receiverId, isRead: false }, { $set: { isRead: true }}).exec();
   }
 }
 

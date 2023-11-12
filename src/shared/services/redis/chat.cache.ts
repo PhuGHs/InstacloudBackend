@@ -4,7 +4,7 @@ import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-metho
 import { BaseCache } from '@service/redis/base.cache';
 import Logger from 'bunyan';
 import { IChatList, IMessageData } from '@chat/interfaces/chat.interface';
-import { findIndex } from 'lodash';
+import { find, findIndex } from 'lodash';
 import { IConversationDocument, IImages, ILinks } from '@chat/interfaces/conversation.interface';
 
 const log: Logger = config.createLogger('chatCache');
@@ -24,7 +24,7 @@ export class ChatCache extends BaseCache {
         await this.client.RPUSH(`conversations:${senderId}`, JSON.stringify({ receiverId, conversationId, links, images}));
       } else {
         const isExist = findIndex(conversationsOfUser, (conversation) =>  conversation.includes(receiverId));
-        if(!isExist) {
+        if(isExist === -1) {
           await this.client.RPUSH(`conversations:${senderId}`, JSON.stringify({ receiverId, conversationId, links, images}));
         }
       }
@@ -91,6 +91,35 @@ export class ChatCache extends BaseCache {
         result.push(SupportiveMethods.parseJson(conversations[index]) as IConversationDocument);
       }
       return [result[0], index];
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server Error. Try again!');
+    }
+  }
+
+  public async markMessagesAsSeen(senderId: string, receiverId: string): Promise<IMessageData> {
+    try {
+      if (!this.client.isOpen) {
+        this.client.connect();
+      }
+      const userConversation: string[] = await this.client.LRANGE(`conversations:${senderId}`, 0, -1);
+      const cachedReceiver: string = find(userConversation, (item: string) => item.includes(receiverId)) as string;
+      const receiver: IChatList = SupportiveMethods.parseJson(cachedReceiver) as IChatList;
+      const messages: string[] = await this.client.LRANGE(`messages:${receiver.conversationId}`, 0, -1);
+      const unreadMessages = messages.filter((item: string) => {
+        const message: IMessageData = SupportiveMethods.parseJson(item);
+        return message.isRead === false && message.receiverId === senderId;
+      });
+      console.log(unreadMessages);
+      for(const [index, item] of unreadMessages.entries()) {
+        const messageItem: IMessageData = SupportiveMethods.parseJson(item) as IMessageData;
+        const index1 = findIndex(messages, (message) => message.includes(`${messageItem._id}`));
+        messageItem.isRead = true;
+        await this.client.LSET(`messages:${messageItem.conversationId}`, index1, JSON.stringify(messageItem));
+      }
+
+      const lastMessage: string = await this.client.LINDEX(`messages:${receiver.conversationId}`, -1) as string;
+      return SupportiveMethods.parseJson(lastMessage);
     } catch (error) {
       log.error(error);
       throw new ServerError('Server Error. Try again!');
