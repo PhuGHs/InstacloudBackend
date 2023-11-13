@@ -43,7 +43,7 @@ class ChatService {
     if(type === 'deleteForMe') {
       update = { $set: { deleteForMe: true }};
     } else if(type === 'deleteForEveryone') {
-      update = { $set: { deleteForMe: true, deleteForEveryOne: true }};
+      update = { $set: { deleteForMe: true, deleteForEveryone: true }};
     }
     await MessageModel.updateOne({ _id: messageId}, update);
   }

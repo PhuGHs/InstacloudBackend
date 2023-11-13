@@ -90,6 +90,8 @@ export class ChatCache extends BaseCache {
       if (!this.client.isOpen) {
         this.client.connect();
       }
+      log.info(`senderId: ${senderId}`);
+      log.info(`receiverId: ${receiverId}`);
       const userConversation: string[] = await this.client.LRANGE(`conversations:${senderId}`, 0, -1);
       const cachedReceiver: string = find(userConversation, (item: string) => item.includes(receiverId)) as string;
       const receiver: IChatList = SupportiveMethods.parseJson(cachedReceiver) as IChatList;
