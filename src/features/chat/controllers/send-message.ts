@@ -27,7 +27,7 @@ export class Add {
     let image = '';
     const cachedSender: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
     const Sender: IUserDocument = cachedSender ? cachedSender : await userService.getUserById(req.currentUser!.userId);
-
+    const senderId: string = req.currentUser!.userId;
     if(selectedImage) {
       const result1: UploadApiResponse = (await upload(selectedImage, `${req.currentUser!.userId}`, true, true)) as UploadApiResponse;
       if (!result1?.public_id) {
@@ -55,8 +55,8 @@ export class Add {
       deleteForEveryone: false
     } as IMessageData;
 
-    await chatCache.addNewConversationToCache(`${conversationObjectId}`, req.currentUser!.userId, receiverId);
-    await chatCache.addNewConversationToCache(`${conversationObjectId}`, receiverId, req.currentUser!.userId);
+    await chatCache.addNewConversationToCache(senderId, receiverId, `${conversationObjectId}`);
+    await chatCache.addNewConversationToCache(receiverId, senderId, `${conversationObjectId}`);
     await chatCache.addMessageToCache(`${conversationObjectId}`, data, SupportiveMethods.extractURLsFromString(body));
 
     chatQueue.addChatJob('addChatMessageToDB', data);

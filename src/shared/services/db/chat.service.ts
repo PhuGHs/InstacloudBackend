@@ -37,6 +37,16 @@ class ChatService {
   public async markMessagesAsSeen(senderId: string, receiverId: string): Promise<void> {
     await MessageModel.updateMany({ receiverId: senderId, senderId: receiverId, isRead: false }, { $set: { isRead: true }}).exec();
   }
+
+  public async markMessageAsDeleted(messageId: string, type: 'deleteForMe' | 'deleteForEveryone'): Promise<void> {
+    let update = {};
+    if(type === 'deleteForMe') {
+      update = { $set: { deleteForMe: true }};
+    } else if(type === 'deleteForEveryone') {
+      update = { $set: { deleteForMe: true, deleteForEveryOne: true }};
+    }
+    await MessageModel.updateOne({ _id: messageId}, update);
+  }
 }
 
 export const chatService: ChatService = new ChatService();
