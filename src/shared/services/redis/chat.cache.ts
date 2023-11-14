@@ -4,7 +4,7 @@ import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-metho
 import { BaseCache } from '@service/redis/base.cache';
 import Logger from 'bunyan';
 import { IChatList, IMessageData } from '@chat/interfaces/chat.interface';
-import { find, findIndex, result } from 'lodash';
+import { find, findIndex, last, result } from 'lodash';
 import { IConversationDocument, IImages, ILinks } from '@chat/interfaces/conversation.interface';
 
 const log: Logger = config.createLogger('chatCache');
@@ -73,11 +73,11 @@ export class ChatCache extends BaseCache {
       }
       const list: IMessageData[] = [];
       const conversations: string[] = await this.client.LRANGE(`conversations:${userId}`, 0, -1);
-      conversations.forEach(async (item) => {
-        const conversation = SupportiveMethods.parseJson(item) as IChatList;
-        const lastMessage: string | null = await this.client.LINDEX(`messages:${conversation.conversationId}`, -1);
-        list.push(SupportiveMethods.parseJson(lastMessage!));
-      });
+      for(const cachedConversation of conversations) {
+        const conversation: IChatList = SupportiveMethods.parseJson(cachedConversation) as IChatList;
+        const lastMessage: string = await this.client.LINDEX(`messages:${conversation.conversationId}`, -1) as string;
+        list.push(SupportiveMethods.parseJson(lastMessage));
+      }
       return list;
     } catch(error) {
       log.error(error);
@@ -90,8 +90,6 @@ export class ChatCache extends BaseCache {
       if (!this.client.isOpen) {
         this.client.connect();
       }
-      log.info(`senderId: ${senderId}`);
-      log.info(`receiverId: ${receiverId}`);
       const userConversation: string[] = await this.client.LRANGE(`conversations:${senderId}`, 0, -1);
       const cachedReceiver: string = find(userConversation, (item: string) => item.includes(receiverId)) as string;
       const receiver: IChatList = SupportiveMethods.parseJson(cachedReceiver) as IChatList;
@@ -140,6 +138,18 @@ export class ChatCache extends BaseCache {
       throw new ServerError('Server Error. Try again!');
     }
   }
+
+  // public async findConversations(senderId: string, receiverId: string, conversationId: string): Promise<IChatList[]> {
+  //   try {
+  //     if (!this.client.isOpen) {
+  //       this.client.connect();
+  //     }
+  //     // const conversations: string[] = await this.client.LRANGE(`conversations:${}`)
+  //   } catch (error) {
+  //     log.error(error);
+  //     throw new ServerError('Server Error. Try again!');
+  //   }
+  // }
 
   private async getASingleConversation(conversationId: string, senderId: string): Promise<[IConversationDocument, number]> {
     try {

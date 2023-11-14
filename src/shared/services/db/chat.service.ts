@@ -3,6 +3,8 @@ import { IConversationDocument } from '@chat/interfaces/conversation.interface';
 import { MessageModel } from '@chat/models/chat.schema';
 import { ConversationModel } from '@chat/models/conversation.schema';
 import { SupportiveMethods } from '@global/helpers/supportive-methods';
+import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 
 class ChatService {
   public async findConversations(userId: string): Promise<void> {
@@ -46,6 +48,43 @@ class ChatService {
       update = { $set: { deleteForMe: true, deleteForEveryone: true }};
     }
     await MessageModel.updateOne({ _id: messageId}, update);
+  }
+
+  public async getConversations(userId: string): Promise<IMessageData[]> {
+    const userObjId: ObjectId = new mongoose.Types.ObjectId(userId);
+    // console.log(userObjId);
+    const list: IMessageData[] = await MessageModel.aggregate([
+      { $match: { $or: [
+        { senderId: userObjId },
+        { receiverId: userObjId }
+      ]  } },
+      { $group: {
+        _id: '$conversationId',
+        result: { $last: '$$ROOT'}
+      }},
+      {
+        $project: {
+          _id: '$result._id',
+          conversationId: '$result.conversationId',
+          receiverId: '$result.receiverId',
+          receiverUsername: '$result.receiverUsername',
+          receiverProfilePicture: '$result.receiverProfilePicture',
+          senderUsername: '$result.senderUsername',
+          senderId: '$result.senderId',
+          senderProfilePicture: '$result.senderProfilePicture',
+          body: '$result.body',
+          isRead: '$result.isRead',
+          gifUrl: '$result.gifUrl',
+          selectedImage: '$result.selectedImage',
+          reaction: '$result.reaction',
+          createdAt: '$result.createdAt',
+        }
+      },
+      {
+        $sort: { createdAt: 1 }
+      }
+    ]);
+    return list;
   }
 }
 
