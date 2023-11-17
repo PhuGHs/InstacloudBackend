@@ -41,17 +41,17 @@ class ChatService {
         { senderId: userObjId, receiverId: { $in: list}},
         { receiverId: userObjId, senderId: { $in: list}},
       ]  } },
-      // { $lookup: { from: 'Conversation', localField: 'conversationId', foreignField: '_id', as: 'conversation'} },
-      // { $unwind: '$conversation'},
       { $group: {
         _id: '$conversationId',
         result: { $last: '$$ROOT'}
       }},
+      { $lookup: { from: 'Conversation', localField: 'result.conversationId', foreignField: '_id', as: 'conversation'} },
+      { $unwind: '$conversation'},
       {
         $project: {
           _id: '$result._id',
-          // links: '$conversation.links',
-          // images: '$conversation.images',
+          links: '$conversation.links',
+          images: '$conversation.images',
           conversationId: '$result.conversationId',
           receiverId: '$result.receiverId',
           receiverUsername: '$result.receiverUsername',
