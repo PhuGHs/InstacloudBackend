@@ -27,6 +27,8 @@ export interface IMessageDocument extends Document {
 export interface IMessageData {
   _id: string | mongoose.Types.ObjectId;
   conversationId: mongoose.Types.ObjectId;
+  links?: ILinks[],
+  images?: IImages[],
   receiverId: string;
   receiverUsername: string;
   receiverProfilePicture: string;

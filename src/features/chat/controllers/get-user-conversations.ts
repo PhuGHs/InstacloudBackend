@@ -8,7 +8,7 @@ const chatCache: ChatCache = new ChatCache();
 export class Get {
   public async conversations(req: Request, res: Response): Promise<void> {
     const userConversations: IMessageData[] = await chatCache.getConversationsOfUsers(req.currentUser!.userId) as IMessageData[];
-    const result: IMessageData[] =  await chatService.getConversations(req.currentUser!.userId);
+    const result: IMessageData[] =  userConversations ? userConversations : await chatService.getConversations(req.currentUser!.userId);
     res.status(STATUS_CODE.OK).json({ message: 'user conversations', conversations: result});
   }
 }

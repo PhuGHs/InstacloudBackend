@@ -15,3 +15,13 @@ export interface ILinks {
 export interface IImages {
   image: string
 }
+
+export interface ISearchConversation {
+  _id: mongoose.Types.ObjectId;
+  senderId: mongoose.Types.ObjectId;
+  receiverId: mongoose.Types.ObjectId;
+  conversationName: string,
+  conversationAvatar: string;
+  links: ILinks[],
+  images: IImages[],
+}
