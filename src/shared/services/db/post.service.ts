@@ -1,4 +1,5 @@
-import { IGetPostsQuery, IPostDocument, IQueryComplete, IQueryDeleted } from '@post/interfaces/post.interface';
+import { IGetPostsQuery, IPostDocument, IQueryComplete, IQueryDeleted, ISavePostDocument } from '@post/interfaces/post.interface';
+import { SavedPostModel } from '@post/models/savedPost.schema';
 import { PostModel } from '@root/features/posts/models/post.schema';
 import { IUserDocument } from '@root/features/users/interfaces/user.interface';
 import { UserModel } from '@root/features/users/models/user.schema';
@@ -38,6 +39,10 @@ class PostService {
 
   public async postsCount(): Promise<number> {
     return await PostModel.find({}).countDocuments();
+  }
+
+  public async saveOtherPostsToDB(post: ISavePostDocument): Promise<void> {
+    await SavedPostModel.create(post);
   }
 }
 

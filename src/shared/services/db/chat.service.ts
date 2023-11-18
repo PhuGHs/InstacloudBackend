@@ -3,7 +3,6 @@ import { IConversationDocument } from '@chat/interfaces/conversation.interface';
 import { MessageModel } from '@chat/models/chat.schema';
 import { ConversationModel } from '@chat/models/conversation.schema';
 import { SupportiveMethods } from '@global/helpers/supportive-methods';
-import { IUserDocument } from '@user/interfaces/user.interface';
 import { UserModel } from '@user/models/user.schema';
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';

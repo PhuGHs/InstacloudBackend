@@ -1,5 +1,6 @@
 import { config } from '@root/config';
 import { chatService } from '@service/db/chat.service';
+import { postService } from '@service/db/post.service';
 import { DoneCallback, Job } from 'bull';
 import Logger from 'bunyan';
 
