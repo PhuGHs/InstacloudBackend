@@ -11,6 +11,7 @@ import { upload } from '@root/shared/globals/helpers/cloudinary-upload';
 import { vidUpload } from '@root/shared/globals/helpers/cloudinary-upload';
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
 import { SupportiveMethods } from '@global/helpers/supportive-methods';
+import { socketIOPostObject } from '@socket/post.socket';
 
 const postCache: PostCache = new PostCache();
 export class Create {
@@ -38,6 +39,8 @@ export class Create {
       createdAt: new Date(),
       reactions: { like: 0 }
     } as IPostDocument;
+
+    socketIOPostObject.emit('add post', userPost);
 
     const data: ISavePostToCache = {
       key: `${postObjectId}`,

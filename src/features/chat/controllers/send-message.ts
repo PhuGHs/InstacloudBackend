@@ -9,6 +9,7 @@ import { userService } from '@service/db/user.service';
 import { chatQueue } from '@service/queues/chat.queue';
 import { ChatCache } from '@service/redis/chat.cache';
 import { UserCache } from '@service/redis/user.cache';
+import { SocketIOChatHandler, chatSocketIOObject } from '@socket/chat.socket';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { UploadApiResponse } from 'cloudinary';
 import { Request, Response } from 'express';
@@ -55,11 +56,18 @@ export class Add {
       deleteForEveryone: false
     } as IMessageData;
 
+    Add.prototype.emitSocketIOEvent(data);
+
     await chatCache.addNewConversationToCache(senderId, receiverId, `${conversationObjectId}`);
     await chatCache.addNewConversationToCache(receiverId, senderId, `${conversationObjectId}`);
     await chatCache.addMessageToCache(`${conversationObjectId}`, data, SupportiveMethods.extractURLsFromString(body));
 
     chatQueue.addChatJob('addChatMessageToDB', data);
     res.status(STATUS_CODE.OK).json({ message: 'message has been sent', data});
+  }
+
+  private emitSocketIOEvent(data: IMessageData): void {
+    chatSocketIOObject.emit('message receive', data);
+    chatSocketIOObject.emit('chat list', data);
   }
 }

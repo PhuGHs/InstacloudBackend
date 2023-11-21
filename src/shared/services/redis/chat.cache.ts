@@ -139,17 +139,32 @@ export class ChatCache extends BaseCache {
     }
   }
 
-  // public async findConversations(senderId: string, receiverId: string, conversationId: string): Promise<IChatList[]> {
-  //   try {
-  //     if (!this.client.isOpen) {
-  //       this.client.connect();
-  //     }
-  //     // const conversations: string[] = await this.client.LRANGE(`conversations:${}`)
-  //   } catch (error) {
-  //     log.error(error);
-  //     throw new ServerError('Server Error. Try again!');
-  //   }
-  // }
+  public async getChatMessagesFromCache(senderId: string, receiverId: string): Promise<IMessageData[]> {
+    try {
+      if(!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      const userChatList: string[] = await this.client.LRANGE(`chatList:${senderId}`, 0, -1);
+      const receiver: string = find(userChatList, (listItem: string) => listItem.includes(receiverId)) as string;
+
+      const parsedReceiver: IChatList = SupportiveMethods.parseJson(receiver) as IChatList;
+      if(parsedReceiver) {
+        const userMessages: string[] = await this.client.LRANGE(`messages:${parsedReceiver.conversationId}`, 0, -1);
+        const chatMessages: IMessageData[] = [];
+        for(const item of userMessages) {
+          const chatItem: IMessageData = SupportiveMethods.parseJson(item) as IMessageData;
+          chatMessages.push(chatItem);
+        }
+        return chatMessages;
+      } else {
+        return [];
+      }
+    } catch(error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
 
   private async getASingleConversation(conversationId: string, senderId: string): Promise<[IConversationDocument, number]> {
     try {

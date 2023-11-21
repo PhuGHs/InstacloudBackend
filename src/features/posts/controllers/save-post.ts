@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import STATUS_CODE from 'http-status-codes';
 import { postQueue } from '@service/queues/post.queue';
+import { socketIOPostObject } from '@socket/post.socket';
 
 export class Save {
   public async post(req: Request, res: Response): Promise<void> {
@@ -14,6 +15,9 @@ export class Save {
       username: req.currentUser!.username,
       createdAt: new Date(),
     } as ISavePostDocument;
+
+    socketIOPostObject.emit('save post', data);
+
     postQueue.addPostJob('saveOtherPostsToDB', { key: data });
     res.status(STATUS_CODE.OK).json({ message: 'The post has been saved'});
   }

@@ -9,6 +9,7 @@ import { UploadApiResponse } from 'cloudinary';
 import { upload, vidUpload } from '@root/shared/globals/helpers/cloudinary-upload';
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
 import { imageQueue } from '@service/queues/image.queue';
+import { socketIOPostObject } from '@socket/post.socket';
 
 const postCache: PostCache = new PostCache();
 export class Update {
@@ -29,6 +30,7 @@ export class Update {
 
     const postInCacheAfterBeingUpdated: IPostDocument = await postCache.updatePostInCache(postId, updatedPost);
     //call socketIO to update in the UI.
+    socketIOPostObject.emit('update post', postInCacheAfterBeingUpdated, 'posts');
     postQueue.addPostJob('updatePostInDB', { key: postId, value: updatedPost });
     res.status(STATUS_CODE.OK).json({ message: 'Post has been updated successfully!', post: postInCacheAfterBeingUpdated });
   }
