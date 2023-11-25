@@ -163,7 +163,7 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async getAllPostsOfCurrentUser(key: string, uId: string): Promise<IPostDocument[]> {
+  public async getPostsFromCacheOfAUser(key: string, uId: number): Promise<IPostDocument[]> {
     try {
       if (!this.client.isOpen) {
         this.client.connect();

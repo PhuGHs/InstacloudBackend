@@ -5,7 +5,7 @@ import Queue, { Job } from 'bull';
 import Logger from 'bunyan';
 import { config } from '@root/config';
 import { IAuthJob } from '@auth/interfaces/auth.interface';
-import { IEmailJob } from '@root/features/users/interfaces/user.interface';
+import { IEmailJob, IUserJob } from '@root/features/users/interfaces/user.interface';
 import { IPostJobData, ISavePostJob } from '@root/features/posts/interfaces/post.interface';
 import { ICommentJob, IUpdateCommentJob } from '@root/features/comments/interfaces/comment.interface';
 import { IReactionJob } from '@reaction/interfaces/reaction.interface';
@@ -27,7 +27,8 @@ type IBaseJobData =
   | IFileImageJobData
   | IChatJobData
   | IMessageData
-  | ISavePostJob;
+  | ISavePostJob
+  | IUserJob;
 
 let bullAdapters: BullAdapter[] = [];
 

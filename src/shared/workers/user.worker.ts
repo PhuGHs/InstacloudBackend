@@ -16,6 +16,42 @@ class UserWorker {
       done(error as Error);
     }
   }
+
+  async updateNotiSettings(job: Job, done: DoneCallback): Promise<void> {
+    try {
+      const { key, value } = job.data;
+      await userService.updateNotiSettings(key, value);
+      job.progress(100);
+      done(null, value);
+    } catch (error) {
+      log.error(error);
+      done(error as Error);
+    }
+  }
+
+  async updateBackgroundInformation(job: Job, done: DoneCallback): Promise<void> {
+    try {
+      const { key, value } = job.data;
+      await userService.updateBackgroundInfomation(key, value);
+      job.progress(100);
+      done(null, value);
+    } catch (error) {
+      log.error(error);
+      done(error as Error);
+    }
+  }
+
+  async updateSocialLinks(job: Job, done: DoneCallback): Promise<void> {
+    try {
+      const { key, value } = job.data;
+      await userService.updateSocialLinks(key, value);
+      job.progress(100);
+      done(null, value);
+    } catch (error) {
+      log.error(error);
+      done(error as Error);
+    }
+  }
 }
 
 export const userWorker: UserWorker = new UserWorker();

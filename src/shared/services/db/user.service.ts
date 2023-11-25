@@ -1,5 +1,7 @@
+import { AuthModel } from '@auth/models/auth.schema';
+import { FollowerModel } from '@follower/models/follower.schema';
 import { UserModel } from '@root/features/users/models/user.schema';
-import { IUserDocument } from '@user/interfaces/user.interface';
+import { IBackgroundInfo, INotificationSettings, ISocialLinks, IUserDocument } from '@user/interfaces/user.interface';
 import mongoose from 'mongoose';
 
 class UserService {
@@ -48,6 +50,37 @@ class UserService {
       {$project: this.aggregateProject() }
     ]);
     return user[0];
+  }
+  public async updatePassword(uId: string, newHashedPassword: string): Promise<void> {
+    await AuthModel.updateOne({ uId }, { $set: { password: newHashedPassword }});
+  }
+  public async updateNotiSettings(userId: string, value: INotificationSettings): Promise<void> {
+    await UserModel.updateOne({ _id: userId }, { $set: { notifications: value}} );
+  }
+  public async updateBackgroundInfomation(userId: string, value: IBackgroundInfo): Promise<void> {
+    await UserModel.updateOne({ _id: userId }, { $set: {
+      school: value.school,
+      quote: value.quote,
+      work: value.work,
+      location: value.location
+    }}).exec();
+  }
+
+  public async updateSocialLinks(userId: string, value: ISocialLinks): Promise<void> {
+    await UserModel.updateOne({ _id: userId }, { $set: {
+      social: value
+    }}).exec();
+  }
+
+  public async recommendUsers(userId: string): Promise<IUserDocument[]> {
+    const user: IUserDocument = await this.getUserById(userId);
+    const relatedUser = FollowerModel.find({
+      fol
+    })
+
+    const activeUsers = UserModel.find({
+      postsCount: { $gt: 0 }
+    });
   }
 }
 

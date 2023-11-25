@@ -41,7 +41,7 @@ export interface INotificationSettings {
   follows: boolean;
 }
 
-export interface IBasicInfo {
+export interface IBackgroundInfo {
   quote: string;
   work: string;
   school: string;
