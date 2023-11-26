@@ -1,8 +1,10 @@
 import { AuthModel } from '@auth/models/auth.schema';
+import { IFollower, IFollowerData, IFollowerDocument } from '@follower/interfaces/follower.interface';
 import { FollowerModel } from '@follower/models/follower.schema';
 import { UserModel } from '@root/features/users/models/user.schema';
 import { IBackgroundInfo, INotificationSettings, ISocialLinks, IUserDocument } from '@user/interfaces/user.interface';
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
+import { followerService } from './follower.service';
 
 class UserService {
   public async createUser(data: IUserDocument): Promise<void> {
@@ -73,14 +75,15 @@ class UserService {
   }
 
   public async recommendUsers(userId: string): Promise<IUserDocument[]> {
-    const user: IUserDocument = await this.getUserById(userId);
-    const relatedUser = FollowerModel.find({
-      fol
-    })
+    const followersOfCurrentUser = await FollowerModel.find({ followeeId: userId});
+    const followersId = followersOfCurrentUser.map((item) => item.followerId);
 
-    const activeUsers = UserModel.find({
-      postsCount: { $gt: 0 }
-    });
+    const followeesOfFollowers = await FollowerModel.find({ followerId: { $in: followersId }});
+    const recommendUserIds = followeesOfFollowers.map((item) => item.followeeId);
+
+    const recommendedUsers = await UserModel.find({ _id: { $in: { recommendUserIds }}});
+
+    return recommendedUsers;
   }
 }
 
