@@ -97,10 +97,10 @@ class UserService {
       { $unwind: '$user' },
       {
         $match: {
-          $and: [
-            { 'user.username': { $regex: query, $options: 'i' } },
-            { '_id': { $ne: userId }}
-          ]
+          // $and: [
+          //   { $text: { $search: query } },
+          //   { '_id': { $ne: userObjId }}
+          // ]
         },
       }
     ]);

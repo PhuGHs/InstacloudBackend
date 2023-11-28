@@ -32,8 +32,6 @@ export class UserCache extends BaseCache {
       location,
       school,
       quote,
-      bgImageId,
-      bgImageVersion,
       social
     } = user;
 
@@ -81,11 +79,7 @@ export class UserCache extends BaseCache {
       'school',
       `${school}`,
       'quote',
-      `${quote}`,
-      'bgImageVersion',
-      `${bgImageVersion}`,
-      'bgImageId',
-      `${bgImageId}`
+      `${quote}`
     ];
 
     const saveData: string[] = [...firstList, ...secondList, ...thirdList];

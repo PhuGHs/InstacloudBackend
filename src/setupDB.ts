@@ -6,7 +6,7 @@ const log: Logger = config.createLogger('SETUP DB');
 export default () => {
   const connect = () => {
     mongoose
-      .connect(config.DATABASE_URL!)
+      .connect(config.MONGODB_HOST!)
       .then(() => {
         log.info('Successfully connected to database.');
       })

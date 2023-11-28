@@ -86,8 +86,6 @@ export class SignUp {
       location: '',
       school: '',
       quote: '',
-      bgImageVersion: '',
-      bgImageId: '',
       followersCount: 0,
       followingCount: 0,
       postsCount: 0,

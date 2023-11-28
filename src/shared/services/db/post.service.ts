@@ -44,6 +44,12 @@ class PostService {
   public async saveOtherPostsToDB(post: ISavePostDocument): Promise<void> {
     await SavedPostModel.create(post);
   }
+
+  // public async searchPosts(query: string): Promise<IPostDocument[]> {
+  //   const posts: IPostDocument[] = await PostModel.aggregate([
+  //     { $match: { post: { $regex: query, options: 'i'}} }
+  //   ]);
+  // }
 }
 
 export const postService: PostService = new PostService();

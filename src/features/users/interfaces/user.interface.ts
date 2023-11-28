@@ -21,8 +21,6 @@ export interface IUserDocument extends Document {
   followingCount: number;
   notifications: INotificationSettings;
   social: ISocialLinks;
-  bgImageVersion: string;
-  bgImageId: string;
   profilePicture: string;
   createdAt?: Date;
 }
@@ -60,7 +58,6 @@ export interface ISearchUser {
   profilePicture: string;
   username: string;
   email: string;
-  avatarColor: string;
 }
 
 export interface ISocketData {
