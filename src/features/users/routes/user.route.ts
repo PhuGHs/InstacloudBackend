@@ -1,5 +1,6 @@
 import { authMiddleware } from '@root/shared/globals/helpers/auth-middleware';
 import { Get } from '@user/controllers/get-profile';
+import { Search } from '@user/controllers/search-users';
 import { BackgroundInformation } from '@user/controllers/update-background-info';
 import { NotificationSettings } from '@user/controllers/update-noti-settings';
 import { Update } from '@user/controllers/update-pasword';
@@ -17,6 +18,8 @@ class UserRoutes {
     this.router.get('/user/profile', authMiddleware.checkAuthentication, Get.prototype.profile);
     this.router.get('/user/profile/:userId', authMiddleware.checkAuthentication, Get.prototype.profileByUserId);
     this.router.get('/user/profile-materials/:userId/:username/:uId', authMiddleware.checkAuthentication, Get.prototype.profileMaterials);
+    this.router.get('/user/suggestion', authMiddleware.checkAuthentication, Get.prototype.userSuggestion);
+    this.router.get('/user/search/:query/:filter', authMiddleware.checkAuthentication, Search.prototype.users);
     return this.router;
   }
 }

@@ -5,6 +5,7 @@ import { UserModel } from '@root/features/users/models/user.schema';
 import { IBackgroundInfo, INotificationSettings, ISocialLinks, IUserDocument } from '@user/interfaces/user.interface';
 import mongoose, { mongo } from 'mongoose';
 import { followerService } from './follower.service';
+import { ObjectId } from 'mongodb';
 
 class UserService {
   public async createUser(data: IUserDocument): Promise<void> {
@@ -67,13 +68,11 @@ class UserService {
       location: value.location
     }}).exec();
   }
-
   public async updateSocialLinks(userId: string, value: ISocialLinks): Promise<void> {
     await UserModel.updateOne({ _id: userId }, { $set: {
       social: value
     }}).exec();
   }
-
   public async recommendUsers(userId: string): Promise<IUserDocument[]> {
     const followersOfCurrentUser = await FollowerModel.find({ followeeId: userId});
     const followersId = followersOfCurrentUser.map((item) => item.followerId);
@@ -81,9 +80,32 @@ class UserService {
     const followeesOfFollowers = await FollowerModel.find({ followerId: { $in: followersId }});
     const recommendUserIds = followeesOfFollowers.map((item) => item.followeeId);
 
-    const recommendedUsers = await UserModel.find({ _id: { $in: { recommendUserIds }}});
+    const recommendedUsers = await UserModel.find({ _id: { $in: recommendUserIds }});
 
     return recommendedUsers;
+  }
+  public async searchUsers(query: string, userId: ObjectId): Promise<IUserDocument[]> {
+    const users = await UserModel.aggregate([
+      {
+        $lookup: {
+          from: 'Auth',
+          localField: 'authId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      {
+        $match: {
+          $and: [
+            { 'user.username': { $regex: query, $options: 'i' } },
+            { '_id': { $ne: userId }}
+          ]
+        },
+      }
+    ]);
+
+    return users;
   }
 }
 
