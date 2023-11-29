@@ -7,6 +7,6 @@ import STATUS_CODE from 'http-status-codes';
 export class Find {
   public async conversations(req: Request, res: Response): Promise<void> {
     const conversations: IMessageData[] = await chatService.findConversations(req.currentUser!.userId, req.params.query);
-    res.status(STATUS_CODE.OK).json({ message: 'results found: ', conversations});
+    res.status(STATUS_CODE.OK).json({ message: 'results found: ', conversations });
   }
 }

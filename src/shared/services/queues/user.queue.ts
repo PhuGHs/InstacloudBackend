@@ -12,7 +12,7 @@ class UserQueue extends BaseQueue {
     this.processJob('updateSocialLinks', 5, userWorker.updateSocialLinks);
   }
 
-  public addUserJob(name: string, data: IAuthJob | IUserJob ) {
+  public addUserJob(name: string, data: IAuthJob | IUserJob) {
     this.addJob(name, data);
   }
 }

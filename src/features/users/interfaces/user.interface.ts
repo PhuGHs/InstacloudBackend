@@ -5,8 +5,7 @@ export interface IUserDocument extends Document {
   _id: string | ObjectId;
   authId: string | ObjectId;
   username?: string;
-  firstname?: string;
-  lastname?: string;
+  fullname?: string;
   email?: string;
   password?: string;
   uId?: string; //optional to save in redis (using the same Document ? sign)

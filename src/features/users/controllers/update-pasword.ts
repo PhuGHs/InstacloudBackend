@@ -16,13 +16,13 @@ export class Update {
   @joiValidation(changePasswordSchema)
   public async password(req: Request, res: Response): Promise<void> {
     const { currentPassword, newPassword, confirmPassword } = req.body;
-    if(newPassword !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       throw new BadRequestError('Passwords do not match.');
     }
 
     const existingUser: IAuthDocument = await authService.getAuthUserByUsernameOrEmail('', req.currentUser!.email);
     const passwordsMatch: boolean = await existingUser.comparePassword(currentPassword);
-    if(!passwordsMatch) {
+    if (!passwordsMatch) {
       throw new BadRequestError('Invalid credentials');
     }
     const hashedPassword: string = await existingUser.hashPassword(newPassword);
@@ -34,7 +34,11 @@ export class Update {
       date: moment().format('DD/MM/YYYY HH:mm')
     };
     const template: string = resetPasswordTemplate.passwordResetConfirmationTemplate(templateParams);
-    emailQueue.addEmailJob('changePasswordEmail', { template, receiverEmail: existingUser.email!, subject: 'Password Update Confirmation'});
-    res.status(STATUS_CODE.OK).json({ message: 'Password has been updated successfully. You will be redirected to the login page.'});
+    emailQueue.addEmailJob('changePasswordEmail', {
+      template,
+      receiverEmail: existingUser.email!,
+      subject: 'Password Update Confirmation'
+    });
+    res.status(STATUS_CODE.OK).json({ message: 'Password has been updated successfully. You will be redirected to the login page.' });
   }
 }

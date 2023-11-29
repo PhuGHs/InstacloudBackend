@@ -14,6 +14,6 @@ export class NotificationSettings {
       key: req.currentUser!.userId,
       value: req.body
     });
-    res.status(STATUS_CODE.OK).json({ message: 'update notification settings succesfully!'});
+    res.status(STATUS_CODE.OK).json({ message: 'update notification settings succesfully!' });
   }
 }

@@ -17,10 +17,10 @@ import mongoose from 'mongoose';
 const SIZE = 12;
 
 export interface IGetAllUser {
-  skip: number,
-  limit: number,
-  newSkip: number,
-  userId: string,
+  skip: number;
+  limit: number;
+  newSkip: number;
+  userId: string;
 }
 
 const userCache: UserCache = new UserCache();
@@ -29,30 +29,28 @@ const followerCache: FollowerCache = new FollowerCache();
 
 export class Get {
   public async profile(req: Request, res: Response): Promise<void> {
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser : await
-    userService.getUserById(req.currentUser!.userId);
-    res.status(STATUS_CODE.OK).json({ message: 'current user profile', user});
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(req.currentUser!.userId);
+    res.status(STATUS_CODE.OK).json({ message: 'current user profile', user });
   }
 
   public async profileByUserId(req: Request, res: Response): Promise<void> {
     const { userId } = req.params;
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(userId) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser : await
-    userService.getUserById(userId);
-    res.status(STATUS_CODE.OK).json({ message: `user with id: ${userId} profile`, user});
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(userId);
+    res.status(STATUS_CODE.OK).json({ message: `user with id: ${userId} profile`, user });
   }
 
   public async profileMaterials(req: Request, res: Response): Promise<void> {
     const { userId, username, uId } = req.params;
     const userName: string = SupportiveMethods.uppercaseFirstLetter(username) as string;
     const cachedPosts: IPostDocument[] = await postCache.getPostsFromCacheOfAUser('post', parseInt(uId, 10));
-    const posts: IPostDocument[] = cachedPosts.length ? cachedPosts :
-    await postService.getPosts({ username: userName }, 0, 100, { createdAt: -1 });
+    const posts: IPostDocument[] = cachedPosts.length
+      ? cachedPosts
+      : await postService.getPosts({ username: userName }, 0, 100, { createdAt: -1 });
 
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser :
-    await userService.getUserById(userId);
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(userId);
 
     const followers: IFollowerData[] = await Get.prototype.followers(userId);
     const following: IFollowerData[] = await Get.prototype.following(userId);
@@ -64,21 +62,20 @@ export class Get {
 
   public async userSuggestion(req: Request, res: Response): Promise<void> {
     const users: IUserDocument[] = await userService.recommendUsers(req.currentUser!.userId);
-    res.status(STATUS_CODE.OK).json({ message: 'user recommendation', users});
+    res.status(STATUS_CODE.OK).json({ message: 'user recommendation', users });
   }
 
   private async followers(userId: string): Promise<IFollowerData[]> {
     const cachedFollowers: IFollowerData[] = await followerCache.getFollowerFromCache(`followers:${userId}`);
-    const followers: IFollowerData[] = cachedFollowers.length > 0 ? cachedFollowers :
-    await followerService.getFollowers(new mongoose.Types.ObjectId(userId));
+    const followers: IFollowerData[] =
+      cachedFollowers.length > 0 ? cachedFollowers : await followerService.getFollowers(new mongoose.Types.ObjectId(userId));
     return followers;
   }
 
   private async following(userId: string): Promise<IFollowerData[]> {
     const cachedFollowerList: IFollowerData[] = await followerCache.getFollowerFromCache(`following:${userId}`);
-    const followingList: IFollowerData[] = cachedFollowerList.length > 0
-      ? cachedFollowerList
-      : await followerService.getFollowingList(new mongoose.Types.ObjectId(userId));
+    const followingList: IFollowerData[] =
+      cachedFollowerList.length > 0 ? cachedFollowerList : await followerService.getFollowingList(new mongoose.Types.ObjectId(userId));
     return followingList;
   }
 }

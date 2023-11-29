@@ -53,6 +53,44 @@ export class Create {
     res.status(STATUS_CODE.OK).json({ message: 'post created successfully!', post: userPost });
   }
 
+  @joiValidation(postSchema)
+  public async seedPosts(req: Request, res: Response): Promise<void> {
+    const { uId, userId, username, email, post, privacy, gifUrl, profilePicture, feelings } = req.body;
+    const postObjectId: ObjectId = new ObjectId();
+    const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
+    const userPost: IPostDocument = {
+      _id: postObjectId,
+      userId,
+      username,
+      email,
+      profilePicture,
+      post,
+      pId,
+      privacy,
+      gifUrl,
+      feelings,
+      commentsCount: 0,
+      imgVersion: '',
+      imgId: '',
+      videoId: '',
+      videoVersion: '',
+      createdAt: new Date(),
+      reactions: { like: 0 }
+    } as IPostDocument;
+
+    socketIOPostObject.emit('add post', userPost);
+
+    const data: ISavePostToCache = {
+      key: `${postObjectId}`,
+      currentUserId: userId,
+      uId: uId,
+      createdPost: userPost
+    } as ISavePostToCache;
+    await postCache.savePostToCache(data);
+    postQueue.addPostJob('savePostToDB', { key: userId, value: userPost });
+    res.status(STATUS_CODE.OK).json({ message: 'post created successfully!', post: userPost });
+  }
+
   @joiValidation(postWithImageSchema)
   public async postWithImage(req: Request, res: Response): Promise<void> {
     const { post, privacy, gifUrl, profilePicture, feelings, image } = req.body;

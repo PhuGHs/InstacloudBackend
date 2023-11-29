@@ -10,7 +10,7 @@ class ChatQueue extends BaseQueue {
     this.processJob('markMessageAsDeleted', 5, chatWorker.markMessageAsDeleted);
   }
 
-  public addChatJob(name: string, data: IChatJobData | IMessageData ) {
+  public addChatJob(name: string, data: IChatJobData | IMessageData) {
     this.addJob(name, data);
   }
 }

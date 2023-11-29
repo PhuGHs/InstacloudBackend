@@ -11,7 +11,7 @@ export class Update {
     const { receiverId } = req.body;
     const senderId = req.currentUser!.userId;
 
-    const lastUpdatedMessage: IMessageData = await chatCache.markMessagesAsSeen(senderId, receiverId) as IMessageData;
+    const lastUpdatedMessage: IMessageData = (await chatCache.markMessagesAsSeen(senderId, receiverId)) as IMessageData;
     chatSocketIOObject.emit('message read', lastUpdatedMessage);
     chatSocketIOObject.emit('chat list', lastUpdatedMessage);
     //update chat list with and send to client
@@ -19,6 +19,6 @@ export class Update {
       senderId,
       receiverId
     });
-    res.status(STATUS_CODE.OK).json({ message: 'message has been seen'});
+    res.status(STATUS_CODE.OK).json({ message: 'message has been seen' });
   }
 }

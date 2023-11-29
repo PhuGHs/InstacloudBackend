@@ -19,7 +19,7 @@ class UserRoutes {
     this.router.get('/user/profile/:userId', authMiddleware.checkAuthentication, Get.prototype.profileByUserId);
     this.router.get('/user/profile-materials/:userId/:username/:uId', authMiddleware.checkAuthentication, Get.prototype.profileMaterials);
     this.router.get('/user/suggestion', authMiddleware.checkAuthentication, Get.prototype.userSuggestion);
-    this.router.get('/user/search/:query/:filter', authMiddleware.checkAuthentication, Search.prototype.users);
+    this.router.get('/user/search', authMiddleware.checkAuthentication, Search.prototype.users);
     return this.router;
   }
 }

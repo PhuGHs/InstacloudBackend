@@ -60,8 +60,7 @@ export class SignUp {
       _id,
       uId,
       username: SupportiveMethods.uppercaseFirstLetter(username),
-      firstname,
-      lastname,
+      fullname: firstname + ' ' + lastname,
       email: SupportiveMethods.lowercase(email),
       password,
       createdAt: new Date()
@@ -69,14 +68,13 @@ export class SignUp {
   }
 
   private userData(data: IAuthDocument, userObjectId: ObjectId): IUserDocument {
-    const { _id, uId, username, email, password, firstname, lastname } = data;
+    const { _id, uId, username, email, password, fullname } = data;
     return {
       _id: userObjectId,
       authId: _id,
       uId,
       username: SupportiveMethods.uppercaseFirstLetter(username),
-      firstname,
-      lastname,
+      fullname,
       email: SupportiveMethods.lowercase(email),
       password,
       profilePicture: '',
@@ -111,8 +109,7 @@ export class SignUp {
         uId: data.uId,
         email: data.email,
         username: data.username,
-        firstname: data.firstname,
-        lastname: data.lastname
+        fullname: data.fullname
       },
       config.JWT_TOKEN!
     );

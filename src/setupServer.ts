@@ -118,7 +118,7 @@ export class MidCloudServer {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private socketIOConnection(io: Server): void {
-    const postSocketHandler : SocketIOPostHandler = new SocketIOPostHandler(io);
+    const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
     const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);
     const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
     const notificationSocketHandler: SocketIONotificationHandler = new SocketIONotificationHandler();

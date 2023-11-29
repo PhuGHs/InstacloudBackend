@@ -7,8 +7,7 @@ const SALT_ROUND = 10;
 const authSchema: Schema = new Schema(
   {
     username: { type: String },
-    firstname: { type: String },
-    lastname: { type: String },
+    fullname: { type: String },
     uId: { type: String },
     email: { type: String },
     password: { type: String },

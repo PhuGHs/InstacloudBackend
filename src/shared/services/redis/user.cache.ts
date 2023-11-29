@@ -18,8 +18,7 @@ export class UserCache extends BaseCache {
       _id,
       uId,
       username,
-      firstname,
-      lastname,
+      fullname,
       email,
       blocked,
       blockedBy,
@@ -42,10 +41,8 @@ export class UserCache extends BaseCache {
       `${uId}`,
       'username',
       `${username}`,
-      'firstname',
-      `${firstname}`,
-      'lastname',
-      `${lastname}`,
+      'fullname',
+      `${fullname}`,
       'email',
       `${email}`,
       'createdAt',
@@ -71,16 +68,7 @@ export class UserCache extends BaseCache {
       `${JSON.stringify(social)}`
     ];
 
-    const thirdList: string[] = [
-      'work',
-      `${work}`,
-      'location',
-      `${location}`,
-      'school',
-      `${school}`,
-      'quote',
-      `${quote}`
-    ];
+    const thirdList: string[] = ['work', `${work}`, 'location', `${location}`, 'school', `${school}`, 'quote', `${quote}`];
 
     const saveData: string[] = [...firstList, ...secondList, ...thirdList];
     try {
@@ -144,13 +132,13 @@ export class UserCache extends BaseCache {
 
   public async getTotalNumberOfUsers(): Promise<number> {
     try {
-      if(!this.client.isOpen) {
+      if (!this.client.isOpen) {
         await this.client.connect();
       }
 
       const count: number = await this.client.ZCARD('user');
       return count;
-    } catch(error) {
+    } catch (error) {
       log.error(error);
       throw new Error('Server error. Try again later');
     }

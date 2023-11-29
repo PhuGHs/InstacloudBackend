@@ -87,7 +87,9 @@ export class Update {
     const { post, feelings, privacy, gifUrl, profilePicture, image, video } = req.body;
     const { postId } = req.params;
 
-    const result: UploadApiResponse = image ? await upload(image) as UploadApiResponse : ((await vidUpload(video)) as UploadApiResponse);
+    const result: UploadApiResponse = image
+      ? ((await upload(image)) as UploadApiResponse)
+      : ((await vidUpload(video)) as UploadApiResponse);
 
     if (!result?.public_id) {
       // if has error, dont return public_id

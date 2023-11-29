@@ -10,13 +10,18 @@ export class Delete {
   public async message(req: Request, res: Response): Promise<void> {
     const { receiverId, messageId, type } = req.body;
     const senderId = req.currentUser!.userId;
-    const updatedMessage: IMessageData = await chatCache.markMessageAsDeleted(senderId, receiverId, messageId, type as 'deleteForMe' | 'deleteForEveryone');
+    const updatedMessage: IMessageData = await chatCache.markMessageAsDeleted(
+      senderId,
+      receiverId,
+      messageId,
+      type as 'deleteForMe' | 'deleteForEveryone'
+    );
     chatSocketIOObject.emit('message read', updatedMessage);
     chatSocketIOObject.emit('chat list', updatedMessage);
     chatQueue.addChatJob('markMessageAsDeleted', {
       messageId: messageId,
       type
     });
-    res.status(STATUS_CODE.OK).json({ message: `The message has been deleted with type: ${type}`});
+    res.status(STATUS_CODE.OK).json({ message: `The message has been deleted with type: ${type}` });
   }
 }

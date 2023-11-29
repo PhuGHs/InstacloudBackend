@@ -27,8 +27,7 @@ export class SignIn {
         uId: existedUser.uId,
         email: existedUser.email,
         username: existedUser.username,
-        firstname: existedUser.firstname,
-        lastname: existedUser.lastname
+        fullname: existedUser.fullname
       },
       config.JWT_TOKEN!
     );
@@ -41,8 +40,7 @@ export class SignIn {
       uId: existedUser.uId,
       email: existedUser.email,
       username: existedUser.username,
-      firstname: existedUser.firstname,
-      lastname: existedUser.lastname,
+      fullname: existedUser.fullname,
       createdAt: existedUser.createdAt
     } as IUserDocument;
 

@@ -13,12 +13,12 @@ export class Save {
       userId: new mongoose.Types.ObjectId(req.currentUser!.userId),
       postId: new mongoose.Types.ObjectId(postId),
       username: req.currentUser!.username,
-      createdAt: new Date(),
+      createdAt: new Date()
     } as ISavePostDocument;
 
     socketIOPostObject.emit('save post', data);
 
     postQueue.addPostJob('saveOtherPostsToDB', { key: data });
-    res.status(STATUS_CODE.OK).json({ message: 'The post has been saved'});
+    res.status(STATUS_CODE.OK).json({ message: 'The post has been saved' });
   }
 }

@@ -26,10 +26,10 @@ export class Add {
     const messageObjectId: ObjectId = new ObjectId();
     const conversationObjectId: ObjectId = !conversationId ? new ObjectId() : new mongoose.Types.ObjectId(conversationId);
     let image = '';
-    const cachedSender: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
+    const cachedSender: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
     const Sender: IUserDocument = cachedSender ? cachedSender : await userService.getUserById(req.currentUser!.userId);
     const senderId: string = req.currentUser!.userId;
-    if(selectedImage) {
+    if (selectedImage) {
       const result1: UploadApiResponse = (await upload(selectedImage, `${req.currentUser!.userId}`, true, true)) as UploadApiResponse;
       if (!result1?.public_id) {
         throw new BadRequestError('File upload error. Please try again!');
@@ -63,7 +63,7 @@ export class Add {
     await chatCache.addMessageToCache(`${conversationObjectId}`, data, SupportiveMethods.extractURLsFromString(body));
 
     chatQueue.addChatJob('addChatMessageToDB', data);
-    res.status(STATUS_CODE.OK).json({ message: 'message has been sent', data});
+    res.status(STATUS_CODE.OK).json({ message: 'message has been sent', data });
   }
 
   private emitSocketIOEvent(data: IMessageData): void {
