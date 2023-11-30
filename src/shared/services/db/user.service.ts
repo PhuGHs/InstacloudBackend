@@ -103,14 +103,14 @@ class UserService {
                 autocomplete: {
                   query: query,
                   path: 'username',
-                  tokenOrder: 'sequential'
+                  tokenOrder: 'sequential',
                 }
               },
               {
                 autocomplete: {
                   query: query,
                   path: 'fullname',
-                  tokenOrder: 'sequential'
+                  tokenOrder: 'sequential',
                 }
               }
             ]
@@ -159,7 +159,6 @@ class UserService {
 
     return users;
   }
-
   public async getAllUsers(): Promise<IUserDocument[]> {
     const users: IUserDocument[] = await UserModel.aggregate([
       { $match: {} },

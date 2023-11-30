@@ -45,11 +45,19 @@ class PostService {
     await SavedPostModel.create(post);
   }
 
-  // public async searchPosts(query: string): Promise<IPostDocument[]> {
-  //   const posts: IPostDocument[] = await PostModel.aggregate([
-  //     { $match: { post: { $regex: query, options: 'i'}} }
-  //   ]);
-  // }
+  public async searchPosts(query: string): Promise<IPostDocument[]> {
+    const posts: IPostDocument[] = await PostModel.aggregate([
+      { $search: {
+        index: 'post_search',
+        autocomplete: {
+          query,
+          path: 'post',
+          tokenOrder: 'sequential'
+        }
+      }}
+    ]);
+    return posts;
+  }
 }
 
 export const postService: PostService = new PostService();
