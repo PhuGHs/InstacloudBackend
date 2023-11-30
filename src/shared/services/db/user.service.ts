@@ -4,7 +4,6 @@ import { UserModel } from '@root/features/users/models/user.schema';
 import { IBackgroundInfo, INotificationSettings, ISocialLinks, IUserDocument } from '@user/interfaces/user.interface';
 import mongoose, { mongo } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { SupportiveMethods } from '@global/helpers/supportive-methods';
 
 class UserService {
   public async createUser(data: IUserDocument): Promise<void> {
@@ -97,11 +96,24 @@ class UserService {
     const users = await AuthModel.aggregate([
       {
         $search: {
-          index: 'auth_search',
-          text: {
-            query: query,
-            path: ['username', 'fullname'],
-            fuzzy: {}
+          index: 'auth_autocomplete',
+          compound: {
+            should: [
+              {
+                autocomplete: {
+                  query: query,
+                  path: 'username',
+                  tokenOrder: 'sequential'
+                }
+              },
+              {
+                autocomplete: {
+                  query: query,
+                  path: 'fullname',
+                  tokenOrder: 'sequential'
+                }
+              }
+            ]
           }
         }
       },
