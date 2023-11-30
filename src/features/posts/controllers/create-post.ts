@@ -12,6 +12,10 @@ import { vidUpload } from '@root/shared/globals/helpers/cloudinary-upload';
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
 import { SupportiveMethods } from '@global/helpers/supportive-methods';
 import { socketIOPostObject } from '@socket/post.socket';
+import { IAuthDocument } from '@auth/interfaces/auth.interface';
+import { IUserDocument } from '@user/interfaces/user.interface';
+import { userService } from '@service/db/user.service';
+import { faker } from '@faker-js/faker';
 
 const postCache: PostCache = new PostCache();
 export class Create {
@@ -55,40 +59,43 @@ export class Create {
 
   @joiValidation(postSchema)
   public async seedPosts(req: Request, res: Response): Promise<void> {
-    const { uId, userId, username, email, post, privacy, gifUrl, profilePicture, feelings } = req.body;
-    const postObjectId: ObjectId = new ObjectId();
-    const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
-    const userPost: IPostDocument = {
-      _id: postObjectId,
-      userId,
-      username,
-      email,
-      profilePicture,
-      post,
-      pId,
-      privacy,
-      gifUrl,
-      feelings,
-      commentsCount: 0,
-      imgVersion: '',
-      imgId: '',
-      videoId: '',
-      videoVersion: '',
-      createdAt: new Date(),
-      reactions: { like: 0 }
-    } as IPostDocument;
+    // const { uId, userId, username, email, post, privacy, gifUrl, profilePicture, feelings } = req.body;
+    const users: IUserDocument[] = await userService.getAllUsers();
+    for(const user of users) {
+      const postObjectId: ObjectId = new ObjectId();
+      const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
+      const userPost: IPostDocument = {
+        _id: postObjectId,
+        userId: `${user._id}`,
+        username: user.username,
+        email: user.email,
+        profilePicture: user.profilePicture,
+        post: faker.lorem.sentence(),
+        pId,
+        privacy: 'public',
+        gifUrl: '',
+        feelings: '',
+        commentsCount: 0,
+        imgVersion: '',
+        imgId: '',
+        videoId: '',
+        videoVersion: '',
+        createdAt: new Date(),
+        reactions: { like: 0 }
+      } as IPostDocument;
 
-    socketIOPostObject.emit('add post', userPost);
+      socketIOPostObject.emit('add post', userPost);
 
-    const data: ISavePostToCache = {
-      key: `${postObjectId}`,
-      currentUserId: userId,
-      uId: uId,
-      createdPost: userPost
-    } as ISavePostToCache;
-    await postCache.savePostToCache(data);
-    postQueue.addPostJob('savePostToDB', { key: userId, value: userPost });
-    res.status(STATUS_CODE.OK).json({ message: 'post created successfully!', post: userPost });
+      const data: ISavePostToCache = {
+        key: `${postObjectId}`,
+        currentUserId: `${user._id}`,
+        uId: user.uId,
+        createdPost: userPost
+      } as ISavePostToCache;
+      await postCache.savePostToCache(data);
+      postQueue.addPostJob('savePostToDB', { key: `${user._id}`, value: userPost });
+    }
+    res.status(STATUS_CODE.OK).json({ message: 'seed successfully!' });
   }
 
   @joiValidation(postWithImageSchema)

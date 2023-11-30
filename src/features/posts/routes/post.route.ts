@@ -20,7 +20,7 @@ class PostRoutes {
     this.router.post('/post-with-image', authMiddleware.checkAuthentication, Create.prototype.postWithImage);
     this.router.post('/post-with-video', authMiddleware.checkAuthentication, Create.prototype.postWithVideo);
     this.router.post('/post/save-post', authMiddleware.checkAuthentication, Save.prototype.post);
-    this.router.post('/post/seeds', authMiddleware.checkAuthentication, Create.prototype.seedPosts);
+    this.router.post('/post/seeds', Create.prototype.seedPosts);
 
     this.router.put('/post-with-image/:postId', authMiddleware.checkAuthentication, Update.prototype.postWithImage);
     this.router.put('/post/:postId', authMiddleware.checkAuthentication, Update.prototype.post);

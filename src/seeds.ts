@@ -81,7 +81,7 @@ async function seedUserData(count: number): Promise<void> {
 }
 
 async function getAllUsers(): Promise<IAuthDocument[]> {
-  const auths: IAuthDocument[] = await AuthModel.find({}).limit(10);
+  const auths: IAuthDocument[] = await AuthModel.find({}).limit(10).maxTimeMS(1000 * 1000 * 1000);
   return auths;
 }
 
@@ -127,4 +127,41 @@ async function getUsers(): Promise<void> {
     console.log('All posts seeded successfully!');
 }
 
-getAllUsers();
+async function seedPostsForUsers() {
+  const batchSize = 90; // Adjust the batch size as needed
+  let skip = 0;
+  try {
+    // Fetch all users
+    while (true) {
+      const users = await UserModel.find({}).skip(skip).limit(batchSize);
+
+      if (users.length === 0) {
+        break;
+      }
+
+      for (const user of users) {
+        const numPosts = faker.number.int({ min: 1, max: 2 });
+
+        for (let i = 0; i < numPosts; i++) {
+          const postData = {
+            userId: user._id,
+            username: user.username,
+            email: user.email,
+            uId: user.uId,
+            profilePicture: 'a path',
+            post: faker.lorem.sentence(),
+            privacy: 'public',
+            gifUrl: '',
+          };
+            await axios.post('http://localhost:5000/api/v1/post/seeds', postData);
+        }
+      }
+
+      skip += batchSize;
+    }
+  } catch (error) {
+    console.error('Error seeding posts:', error);
+  }
+}
+
+seedUserData(100);

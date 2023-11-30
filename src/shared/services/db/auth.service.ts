@@ -2,7 +2,9 @@ import { config } from '@root/config';
 import { IAuthDocument, ISignUpData } from '@root/features/auth/interfaces/auth.interface';
 import { AuthModel } from '@auth/models/auth.schema';
 import Logger from 'bunyan';
+import {faker} from '@faker-js/faker';
 import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-methods';
+import axios from 'axios';
 
 class AuthService {
   public async createAuthUser(data: IAuthDocument): Promise<void> {
@@ -32,6 +34,43 @@ class AuthService {
         passwordResetExpires: tokenExpiration
       }
     );
+  }
+
+  public async seedPostsForUsers() {
+    const batchSize = 90; // Adjust the batch size as needed
+    let skip = 0;
+    try {
+      // Fetch all users
+      while (true) {
+        const users = await AuthModel.find({}).skip(skip).limit(batchSize);
+
+        if (users.length === 0) {
+          break;
+        }
+
+        for (const user of users) {
+          const numPosts = faker.number.int({ min: 1, max: 2 });
+
+          for (let i = 0; i < numPosts; i++) {
+            const postData = {
+              userId: user._id,
+              username: user.username,
+              email: user.email,
+              uId: user.uId,
+              profilePicture: 'a path',
+              post: faker.lorem.sentence(),
+              privacy: 'public',
+              gifUrl: '',
+            };
+              await axios.post('http://localhost:5000/api/v1/post/seeds', postData);
+          }
+        }
+
+        skip += batchSize;
+      }
+    } catch (error) {
+      console.error('Error seeding posts:', error);
+    }
   }
 }
 

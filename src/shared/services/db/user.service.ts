@@ -150,10 +150,16 @@ class UserService {
 
   public async getAllUsers(): Promise<IUserDocument[]> {
     const users: IUserDocument[] = await UserModel.aggregate([
-      { $sort: { createdAt: -1 } },
+      { $match: {} },
       { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } }, // this returns an array
       { $unwind: '$authId' }, // use this so that we can access to the property.
-      { $project: this.aggregateProject() } // to exclude properties that you want to remove. properties which were set to 1 means that the object includes it.
+      { $project: {
+        _id: 1,
+        username: '$authId.username',
+        uId: '$authId.uId',
+        email: '$authId.email',
+        profilePicture: 1,
+      } } // to exclude properties that you want to remove. properties which were set to 1 means that the object includes it.
     ]);
 
     return users;
