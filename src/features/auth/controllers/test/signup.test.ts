@@ -100,7 +100,7 @@ describe('SignUp', () => {
   it('Throw an error if password is less than 4 digits', () => {
     const req: Request = authMockRequest({}, {
       username: 'vanphu',
-      email: 'levanphu2003248gmail.com',
+      email: 'levanphu2003248@gmail.com',
       firstname: 'Le Van',
       lastname: 'Phu',
       password: 'qwerty',
@@ -117,7 +117,7 @@ describe('SignUp', () => {
   it('Throw an unauthorized error if user is already exist', () => {
     const req: Request = authMockRequest({}, {
       username: 'Thankful',
-      email: 'levanphu2003248gmail.com',
+      email: 'levanphu2003248@gmail.com',
       firstname: 'Le Van',
       lastname: 'Phu',
       password: 'qwerty',

@@ -20,7 +20,7 @@ export const authUserPayload: AuthPayload = {
   uId: '1621613119252066',
   username: 'phule',
   fullname: 'Phu Le',
-  email: 'manny@me.com',
+  email: 'phule@gmail.com',
   iat: 12345
 };
 
