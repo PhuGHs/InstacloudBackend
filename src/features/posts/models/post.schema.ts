@@ -8,14 +8,16 @@ const postSchema: Schema = new Schema({
   profilePicture: { type: String },
   post: { type: String, default: '' },
   imgVersion: { type: String, default: '' },
-  pId: {type: String},
+  pId: { type: String },
   imgId: { type: String, default: '' },
+  videoVersion: { type: String, default: '' },
+  videoId: { type: String, default: '' },
   feelings: { type: String, default: '' },
   gifUrl: { type: String, default: '' },
   privacy: { type: String, default: '' },
   commentsCount: { type: Number, default: 0 },
   reactions: {
-    like: { type: Number, default: 0 },
+    like: { type: Number, default: 0 }
   },
   createdAt: { type: Date, default: Date.now }
 });

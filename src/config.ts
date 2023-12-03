@@ -19,7 +19,18 @@ class Config {
   public SENDER_PASSWORD: string | undefined;
   public SENDGRID_API_KEY: string | undefined;
   public SENDGRID_SENDER: string | undefined;
+  public MONGODB_HOST: string | undefined;
+  // public MONGODB_USERNAME: string | undefined;
+  // public MONGODB_PASSWORD: string | undefined;
+  // public MONGODB_ATLAS_PROJECT_ID: string | undefined;
+  // public MONGODB_ATLAS_CLUSTER: string | undefined;
+  // public MONGODB_ATLAS_PUBLIC_KEY: string | undefined;
+  // public MONGODB_ATLAS_PRIVATE_KEY: string | undefined;
+  // public ATLAS_CLUSTER_API_URL: string | undefined;
+  // public ATLAS_SEARCH_INDEX_API_URL: string | undefined;
+  // public DIGEST_AUTH: string | undefined;
 
+  public readonly ATLAS_API_BASE_URL = 'https://cloud.mongodb.com/api/atlas/v1.0';
   private readonly defaultDBURL: string = 'mongodb://localhost:27017/midcloud';
 
   constructor() {
@@ -37,6 +48,16 @@ class Config {
     this.SENDER_PASSWORD = process.env.SENDER_PASSWORD || '';
     this.SENDGRID_SENDER = process.env.SENGRID_SENDER || '';
     this.SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
+    this.MONGODB_HOST = process.env.MONGODB_HOST || '';
+    // this.MONGODB_USERNAME = process.env.MONGODB_USERNAME || '';
+    // this.MONGODB_PASSWORD = process.env.MONGODB_PASSWORD || '';
+    // this.MONGODB_ATLAS_PROJECT_ID = process.env.MONGODB_ATLAS_PROJECT_ID || '';
+    // this.MONGODB_ATLAS_CLUSTER = process.env.MONGODB_ATLAS_CLUSTER || '';
+    // this.MONGODB_ATLAS_PUBLIC_KEY = process.env.MONGODB_ATLAS_PUBLIC_KEY || '';
+    // this.MONGODB_ATLAS_PRIVATE_KEY = process.env.MONGODB_ATLAS_PRIVATE_KEY || '';
+    // this.ATLAS_CLUSTER_API_URL = `${this.ATLAS_API_BASE_URL}/groups/${this.MONGODB_ATLAS_PROJECT_ID}/clusters/${this.MONGODB_ATLAS_CLUSTER}`;
+    // this.ATLAS_SEARCH_INDEX_API_URL = `${this.ATLAS_CLUSTER_API_URL}/fts/indexes`;
+    // this.DIGEST_AUTH = `${this.MONGODB_ATLAS_PUBLIC_KEY}:${this.MONGODB_ATLAS_PRIVATE_KEY}`;
   }
 
   public createLogger(name: string): bunyan {
@@ -55,7 +76,7 @@ class Config {
     cloudinary.v2.config({
       cloud_name: this.CLOUD_NAME,
       api_key: this.CLOUD_API_KEY,
-      api_secret: this.CLOUD_API_SECRET,
+      api_secret: this.CLOUD_API_SECRET
     });
   }
 }

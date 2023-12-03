@@ -13,22 +13,24 @@ export class SignIn {
   public async user(req: Request, res: Response): Promise<void> {
     const { username, password } = req.body;
     const existedUser: IAuthDocument = await authService.getAuthUserByUsernameOrEmail(username, '');
-    if(!existedUser) {
+    if (!existedUser) {
       throw new BadRequestError('Invalid credentials!');
     }
     const arePasswordsMatch: boolean = await existedUser.comparePassword(password);
-    if(!arePasswordsMatch) {
+    if (!arePasswordsMatch) {
       throw new BadRequestError('Invalid credentials!');
     }
     const user: IUserDocument = await userService.getUserByAuthId(`${existedUser._id}`);
-    const userToken: string = jwt.sign({
-      userId: user._id,
-      uId: existedUser.uId,
-      email: existedUser.email,
-      username: existedUser.username,
-      firstname: existedUser.firstname,
-      lastname: existedUser.lastname,
-    }, config.JWT_TOKEN!);
+    const userToken: string = jwt.sign(
+      {
+        userId: user._id,
+        uId: existedUser.uId,
+        email: existedUser.email,
+        username: existedUser.username,
+        fullname: existedUser.fullname
+      },
+      config.JWT_TOKEN!
+    );
 
     req.session = { jwt: userToken };
 
@@ -38,9 +40,8 @@ export class SignIn {
       uId: existedUser.uId,
       email: existedUser.email,
       username: existedUser.username,
-      firstname: existedUser.firstname,
-      lastname: existedUser.lastname,
-      createdAt: existedUser.createdAt,
+      fullname: existedUser.fullname,
+      createdAt: existedUser.createdAt
     } as IUserDocument;
 
     res.status(STATUS_CODE.OK).json({ message: 'user has been logged in successfully', user: userDocument, token: userToken });

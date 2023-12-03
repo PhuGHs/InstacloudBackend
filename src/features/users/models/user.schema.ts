@@ -26,9 +26,7 @@ const userSchema: Schema = new Schema({
   work: { type: String, default: '' },
   school: { type: String, default: '' },
   location: { type: String, default: '' },
-  quote: { type: String, default: '' },
-  bgImageVersion: { type: String, default: '' },
-  bgImageId: { type: String, default: '' }
+  quote: { type: String, default: '' }
 });
 
 const UserModel: Model<IUserDocument> = model<IUserDocument>('User', userSchema, 'User');

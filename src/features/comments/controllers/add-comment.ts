@@ -17,14 +17,12 @@ export class Add {
     const data: ICommentDocument = {
       _id: commentObjectId,
       username: req.currentUser!.username,
-      firstname: req.currentUser!.firstname,
-      lastname: req.currentUser!.lastname,
       postId,
       userTo,
       profilePicture,
       comment,
       createdAt: new Date(),
-      reactions: {like: 0}
+      reactions: { like: 0 }
     } as ICommentDocument;
 
     const workerData: ICommentJob = {
@@ -36,6 +34,6 @@ export class Add {
     };
     await commentCache.addCommentToCache({ commentId: `${commentObjectId}`, commentData: data });
     commentQueue.addCommentJob('addCommentToDB', workerData);
-    res.status(STATUS_CODE.OK).json({message: 'Your comment has been added.' });
+    res.status(STATUS_CODE.OK).json({ message: 'Your comment has been added.' });
   }
 }

@@ -25,21 +25,24 @@ class FollowerService {
       {
         updateOne: {
           filter: { _id: userId },
-          update: { $inc: { followingCount: 1 }}
+          update: { $inc: { followingCount: 1 } }
         }
       },
       {
         updateOne: {
           filter: { _id: followeeId },
-          update: { $inc: { followingCount: 1 }}
+          update: { $inc: { followingCount: 1 } }
         }
       }
     ]);
 
-    const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null] = await Promise.all([users, userCache.getUserFromCache(followeeId)]);
+    const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null] = await Promise.all([
+      users,
+      userCache.getUserFromCache(followeeId)
+    ]);
 
     //send notification
-    if(response[1]?.notifications.follows && userId !== followeeId) {
+    if (response[1]?.notifications.follows && userId !== followeeId) {
       const notificationModel: INotificationDocument = new NotificationModel();
       const notification = await notificationModel.insertNotification({
         userFrom: userId,
@@ -71,16 +74,16 @@ class FollowerService {
       followeeId: followeeObId
     });
 
-    await UserModel.updateOne({_id: followeeId }, { $inc: { followersCount: -1 }});
-    await UserModel.updateOne({_id: followerId }, { $inc: { followingCount: - 1}});
+    await UserModel.updateOne({ _id: followeeId }, { $inc: { followersCount: -1 } });
+    await UserModel.updateOne({ _id: followerId }, { $inc: { followingCount: -1 } });
   }
 
   public async getFollowers(userObjectId: ObjectId): Promise<IFollowerData[]> {
     const followee = await FollowerModel.aggregate([
-      { $match: { followeeId: userObjectId }},
-      { $lookup: { from: 'User', localField: 'followerId', foreignField: '_id', as: 'followerId'}},
-      { $unwind: '$follower'},
-      { $lookup: { from: 'Auth', localField: 'follower.authId', foreignField: '_id', as: 'authId'}},
+      { $match: { followeeId: userObjectId } },
+      { $lookup: { from: 'User', localField: 'followerId', foreignField: '_id', as: 'followerId' } },
+      { $unwind: '$follower' },
+      { $lookup: { from: 'Auth', localField: 'follower.authId', foreignField: '_id', as: 'authId' } },
       { $unwind: '$auth' },
       {
         $addFields: {
@@ -109,10 +112,10 @@ class FollowerService {
 
   public async getFollowingList(userObjectId: ObjectId): Promise<IFollowerData[]> {
     const followingList = await FollowerModel.aggregate([
-      { $match: { followerId: userObjectId }},
-      { $lookup: { from: 'User', localField: 'followeeId', foreignField: '_id', as: 'followeeId'}},
-      { $unwind: '$followee'},
-      { $lookup: { from: 'Auth', localField: 'followee.authId', foreignField: '_id', as: 'authId'}},
+      { $match: { followerId: userObjectId } },
+      { $lookup: { from: 'User', localField: 'followeeId', foreignField: '_id', as: 'followeeId' } },
+      { $unwind: '$followee' },
+      { $lookup: { from: 'Auth', localField: 'followee.authId', foreignField: '_id', as: 'authId' } },
       { $unwind: '$auth' },
       {
         $addFields: {

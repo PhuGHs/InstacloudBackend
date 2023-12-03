@@ -6,15 +6,14 @@ const SALT_ROUND = 10;
 
 const authSchema: Schema = new Schema(
   {
-    username: {type: String },
-    firstname: {type: String },
-    lastname: {type: String },
-    uId: {type: String },
-    email: {type: String },
-    password: {type: String },
-    createdAt: {type: Date, default: Date.now },
-    passwordResetToken: {type: String, default: ''},
-    passwordResetExpires: {type: Number}
+    username: { type: String },
+    fullname: { type: String },
+    uId: { type: String },
+    email: { type: String },
+    password: { type: String },
+    createdAt: { type: Date, default: Date.now },
+    passwordResetToken: { type: String, default: '' },
+    passwordResetExpires: { type: Number }
   },
   {
     toJSON: {
@@ -32,7 +31,7 @@ const authSchema: Schema = new Schema(
         return hash(password, SALT_ROUND);
       }
     }
-  },
+  }
 );
 
 authSchema.pre('save', async function (this: IAuthDocument, next: () => void) {

@@ -1,6 +1,5 @@
 import { BaseQueue } from './base.queue';
-import { emailWorker } from '@root/shared/workers/email.worker';
-import { IPostJobData } from '@root/features/posts/interfaces/post.interface';
+import { IPostJobData, ISavePostJob } from '@root/features/posts/interfaces/post.interface';
 import { postWorker } from '@root/shared/workers/post.worker';
 
 class PostQueue extends BaseQueue {
@@ -8,11 +7,13 @@ class PostQueue extends BaseQueue {
     super('post');
     this.processJob('savePostToDB', 5, postWorker.savePostToDB);
     this.processJob('savePostWithImageToDB', 5, postWorker.savePostToDB);
+    this.processJob('savePostWithVideoToDB', 5, postWorker.savePostToDB);
     this.processJob('updatePostInDB', 5, postWorker.updatePost);
     this.processJob('deleteAPostInDB', 5, postWorker.deletePost);
+    this.processJob('saveOtherPostsToDB', 5, postWorker.saveOtherPostsToDB);
   }
 
-  public addPostJob(name: string, data: IPostJobData): void {
+  public addPostJob(name: string, data: IPostJobData | ISavePostJob): void {
     this.addJob(name, data);
   }
 }

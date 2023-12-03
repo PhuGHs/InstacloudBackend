@@ -10,14 +10,14 @@ const addCommentSchema: ObjectSchema = Joi.object().keys({
   comment: Joi.string().required().messages({
     'any.required': 'comment is a required property'
   }),
-  profilePicture: Joi.string().optional().allow(null, ''),
+  profilePicture: Joi.string().optional().allow(null, '')
 });
 
 const updateCommentSchema: ObjectSchema = Joi.object().keys({
   comment: Joi.string().required().messages({
     'any.required': 'comment is a required property'
   }),
-  profilePicture: Joi.string().optional().allow(null, ''),
+  profilePicture: Joi.string().optional().allow(null, '')
 });
 
 export { addCommentSchema, updateCommentSchema };

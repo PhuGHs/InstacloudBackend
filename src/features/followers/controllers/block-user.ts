@@ -15,7 +15,7 @@ export class Update {
       keyTwo: followerId,
       type: 'block'
     });
-    res.status(STATUS_CODE.OK).json({ message: 'blocked user!'});
+    res.status(STATUS_CODE.OK).json({ message: 'blocked user!' });
   }
 
   public async unblockUser(req: Request, res: Response): Promise<void> {
@@ -28,6 +28,6 @@ export class Update {
       keyTwo: followerId,
       type: 'unblock'
     });
-    res.status(STATUS_CODE.OK).json({ message: 'Unblocked user!'});
+    res.status(STATUS_CODE.OK).json({ message: 'Unblocked user!' });
   }
 }

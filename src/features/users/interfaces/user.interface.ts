@@ -5,8 +5,7 @@ export interface IUserDocument extends Document {
   _id: string | ObjectId;
   authId: string | ObjectId;
   username?: string;
-  firstname?: string;
-  lastname?: string;
+  fullname?: string;
   email?: string;
   password?: string;
   uId?: string; //optional to save in redis (using the same Document ? sign)
@@ -21,8 +20,6 @@ export interface IUserDocument extends Document {
   followingCount: number;
   notifications: INotificationSettings;
   social: ISocialLinks;
-  bgImageVersion: string;
-  bgImageId: string;
   profilePicture: string;
   createdAt?: Date;
 }
@@ -41,7 +38,7 @@ export interface INotificationSettings {
   follows: boolean;
 }
 
-export interface IBasicInfo {
+export interface IBackgroundInfo {
   quote: string;
   work: string;
   school: string;
@@ -60,7 +57,6 @@ export interface ISearchUser {
   profilePicture: string;
   username: string;
   email: string;
-  avatarColor: string;
 }
 
 export interface ISocketData {

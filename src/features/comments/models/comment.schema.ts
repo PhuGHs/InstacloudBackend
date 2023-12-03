@@ -5,8 +5,6 @@ const commentSchema: Schema = new Schema({
   postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', index: true },
   comment: { type: String, default: '' },
   username: { type: String },
-  firstname: { type: String },
-  lastname: {type: String },
   profilePicture: { type: String },
   reactions: {
     like: { type: Number, default: 0 }

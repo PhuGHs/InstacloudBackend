@@ -15,7 +15,7 @@ export class Remove {
     } as IReactionJob;
     await reactionCache.removeReactionFromCache(postId, req.currentUser!.username, JSON.parse(postReactions));
     reactionQueue.addReactionJob('removePostReactionFromDB', dataJob);
-    res.status(STATUS_CODE.OK).json({ message: 'You have removed your reaction from the post'});
+    res.status(STATUS_CODE.OK).json({ message: 'You have removed your reaction from the post' });
   }
 
   public async commentReaction(req: Request, res: Response): Promise<void> {
@@ -26,6 +26,6 @@ export class Remove {
     } as IReactionJob;
     await reactionCache.removeCommentReactionFromCache(commentId, req.currentUser!.username, JSON.parse(commentReactions));
     reactionQueue.addReactionJob('removeCommentReactionFromDB', dataJob);
-    res.status(STATUS_CODE.OK).json({ message: 'You have removed your reaction from the comment'});
+    res.status(STATUS_CODE.OK).json({ message: 'You have removed your reaction from the comment' });
   }
 }

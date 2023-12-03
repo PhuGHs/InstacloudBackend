@@ -13,6 +13,8 @@ export interface IPostDocument extends Document {
   commentsCount: number;
   imgVersion?: string;
   imgId?: string;
+  videoId?: string;
+  videoVersion?: string;
   feelings?: string;
   gifUrl?: string;
   privacy?: string;
@@ -20,10 +22,23 @@ export interface IPostDocument extends Document {
   createdAt?: Date;
 }
 
+export interface ISavePostDocument extends Document {
+  _id?: string | mongoose.Types.ObjectId;
+  userId: string | mongoose.Types.ObjectId;
+  postId: string | mongoose.Types.ObjectId;
+  username: string;
+  createdAt?: Date;
+}
+
+export interface ISavePostJob {
+  key: ISavePostDocument;
+}
+
 export interface IGetPostsQuery {
   _id?: ObjectId | string;
   username?: string;
   imgId?: string;
+  videoId?: string;
   gifUrl?: string;
 }
 

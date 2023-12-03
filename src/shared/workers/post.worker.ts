@@ -31,8 +31,20 @@ class PostWorker {
 
   async deletePost(job: Job, done: DoneCallback): Promise<void> {
     try {
-      const { keyOne , keyTwo } = job.data;
+      const { keyOne, keyTwo } = job.data;
       await postService.deleteAPost(keyOne, keyTwo);
+      job.progress(100);
+      done(null, job.data);
+    } catch (error) {
+      log.error(error);
+      done(error as Error);
+    }
+  }
+
+  async saveOtherPostsToDB(job: Job, done: DoneCallback): Promise<void> {
+    try {
+      const { key } = job.data;
+      await postService.saveOtherPostsToDB(key);
       job.progress(100);
       done(null, job.data);
     } catch (error) {

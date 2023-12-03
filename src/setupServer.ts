@@ -14,6 +14,12 @@ import { config } from '@root/config';
 import appRoutes from '@root/routes';
 import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 import Logger from 'bunyan';
+import { SocketIOPostHandler } from '@socket/post.socket';
+import { SocketIOFollowerHandler } from '@socket/follower.socket';
+import { SocketIOChatHandler } from '@socket/chat.socket';
+import { SocketIOImageHandler } from '@socket/image.socket';
+import { SocketIOUserHandler } from '@socket/user.socket';
+import { SocketIONotificationHandler } from '@socket/notification.socket';
 
 const PORT = 5000;
 const log: Logger = config.createLogger('SETUP SERVER');
@@ -38,7 +44,7 @@ export class MidCloudServer {
       cookieSession({
         name: 'session',
         keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!],
-        maxAge: 24 * 7 * 3600, // seven days
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 1 month
         secure: config.NODE_ENV !== 'development'
       })
     );
@@ -111,5 +117,19 @@ export class MidCloudServer {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private socketIOConnection(io: Server): void {}
+  private socketIOConnection(io: Server): void {
+    const postSocketHandler: SocketIOPostHandler = new SocketIOPostHandler(io);
+    const followerSocketHandler: SocketIOFollowerHandler = new SocketIOFollowerHandler(io);
+    const userSocketHandler: SocketIOUserHandler = new SocketIOUserHandler(io);
+    const notificationSocketHandler: SocketIONotificationHandler = new SocketIONotificationHandler();
+    const imageSocketHandler: SocketIOImageHandler = new SocketIOImageHandler();
+    const chatSocketHandler: SocketIOChatHandler = new SocketIOChatHandler(io);
+
+    postSocketHandler.listen();
+    followerSocketHandler.listen();
+    userSocketHandler.listen();
+    chatSocketHandler.listen();
+    notificationSocketHandler.listen(io);
+    imageSocketHandler.listen(io);
+  }
 }

@@ -1,5 +1,5 @@
 import { joiValidation } from '@root/shared/globals/decorators/joi.validation';
-import { postSchema, postWithImageSchema } from '@post/schemes/post.scheme';
+import { postSchema, postWithImageSchema, postWithVideoSchema } from '@post/schemes/post.scheme';
 import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { IPostDocument, ISavePostToCache } from '../interfaces/post.interface';
@@ -8,8 +8,14 @@ import { postQueue } from '@root/shared/services/queues/post.queue';
 import STATUS_CODE from 'http-status-codes';
 import { UploadApiResponse } from 'cloudinary';
 import { upload } from '@root/shared/globals/helpers/cloudinary-upload';
+import { vidUpload } from '@root/shared/globals/helpers/cloudinary-upload';
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
 import { SupportiveMethods } from '@global/helpers/supportive-methods';
+import { socketIOPostObject } from '@socket/post.socket';
+import { IAuthDocument } from '@auth/interfaces/auth.interface';
+import { IUserDocument } from '@user/interfaces/user.interface';
+import { userService } from '@service/db/user.service';
+import { faker } from '@faker-js/faker';
 
 const postCache: PostCache = new PostCache();
 export class Create {
@@ -32,19 +38,64 @@ export class Create {
       commentsCount: 0,
       imgVersion: '',
       imgId: '',
+      videoId: '',
+      videoVersion: '',
       createdAt: new Date(),
       reactions: { like: 0 }
     } as IPostDocument;
+
+    socketIOPostObject.emit('add post', userPost);
 
     const data: ISavePostToCache = {
       key: `${postObjectId}`,
       currentUserId: req.currentUser!.userId,
       uId: req.currentUser!.uId,
-      createdPost: userPost,
+      createdPost: userPost
     } as ISavePostToCache;
     await postCache.savePostToCache(data);
-    postQueue.addPostJob('savePostToDB', { key: req.currentUser!.userId, value: userPost});
-    res.status(STATUS_CODE.OK).json({message: 'post created successfully!', post: userPost});
+    postQueue.addPostJob('savePostToDB', { key: req.currentUser!.userId, value: userPost });
+    res.status(STATUS_CODE.OK).json({ message: 'post created successfully!', post: userPost });
+  }
+
+  @joiValidation(postSchema)
+  public async seedPosts(req: Request, res: Response): Promise<void> {
+    // const { uId, userId, username, email, post, privacy, gifUrl, profilePicture, feelings } = req.body;
+    const users: IUserDocument[] = await userService.getAllUsers();
+    for(const user of users) {
+      const postObjectId: ObjectId = new ObjectId();
+      const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
+      const userPost: IPostDocument = {
+        _id: postObjectId,
+        userId: `${user._id}`,
+        username: user.username,
+        email: user.email,
+        profilePicture: user.profilePicture,
+        post: faker.lorem.sentence(),
+        pId,
+        privacy: 'public',
+        gifUrl: '',
+        feelings: '',
+        commentsCount: 0,
+        imgVersion: '',
+        imgId: '',
+        videoId: '',
+        videoVersion: '',
+        createdAt: new Date(),
+        reactions: { like: 0 }
+      } as IPostDocument;
+
+      socketIOPostObject.emit('add post', userPost);
+
+      const data: ISavePostToCache = {
+        key: `${postObjectId}`,
+        currentUserId: `${user._id}`,
+        uId: user.uId,
+        createdPost: userPost
+      } as ISavePostToCache;
+      await postCache.savePostToCache(data);
+      postQueue.addPostJob('savePostToDB', { key: `${user._id}`, value: userPost });
+    }
+    res.status(STATUS_CODE.OK).json({ message: 'seed successfully!' });
   }
 
   @joiValidation(postWithImageSchema)
@@ -52,8 +103,8 @@ export class Create {
     const { post, privacy, gifUrl, profilePicture, feelings, image } = req.body;
     const postObjectId: ObjectId = new ObjectId();
     const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
-    const result: UploadApiResponse = await upload(image) as UploadApiResponse;
-    if(!result?.public_id) {
+    const result: UploadApiResponse = (await upload(image)) as UploadApiResponse;
+    if (!result?.public_id) {
       throw new BadRequestError('File upload error. Please try again!');
     }
 
@@ -69,6 +120,8 @@ export class Create {
       gifUrl,
       feelings,
       commentsCount: 0,
+      videoId: '',
+      videoVersion: '',
       imgVersion: `${result.version}`,
       imgId: result.public_id.toString(),
       createdAt: new Date(),
@@ -79,11 +132,53 @@ export class Create {
       key: `${postObjectId}`,
       currentUserId: req.currentUser!.userId,
       uId: req.currentUser!.uId,
-      createdPost: userPost,
+      createdPost: userPost
     } as ISavePostToCache;
     await postCache.savePostToCache(data);
-    postQueue.addPostJob('savePostWithImageToDB', { key: req.currentUser!.userId, value: userPost});
+    postQueue.addPostJob('savePostWithImageToDB', { key: req.currentUser!.userId, value: userPost });
     // call image queue to add image to mongodb database
-    res.status(STATUS_CODE.OK).json({message: 'post with image created successfully!', post: userPost});
+    res.status(STATUS_CODE.OK).json({ message: 'post with image created successfully!', post: userPost });
+  }
+
+  @joiValidation(postWithVideoSchema)
+  public async postWithVideo(req: Request, res: Response): Promise<void> {
+    const { post, privacy, gifUrl, profilePicture, feelings, video } = req.body;
+    const postObjectId: ObjectId = new ObjectId();
+    const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
+    const result: UploadApiResponse = (await vidUpload(video)) as UploadApiResponse;
+    if (!result?.public_id) {
+      throw new BadRequestError('File upload error. Please try again!');
+    }
+
+    const userPost: IPostDocument = {
+      _id: postObjectId,
+      userId: req.currentUser!.userId,
+      username: req.currentUser!.username,
+      email: req.currentUser!.email,
+      pId,
+      profilePicture,
+      post,
+      privacy,
+      gifUrl,
+      feelings,
+      commentsCount: 0,
+      videoVersion: `${result.version}`,
+      videoId: result.public_id.toString(),
+      imgId: '',
+      imgVersion: '',
+      createdAt: new Date(),
+      reactions: { like: 0 }
+    } as IPostDocument;
+
+    const data: ISavePostToCache = {
+      key: `${postObjectId}`,
+      currentUserId: req.currentUser!.userId,
+      uId: req.currentUser!.uId,
+      createdPost: userPost
+    } as ISavePostToCache;
+    await postCache.savePostToCache(data);
+    postQueue.addPostJob('savePostWithVideoToDB', { key: req.currentUser!.userId, value: userPost });
+    // call image queue to add image to mongodb database
+    res.status(STATUS_CODE.OK).json({ message: 'post with video created successfully!', post: userPost });
   }
 }

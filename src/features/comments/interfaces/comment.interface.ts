@@ -5,8 +5,6 @@ import { Document } from 'mongoose';
 export interface ICommentDocument extends Document {
   _id?: string | ObjectId;
   username: string;
-  firstname: string;
-  lastname: string;
   postId: string;
   profilePicture: string;
   comment: string;

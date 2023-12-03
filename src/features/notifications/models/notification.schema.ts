@@ -6,7 +6,7 @@ const notificationSchema: Schema = new Schema({
   userTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
   userFrom: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   read: { type: Boolean, default: false },
-  message: { type: String, default: ''},
+  message: { type: String, default: '' },
   notificationType: String,
   entityId: mongoose.Types.ObjectId,
   createdItemId: mongoose.Types.ObjectId,
@@ -19,7 +19,7 @@ const notificationSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now() }
 });
 
-notificationSchema.methods.insertNotification = async function(body: INotification) {
+notificationSchema.methods.insertNotification = async function (body: INotification) {
   const {
     userTo,
     userFrom,
@@ -55,7 +55,7 @@ notificationSchema.methods.insertNotification = async function(body: INotificati
   try {
     const notifications: INotificationDocument[] = await notificationService.getNotification(userTo);
     return notifications;
-  } catch(error) {
+  } catch (error) {
     return error;
   }
 };
