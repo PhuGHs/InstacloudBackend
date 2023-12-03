@@ -52,6 +52,18 @@ class UserWorker {
       done(error as Error);
     }
   }
+
+  async updateFullname(job: Job, done: DoneCallback): Promise<void> {
+    try {
+      const { key, value } = job.data;
+      await userService.updateFullName(key, value);
+      job.progress(100);
+      done(null, value);
+    } catch (error) {
+      log.error(error);
+      done(error as Error);
+    }
+  }
 }
 
 export const userWorker: UserWorker = new UserWorker();

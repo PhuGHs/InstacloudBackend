@@ -21,9 +21,9 @@ class UserService {
   private aggregateProject() {
     return {
       _id: 1,
+      authId: '$authId._id',
       username: '$authId.username',
-      firstname: '$authId.firstname',
-      lastname: '$authId.lastname',
+      fullname: '$authId.fullname',
       uId: '$authId.uId',
       email: '$authId.email',
       createdAt: '$authId.createdAt',
@@ -92,7 +92,7 @@ class UserService {
 
     return recommendedUsers;
   }
-  public async searchUsers(query: string, userId: ObjectId): Promise<IUserDocument[]> {
+  public async searchUsers(query: string, userId: ObjectId, location: string): Promise<IUserDocument[]> {
     const users = await AuthModel.aggregate([
       {
         $search: {
@@ -126,7 +126,12 @@ class UserService {
         }
       },
       {
-        $match: { 'user._id': { $ne: userId } }
+        $match: {
+          $and: [
+            {'user._id': { $ne: userId }},
+            {'user.location': {$eq: location }}
+          ]
+        }
       },
       { $unwind: '$user' },
       {
@@ -174,6 +179,14 @@ class UserService {
     ]);
 
     return users;
+  }
+  public async updateFullName(userId: string, fullname: string): Promise<void> {
+    console.log('userId', userId);
+    console.log('fullname', fullname);
+    const user: IUserDocument = await this.getUserById(userId);
+    console.log('authId', user.authId);
+    console.log('fullname', user.fullname);
+    await AuthModel.updateOne({ _id: user.authId }, { $set: { fullname: fullname } }).exec();
   }
 }
 

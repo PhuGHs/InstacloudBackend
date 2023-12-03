@@ -10,6 +10,7 @@ class UserQueue extends BaseQueue {
     this.processJob('updateNotiSettings', 5, userWorker.updateNotiSettings);
     this.processJob('updateBackgroundInformation', 5, userWorker.updateBackgroundInformation);
     this.processJob('updateSocialLinks', 5, userWorker.updateSocialLinks);
+    this.processJob('updateFullname', 5, userWorker.updateFullname);
   }
 
   public addUserJob(name: string, data: IAuthJob | IUserJob) {
