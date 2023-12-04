@@ -3,7 +3,7 @@ import { SavedPostModel } from '@post/models/savedPost.schema';
 import { PostModel } from '@root/features/posts/models/post.schema';
 import { IUserDocument } from '@root/features/users/interfaces/user.interface';
 import { UserModel } from '@root/features/users/models/user.schema';
-import { Query, UpdateQuery } from 'mongoose';
+import mongoose, { Query, UpdateQuery } from 'mongoose';
 
 class PostService {
   public async savePostToDB(userId: string, post: IPostDocument): Promise<void> {
@@ -43,6 +43,18 @@ class PostService {
 
   public async saveOtherPostsToDB(post: ISavePostDocument): Promise<void> {
     await SavedPostModel.create(post);
+  }
+
+  public async getSavedPostsFromDB(userId: string): Promise<ISavePostDocument[]> {
+    const savedPosts: ISavePostDocument[] = await SavedPostModel.aggregate([
+      {
+        $match: { userId: new mongoose.Types.ObjectId(userId) }
+      },
+      {
+        $sort: { createdAt: -1 }
+      }
+    ]);
+    return savedPosts;
   }
 
   public async searchPosts(query: string): Promise<IPostDocument[]> {

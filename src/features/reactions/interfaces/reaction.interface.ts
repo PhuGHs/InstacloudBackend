@@ -10,6 +10,7 @@ export interface IReactionDocument extends Document {
   createdAt?: Date;
   userTo?: string | ObjectId;
   comment?: string;
+  liked?: boolean;
 }
 
 export interface IReactions {
