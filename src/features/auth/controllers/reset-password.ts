@@ -11,8 +11,11 @@ import publicIP from 'ip';
 import moment from 'moment';
 import { resetPasswordTemplate } from '@root/shared/services/emails/templates/reset-password/reset-password.template';
 import { IResetPasswordParams } from '@root/features/users/interfaces/user.interface';
+import { joiValidation } from '@global/decorators/joi.validation';
+import { emailSchema, passwordSchema } from '@auth/schemes/resetPassword.scheme';
 
 export class Password {
+  @joiValidation(emailSchema)
   public async create(req: Request, res: Response): Promise<void> {
     const { email } = req.body;
     const user: IAuthDocument = (await authService.getAuthUserByUsernameOrEmail('', email)) as IAuthDocument;
@@ -35,6 +38,7 @@ export class Password {
     res.status(STATUS_CODE.OK).json({ message: 'Password reset request email has been sent.' });
   }
 
+  @joiValidation(passwordSchema)
   public async update(req: Request, res: Response): Promise<void> {
     const { password, confirmPassword } = req.body;
     const { token } = req.params;
@@ -61,6 +65,6 @@ export class Password {
 
     const template: string = resetPasswordTemplate.passwordResetConfirmationTemplate(templateParams);
     emailQueue.addEmailJob('forgotPassword', { template, receiverEmail: user.email, subject: 'Password reset confirmation' });
-    res.status(STATUS_CODE.OK).json({ message: 'Password is updated succesfully!' });
+    res.status(STATUS_CODE.OK).json({ message: 'Password has been updated succesfully!' });
   }
 }

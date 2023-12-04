@@ -44,6 +44,7 @@ export interface IAuthMock {
   username?: string;
   firstname?: string;
   lastname?: string;
+  confirmPassword?: string;
   email?: string;
   password?: string;
   avatarImage?: string;
