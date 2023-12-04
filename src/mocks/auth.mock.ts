@@ -30,7 +30,7 @@ export const authMock = {
   username: 'phule',
   fullname: 'Phu Le',
   email: 'phule@gmail.com',
-  createdAt: '2022-08-31T07:42:24.451Z',
+  createdAt: '2023-11-30T03:10:32.539Z',
   save: () => {},
   comparePassword: () => false
 } as unknown as IAuthDocument;
