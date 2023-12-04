@@ -16,8 +16,6 @@ export class Save {
       createdAt: new Date()
     } as ISavePostDocument;
 
-    socketIOPostObject.emit('save post', data);
-
     postQueue.addPostJob('saveOtherPostsToDB', { key: data });
     res.status(STATUS_CODE.OK).json({ message: 'The post has been saved' });
   }

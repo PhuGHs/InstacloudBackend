@@ -1,12 +1,14 @@
-import { ObjectId } from 'mongodb';
-import mongoose from 'mongoose';
 import { AuthPayload } from '@auth/interfaces/auth.interface';
 import { Request, Response } from 'express';
+import { IPostDocument, ISavePostDocument } from '@post/interfaces/post.interface';
+import mongoose from 'mongoose';
+import { userdata } from './user.mock';
 
-export const postMockRequest = (body: IPostBody, currentUser?: AuthPayload | null, params?: IParameters) => ({
+export const postMockRequest = (body?: IPostBody, currentUser?: AuthPayload | null, params?: IParameters, query?: IQuery) => ({
   body,
   params,
-  currentUser
+  currentUser,
+  query
 });
 
 export const postMockResponse = (): Response => {
@@ -55,6 +57,59 @@ export const postWithVideoFieldEmpty: IPostBody = {
   video: ''
 };
 
+export const savedPost: ISavePostDocument = {
+  userId: '60263f14648fed5246e322d9',
+  username: 'phule',
+  postId: '6568049ff9ecc21f63864821',
+  createdAt: new Date()
+} as unknown as ISavePostDocument;
+
+export const postMockData: IPostDocument = {
+  _id: new mongoose.Types.ObjectId('6027f77087c9d9ccb1555268'),
+  userId: userdata._id,
+  username: userdata.username,
+  email: userdata.email,
+  profilePicture: userdata.profilePicture,
+  post: 'how are you?',
+  imgId: '',
+  imgVersion: '',
+  feelings: 'happy',
+  gifUrl: '',
+  privacy: 'Public',
+  commentsCount: 0,
+  createdAt: new Date(),
+  reactions: {
+    like: 0,
+    love: 0,
+    happy: 0,
+    wow: 0,
+    sad: 0,
+    angry: 0
+  }
+} as unknown as IPostDocument;
+
+
+export const updatedPost = {
+  profilePicture: postMockData.profilePicture,
+  post: postMockData.post,
+  feelings: 'wow',
+  privacy: 'Private',
+  gifUrl: '',
+  imgId: '',
+  imgVersion: '',
+};
+
+export const updatedPostWithImage = {
+  profilePicture: postMockData.profilePicture,
+  post: 'Wonderful',
+  feelings: 'wow',
+  privacy: 'Private',
+  gifUrl: '',
+  imgId: '',
+  imgVersion: '',
+  image: ''
+};
+
 
 
 export interface IPostBody {
@@ -64,9 +119,14 @@ export interface IPostBody {
   profilePicture?: string;
   image?: string;
   video?: string;
+  postId?: string;
 }
 
 export interface IParameters {
   postId?: string;
   page?: string;
+}
+
+export interface IQuery {
+  query: string;
 }

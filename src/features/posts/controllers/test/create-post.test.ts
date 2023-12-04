@@ -32,7 +32,7 @@ describe('Create Post', () => {
 
   describe('post without image or video', () => {
     it('should send correct json response', async () => {
-      const req: Request = postMockRequest(post, authUserPayload) as Request;
+      const req: Request = postMockRequest(post, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       const spy = jest.spyOn(PostCache.prototype, 'savePostToCache');
@@ -58,7 +58,7 @@ describe('Create Post', () => {
 
   describe('post with image', () => {
     it('should throw an error if image is not available', () => {
-      const req: Request = postMockRequest(post, authUserPayload) as Request;
+      const req: Request = postMockRequest(post, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       Create.prototype.postWithImage(req, res).catch((error: CustomError) => {
@@ -68,7 +68,7 @@ describe('Create Post', () => {
     });
 
     it('should throw an error if image is empty', () => {
-      const req: Request = postMockRequest(postWithImageFieldEmpty, authUserPayload) as Request;
+      const req: Request = postMockRequest(postWithImageFieldEmpty, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       Create.prototype.postWithImage(req, res).catch((error: CustomError) => {
@@ -78,7 +78,7 @@ describe('Create Post', () => {
     });
 
     it('should throw upload error', () => {
-      const req: Request = postMockRequest(postWithImage, authUserPayload) as Request;
+      const req: Request = postMockRequest(postWithImage, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       jest.spyOn(cloudinaryUpload, 'upload').mockImplementation((): any => Promise.resolve({version: '', public_id: '', message: 'Upload error'}));
@@ -89,7 +89,7 @@ describe('Create Post', () => {
     });
 
     it('should send correct json response', async () => {
-      const req: Request = postMockRequest(postWithImage, authUserPayload) as Request;
+      const req: Request = postMockRequest(postWithImage, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       const spy = jest.spyOn(PostCache.prototype, 'savePostToCache');
@@ -116,7 +116,7 @@ describe('Create Post', () => {
 
   describe('post with video', () => {
     it('should throw an error if video field is not available', () => {
-      const req: Request = postMockRequest(post, authUserPayload) as Request;
+      const req: Request = postMockRequest(post, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       Create.prototype.postWithVideo(req, res).catch((error: CustomError) => {
@@ -126,7 +126,7 @@ describe('Create Post', () => {
     });
 
     it('should throw an error if video field is empty', () => {
-      const req: Request = postMockRequest(postWithVideoFieldEmpty, authUserPayload) as Request;
+      const req: Request = postMockRequest(postWithVideoFieldEmpty, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       Create.prototype.postWithVideo(req, res).catch((error: CustomError) => {
@@ -136,7 +136,7 @@ describe('Create Post', () => {
     });
 
     it('should throw upload error', () => {
-      const req: Request = postMockRequest(postWithVideo, authUserPayload) as Request;
+      const req: Request = postMockRequest(postWithVideo, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       jest.spyOn(cloudinaryUpload, 'vidUpload').mockImplementation((): any => Promise.resolve({version: '', public_id: '', message: 'Upload error'}));
@@ -147,7 +147,7 @@ describe('Create Post', () => {
     });
 
     it('should send correct json response', async () => {
-      const req: Request = postMockRequest(postWithVideo, authUserPayload) as Request;
+      const req: Request = postMockRequest(postWithVideo, authUserPayload) as unknown as Request;
       const res: Response = postMockResponse();
 
       const spy = jest.spyOn(PostCache.prototype, 'savePostToCache');
