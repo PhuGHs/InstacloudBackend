@@ -124,6 +124,7 @@ export interface IPostBody {
 
 export interface IParameters {
   postId?: string;
+  commentId?: string;
   page?: string;
 }
 

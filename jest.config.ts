@@ -28,7 +28,7 @@ const config: Config.InitialOptions = {
     '@reaction/(.*)': ['<rootDir>/src/features/reactions/$1'],
     '@comment/(.*)': ['<rootDir>/src/features/comments/$1'],
     '@follower/(.*)': ['<rootDir>/src/features/followers/$1'],
-    '@notfication/(.*)': ['<rootDir>/src/features/notifications/$1'],
+    '@notification/(.*)': ['<rootDir>/src/features/notifications/$1'],
     '@image/(.*)': ['<rootDir>/src/features/images/$1'],
     '@chat/(.*)': ['<rootDir>/src/features/chat/$1'],
     '@root/(.*)': ['<rootDir>/src/$1'],
