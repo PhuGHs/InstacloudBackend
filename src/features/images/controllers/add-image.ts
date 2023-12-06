@@ -24,7 +24,6 @@ export class Add {
     socketIOImageObject.emit('update user', cachedUser);
     imageQueue.addImageJob('addImageToDB', {
       key: req.currentUser!.userId,
-      value: createdUrl,
       imgId: result.public_id!,
       imgVersion: result.version.toString()
     });

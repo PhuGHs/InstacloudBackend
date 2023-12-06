@@ -16,6 +16,9 @@ import { IAuthDocument } from '@auth/interfaces/auth.interface';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { userService } from '@service/db/user.service';
 import { faker } from '@faker-js/faker';
+import { imageQueue } from '@service/queues/image.queue';
+import { videoQueue } from '@service/queues/video.queue';
+import { IFileVideoDocument, IFileVideoJob } from '@video/interfaces/video.interface';
 
 const postCache: PostCache = new PostCache();
 export class Create {
@@ -138,7 +141,11 @@ export class Create {
     } as ISavePostToCache;
     await postCache.savePostToCache(data);
     postQueue.addPostJob('savePostWithImageToDB', { key: req.currentUser!.userId, value: userPost });
-    // call image queue to add image to mongodb database
+    imageQueue.addImageJob('addImageToDB', {
+      key: req.currentUser!.userId,
+      imgId: result.public_id,
+      imgVersion: result.version.toString()
+    });
     res.status(STATUS_CODE.OK).json({ message: 'post with image created successfully!', post: userPost });
   }
 
@@ -182,7 +189,14 @@ export class Create {
     } as ISavePostToCache;
     await postCache.savePostToCache(data);
     postQueue.addPostJob('savePostWithVideoToDB', { key: req.currentUser!.userId, value: userPost });
-    // call image queue to add image to mongodb database
+    videoQueue.addVideoJob('addVideoToDB', {
+      value: {
+        userId: req.currentUser!.userId,
+        videoId: userPost.videoId!,
+        videoVersion: userPost.videoVersion!,
+        createdAt: new Date()
+      } as IFileVideoDocument
+    });
     res.status(STATUS_CODE.OK).json({ message: 'post with video created successfully!', post: userPost });
   }
 }

@@ -37,6 +37,7 @@
       "@follower/*": ["src/features/followers/*"],
       "@notification/*": ["src/features/notifications/*"],
       "@image/*": ["src/features/images/*"],
+      "@video/*": ["src/features/videos/*"],
       "@chat/*": ["src/features/chat/*"],
       "@root/*": ["src/*"],
     }

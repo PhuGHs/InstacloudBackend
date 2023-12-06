@@ -200,6 +200,9 @@ class UserService {
     console.log('fullname', user.fullname);
     await AuthModel.updateOne({ _id: user.authId }, { $set: { fullname: fullname } }).exec();
   }
+  public async updateProfilePicture(userId: string, path: string): Promise<void> {
+    await UserModel.updateOne({ _id: userId }, { $set: { profilePicture: path } });
+  }
 }
 
 export const userService: UserService = new UserService();

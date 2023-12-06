@@ -13,6 +13,7 @@ import { IBlockedUserJobData, IFollowerJobData } from '@follower/interfaces/foll
 import { INotificationJobData } from '@notification/interfaces/notification.interface';
 import { IFileImageJobData } from '@image/interfaces/image.interface';
 import { IChatJobData, IMessageData } from '@chat/interfaces/chat.interface';
+import { IFileVideoJob } from '@video/interfaces/video.interface';
 
 type IBaseJobData =
   | IAuthJob
@@ -28,7 +29,8 @@ type IBaseJobData =
   | IChatJobData
   | IMessageData
   | ISavePostJob
-  | IUserJob;
+  | IUserJob
+  | IFileVideoJob;
 
 let bullAdapters: BullAdapter[] = [];
 

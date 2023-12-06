@@ -20,7 +20,7 @@ const userCache: UserCache = new UserCache();
 export class SignUp {
   @joiValidation(signupSchema)
   public async user(req: Request, res: Response): Promise<void> {
-    const { username, firstname, lastname, email, password, avatarImage } = req.body;
+    const { username, firstname, lastname, email, password } = req.body;
     //check if user is exist
     const existedUser: IAuthDocument = await authService.getAuthUserByUsernameOrEmail(username, email);
     if (existedUser) {
@@ -39,6 +39,7 @@ export class SignUp {
       lastname,
       password
     } as ISignUpData);
+    const avatarImage = 'https://res.cloudinary.com/daszajz9a/image/upload/v1701853039/defaultAvatar_q8btqd.png';
     const result: UploadApiResponse = (await upload(avatarImage, `${userObjectId}`, true, true)) as UploadApiResponse;
     if (!result?.public_id) {
       throw new BadRequestError('File upload error. Please try again!');

@@ -6,7 +6,7 @@ import { IFileImageJobData } from '@image/interfaces/image.interface';
 
 class ImageQueue extends BaseQueue {
   constructor() {
-    super('followerQueue');
+    super('videoQueue');
     this.processJob('addImageToDB', 5, imageWorker.addImageToDB);
     this.processJob('removeImageFromDB', 5, imageWorker.removeImageFromDB);
   }
