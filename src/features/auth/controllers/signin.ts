@@ -8,8 +8,11 @@ import { userService } from '@root/shared/services/db/user.service';
 import jwt from 'jsonwebtoken';
 import { config } from '@root/config';
 import STATUS_CODE from 'http-status-codes';
+import { joiValidation } from '@global/decorators/joi.validation';
+import { signinSchema } from '@auth/schemes/signin.schema';
 
 export class SignIn {
+  @joiValidation(signinSchema)
   public async user(req: Request, res: Response): Promise<void> {
     const { username, password } = req.body;
     const existedUser: IAuthDocument = await authService.getAuthUserByUsernameOrEmail(username, '');
@@ -44,6 +47,6 @@ export class SignIn {
       createdAt: existedUser.createdAt
     } as IUserDocument;
 
-    res.status(STATUS_CODE.OK).json({ message: 'user has been logged in successfully', user: userDocument, token: userToken });
+    res.status(STATUS_CODE.OK).json({ message: 'User logged in successfully', user: userDocument, token: userToken });
   }
 }

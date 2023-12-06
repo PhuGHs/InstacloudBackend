@@ -93,6 +93,25 @@ class UserService {
     return recommendedUsers;
   }
   public async searchUsers(query: string, userId: ObjectId, location: string): Promise<IUserDocument[]> {
+    let matchOperator;
+    if(location) {
+      matchOperator = {
+        $match: {
+          $and: [
+            {'user._id': { $ne: userId }},
+            {'user.location': {$eq: location }}
+          ]
+        }
+      };
+    } else {
+      matchOperator = {
+        $match: {
+          $and: [
+            {'user._id': { $ne: userId }},
+          ]
+        }
+      };
+    }
     const users = await AuthModel.aggregate([
       {
         $search: {
@@ -125,14 +144,7 @@ class UserService {
           as: 'user'
         }
       },
-      {
-        $match: {
-          $and: [
-            {'user._id': { $ne: userId }},
-            {'user.location': {$eq: location }}
-          ]
-        }
-      },
+      matchOperator,
       { $unwind: '$user' },
       {
         $project: {

@@ -1,7 +1,7 @@
 import { IFollower, IFollowerData } from '@follower/interfaces/follower.interface';
 import { SupportiveMethods } from '@global/helpers/supportive-methods';
 import { IFileImageDocument } from '@image/interfaces/image.interface';
-import { IPostDocument } from '@post/interfaces/post.interface';
+import { IPostDocument, ISavePostDocument } from '@post/interfaces/post.interface';
 import { followerService } from '@service/db/follower.service';
 import { imageService } from '@service/db/image.service';
 import { postService } from '@service/db/post.service';
@@ -43,7 +43,7 @@ export class Get {
 
   public async profileMaterials(req: Request, res: Response): Promise<void> {
     const { userId, username, uId } = req.params;
-    const userName: string = SupportiveMethods.uppercaseFirstLetter(username) as string;
+    const userName: string = SupportiveMethods.lowercase(username) as string;
     const cachedPosts: IPostDocument[] = await postCache.getPostsFromCacheOfAUser('post', parseInt(uId, 10));
     const posts: IPostDocument[] = cachedPosts.length
       ? cachedPosts
@@ -56,8 +56,9 @@ export class Get {
     const following: IFollowerData[] = await Get.prototype.following(userId);
 
     const image: IFileImageDocument[] = await imageService.getImagesFromDB(req.currentUser!.userId);
+    const savedPosts: ISavePostDocument[] = await postService.getSavedPostsFromDB(req.currentUser!.userId);
 
-    res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image });
+    res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image, savedPosts });
   }
 
   public async userSuggestion(req: Request, res: Response): Promise<void> {

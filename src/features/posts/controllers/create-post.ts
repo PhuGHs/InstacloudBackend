@@ -128,6 +128,8 @@ export class Create {
       reactions: { like: 0 }
     } as IPostDocument;
 
+    socketIOPostObject.emit('add post', userPost);
+
     const data: ISavePostToCache = {
       key: `${postObjectId}`,
       currentUserId: req.currentUser!.userId,
@@ -169,6 +171,8 @@ export class Create {
       createdAt: new Date(),
       reactions: { like: 0 }
     } as IPostDocument;
+
+    socketIOPostObject.emit('add post', userPost);
 
     const data: ISavePostToCache = {
       key: `${postObjectId}`,

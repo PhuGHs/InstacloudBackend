@@ -12,7 +12,7 @@ class AuthService {
   }
   public async getAuthUserByUsernameOrEmail(username: string, email: string): Promise<IAuthDocument> {
     const query = {
-      $or: [{ username: SupportiveMethods.uppercaseFirstLetter(username) }, { email: SupportiveMethods.lowercase(email) }]
+      $or: [{ username: SupportiveMethods.lowercase(username) }, { email: SupportiveMethods.lowercase(email) }]
     };
 
     const user: IAuthDocument = (await AuthModel.findOne(query).exec()) as IAuthDocument;

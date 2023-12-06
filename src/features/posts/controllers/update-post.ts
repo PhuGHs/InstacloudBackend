@@ -46,6 +46,7 @@ export class Update {
         throw new BadRequestError(result.message);
       }
     }
+
     res.status(STATUS_CODE.OK).json({ message: 'post with image has been updated successfully' });
   }
 
@@ -80,6 +81,7 @@ export class Update {
     } as IPostDocument;
 
     const postUpdated: IPostDocument = await postCache.updatePostInCache(postId, updatedPost);
+    socketIOPostObject.emit('update post', postUpdated, 'posts');
     postQueue.addPostJob('updatePostInDB', { key: postId, value: postUpdated });
   }
 
