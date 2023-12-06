@@ -43,7 +43,7 @@ export class Get {
 
   public async profileMaterials(req: Request, res: Response): Promise<void> {
     const { userId, username, uId } = req.params;
-    const userName: string = SupportiveMethods.uppercaseFirstLetter(username) as string;
+    const userName: string = SupportiveMethods.lowercase(username) as string;
     const cachedPosts: IPostDocument[] = await postCache.getPostsFromCacheOfAUser('post', parseInt(uId, 10));
     const posts: IPostDocument[] = cachedPosts.length
       ? cachedPosts

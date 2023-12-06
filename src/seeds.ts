@@ -58,7 +58,7 @@ async function seedUserData(count: number): Promise<void> {
   let i = 0;
   try {
     for(i = 0; i < count; i++) {
-      const username: string = faker.helpers.unique(faker.word.adjective, [8]);
+      const username: string = faker.internet.userName();
       const firstname: string = faker.person.firstName();
       const lastname: string = faker.person.lastName();
       const color = avatarColor();
@@ -164,4 +164,4 @@ async function seedPostsForUsers() {
   }
 }
 
-seedUserData(100);
+seedUserData(50);

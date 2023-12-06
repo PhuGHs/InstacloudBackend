@@ -59,7 +59,7 @@ export class SignUp {
     return {
       _id,
       uId,
-      username: SupportiveMethods.uppercaseFirstLetter(username),
+      username: SupportiveMethods.lowercase(username),
       fullname: firstname + ' ' + lastname,
       email: SupportiveMethods.lowercase(email),
       password,
@@ -73,7 +73,7 @@ export class SignUp {
       _id: userObjectId,
       authId: _id,
       uId,
-      username: SupportiveMethods.uppercaseFirstLetter(username),
+      username: SupportiveMethods.lowercase(username),
       fullname,
       email: SupportiveMethods.lowercase(email),
       password,

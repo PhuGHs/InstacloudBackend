@@ -169,7 +169,7 @@ export class PostCache extends BaseCache {
         this.client.connect();
       }
       const posts: IPostDocument[] = [];
-      const reply: string[] = await this.client.ZRANGE(key, uId, uId, { REV: true, BY: 'SCORE' });
+      const reply: string[] = await this.client.ZRANGEBYSCORE(key, uId, uId);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
         multi.HGETALL(`posts:${value}`);
