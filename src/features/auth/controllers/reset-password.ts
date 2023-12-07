@@ -30,7 +30,7 @@ export class Password {
 
     const resetLink = `${config.CLIENT_URL}/reset-password?token=${randomCharacters}`;
     const template: string = forgotPasswordTemplate.passwordResetTemplate(user.username, resetLink);
-    emailQueue.addEmailJob('forgotPassword', {
+    emailQueue.addEmailJob('resetPassword', {
       receiverEmail: user.email,
       template,
       subject: 'Reset your password'
@@ -64,7 +64,7 @@ export class Password {
     };
 
     const template: string = resetPasswordTemplate.passwordResetConfirmationTemplate(templateParams);
-    emailQueue.addEmailJob('forgotPassword', { template, receiverEmail: user.email, subject: 'Password reset confirmation' });
+    emailQueue.addEmailJob('resetPassword', { template, receiverEmail: user.email, subject: 'Password reset confirmation' });
     res.status(STATUS_CODE.OK).json({ message: 'Password has been updated succesfully!' });
   }
 }

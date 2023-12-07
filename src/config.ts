@@ -46,7 +46,7 @@ class Config {
     this.CLOUD_API_SECRET = process.env.CLOUD_API_SECRET || '';
     this.SENDER_EMAIL = process.env.SENDER_EMAIL || '';
     this.SENDER_PASSWORD = process.env.SENDER_PASSWORD || '';
-    this.SENDGRID_SENDER = process.env.SENGRID_SENDER || '';
+    this.SENDGRID_SENDER = process.env.SENDGRID_SENDER || '';
     this.SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
     this.MONGODB_HOST = process.env.MONGODB_HOST || '';
     // this.MONGODB_USERNAME = process.env.MONGODB_USERNAME || '';

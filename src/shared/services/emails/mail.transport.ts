@@ -17,11 +17,7 @@ sendGridMail.setApiKey(config.SENDGRID_API_KEY!);
 
 class MailTransport {
   public async sendEmail(receiverEmail: string, subject: string, body: string): Promise<void> {
-    if (config.NODE_ENV === 'development' || config.NODE_ENV === 'test') {
-      this.devEmailSender(receiverEmail, subject, body);
-    } else {
-      this.prodEmailSender(receiverEmail, subject, body);
-    }
+    this.prodEmailSender(receiverEmail, subject, body);
   }
   private async devEmailSender(receiverEmail: string, subject: string, body: string): Promise<void> {
     log.info(config.SENDER_EMAIL);
@@ -36,8 +32,8 @@ class MailTransport {
     });
 
     const mailOptions: IMailerOptions = {
-      from: `InsideCloud App <${config.SENDER_EMAIL!}>`,
       to: receiverEmail,
+      from: config.SENDER_EMAIL!,
       subject,
       html: body
     };
@@ -52,7 +48,7 @@ class MailTransport {
   }
   private async prodEmailSender(receiverEmail: string, subject: string, body: string): Promise<void> {
     const mailOptions: IMailerOptions = {
-      from: `InsideCloud App <${config.SENDER_EMAIL!}>`,
+      from: config.SENDGRID_SENDER!,
       to: receiverEmail,
       subject,
       html: body

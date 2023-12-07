@@ -51,7 +51,7 @@ class ReactionService {
         createdAt: new Date()
       });
     }
-    //send to client using socketIO\
+    //send to client using socketIO
   }
 
   public async addCommentReactionToDB(reactionData: IReactionJob): Promise<void> {

@@ -36,10 +36,10 @@ export class Get {
     const cachedPosts: IPostDocument[] = await postCache.getPostsWithImagesFromCache('post', newSkip, limit);
     if (cachedPosts.length) {
       posts = cachedPosts;
-      totalPosts = await postCache.getTotalPostsWithImagesFromCache();
+      totalPosts = cachedPosts.length;
     } else {
       posts = await postService.getPosts({ imgId: '$ne', gifUrl: '$ne' }, skip, limit, { createdAt: -1 });
-      totalPosts = await postService.postsCount();
+      totalPosts = posts.length;
     }
     res.status(STATUS_CODE.OK).json({ message: 'All posts with images', posts, totalPosts });
   }
@@ -50,12 +50,15 @@ export class Get {
     const limit: number = PAGE_SIZE * parseInt(page);
     const newSkip: number = skip === 0 ? skip : skip + 1;
     let posts: IPostDocument[] = [];
+    let totalPosts: number = 0;
     const cachedPosts: IPostDocument[] = await postCache.getPostsWithVideoFromCache('post', newSkip, limit);
     if (cachedPosts.length) {
       posts = cachedPosts;
+      totalPosts = posts.length;
     } else {
       posts = await postService.getPosts({ videoId: '$ne' }, skip, limit, { createdAt: -1 });
+      totalPosts = posts.length;
     }
-    res.status(STATUS_CODE.OK).json({ message: 'All posts with video', posts });
+    res.status(STATUS_CODE.OK).json({ message: 'All posts with video', posts, totalPosts });
   }
 }
