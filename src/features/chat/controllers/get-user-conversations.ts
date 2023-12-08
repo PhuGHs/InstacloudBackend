@@ -27,6 +27,12 @@ export class Get {
       );
     }
 
+    messages = await chatService.getMessages(
+      new mongoose.Types.ObjectId(req.currentUser!.userId),
+      new mongoose.Types.ObjectId(receiverId),
+      { createdAt: 1 }
+    );
+
     res.status(STATUS_CODE.OK).json({ message: 'conversation messages', messages });
   }
 }

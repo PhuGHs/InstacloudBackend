@@ -112,17 +112,10 @@ class ReactionService {
     ]);
   }
 
-  public async getPostReactions(query: IQueryReaction, sort: Record<string, 1 | -1>, username?: string): Promise<[IReactionDocument[], number]> {
+  public async getPostReactions(query: IQueryReaction, sort: Record<string, 1 | -1>, username?: string): Promise<IReactionDocument[]> {
     const reactions: IReactionDocument[] = await ReactionModel.aggregate([{ $match: query }, { $sort: sort }]);
-    for(const reaction of reactions) {
-      if(reaction.username === username) {
-        reaction.liked = true;
-      } else {
-        reaction.liked = false;
-      }
-    }
 
-    return [reactions, reactions.length];
+    return reactions;
   }
 
 

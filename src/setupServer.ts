@@ -45,7 +45,7 @@ export class MidCloudServer {
         name: 'session',
         keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!],
         maxAge: 30 * 24 * 60 * 60 * 1000, // 1 month
-        secure: config.NODE_ENV !== 'development'
+        secure: false,
       })
     );
 
