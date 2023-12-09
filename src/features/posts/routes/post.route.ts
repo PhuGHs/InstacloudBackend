@@ -16,6 +16,7 @@ class PostRoutes {
     this.router.get('/post/all/:page', authMiddleware.checkAuthentication, Get.prototype.posts);
     this.router.get('/post/images/:page', authMiddleware.checkAuthentication, Get.prototype.postsWithImage);
     this.router.get('/post/videos/:page', authMiddleware.checkAuthentication, Get.prototype.postsWithVideo);
+    this.router.get('/post/:postId', authMiddleware.checkAuthentication, Get.prototype.getSinglePost);
 
     this.router.get('/post/search', authMiddleware.checkAuthentication, Search.prototype.posts);
 
@@ -29,7 +30,7 @@ class PostRoutes {
     this.router.put('/post/:postId', authMiddleware.checkAuthentication, Update.prototype.post);
     this.router.put('/post-with-video/:postId', authMiddleware.checkAuthentication, Update.prototype.postWithVideo);
 
-    this.router.delete('/post/:postId', authMiddleware.checkAuthentication, Delete.prototype.post);
+    this.router.delete('/post/:postId/:pId', authMiddleware.checkAuthentication, Delete.prototype.post);
     return this.router;
   }
 }

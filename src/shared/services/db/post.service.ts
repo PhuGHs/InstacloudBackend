@@ -18,7 +18,6 @@ class PostService {
 
   public async deleteAPost(postId: string, userId: string): Promise<void> {
     const promiseDeletedPost: Query<IQueryComplete & IQueryDeleted, IPostDocument> = PostModel.deleteOne({ _id: postId });
-    //delete reactions
     const promiseUpdatedUser: UpdateQuery<IUserDocument> = UserModel.updateOne({ _id: userId }, { $inc: { postsCount: -1 } });
     await Promise.all([promiseDeletedPost, promiseUpdatedUser]);
   }
@@ -35,6 +34,11 @@ class PostService {
 
     const posts: IPostDocument[] = await PostModel.aggregate([{ $match: postQuery }, { $sort: sort }, { $skip: skip }, { $limit: limit }]);
     return posts;
+  }
+
+  public async getSinglePost(postId: string): Promise<IPostDocument> {
+    const post: IPostDocument = await PostModel.findOne({ _id: postId }).exec() as IPostDocument;
+    return post;
   }
 
   public async postsCount(): Promise<number> {

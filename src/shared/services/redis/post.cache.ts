@@ -143,7 +143,7 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async deleteAPostInCache(postId: string, userId: string): Promise<void> {
+  public async deleteAPostInCache(postId: string, userId: string, pId: string): Promise<void> {
     try {
       if (!this.client.isOpen) {
         this.client.connect();
@@ -152,11 +152,33 @@ export class PostCache extends BaseCache {
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       multi.ZREM('post', `${postId}`);
       multi.DEL(`posts:${postId}`);
-      //remove comment and reactions as well
+      multi.DEL(`reactions:${postId}`);
+      multi.ZREMRANGEBYSCORE('comment', pId, pId);
+      // const commentId = this.client.ZRANGEBYSCORE('comment')
       const count: number = parseInt(postCount!, 10) - 1;
       multi.HSET(`users:${userId}`, ['postsCount', count]);
 
       await multi.exec();
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async getAPostFromCache(postId: string): Promise<IPostDocument> {
+    try {
+      if (!this.client.isOpen) {
+        this.client.connect();
+      }
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      multi.HGETALL(`posts:${postId}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const reply = (await multi.exec()) as any as IPostDocument[];
+      reply[0].commentsCount = SupportiveMethods.parseJson(`${reply[0].commentsCount}`) as number;
+      reply[0].reactions = SupportiveMethods.parseJson(`${reply[0].reactions}`) as IReactions;
+      reply[0].createdAt = new Date(SupportiveMethods.parseJson(`${reply[0].createdAt}`)) as Date;
+
+      return reply[0];
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');

@@ -61,4 +61,11 @@ export class Get {
     }
     res.status(STATUS_CODE.OK).json({ message: 'All posts with video', posts, totalPosts });
   }
+
+  public async getSinglePost(req: Request, res: Response): Promise<void> {
+    const { postId } = req.params;
+    const post: IPostDocument = await postCache.getAPostFromCache(postId);
+    const result = post ? post : await postService.getSinglePost(postId);
+    res.status(STATUS_CODE.OK).json({ post: result });
+  }
 }
