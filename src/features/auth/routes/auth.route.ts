@@ -12,7 +12,7 @@ class AuthRoutes {
   public routes(): Router {
     this.router.post('/signup', SignUp.prototype.user);
     this.router.post('/signin', SignIn.prototype.user);
-    this.router.get('/signout', SignOut.prototype.user);
+    this.router.post('/signout', SignOut.prototype.user);
     this.router.post('/forgot-password', Password.prototype.create);
     this.router.post('/reset-password/:token', Password.prototype.update);
 
@@ -20,7 +20,7 @@ class AuthRoutes {
   }
 
   public signOutRoutes(): Router {
-    this.router.get('/signout', SignOut.prototype.user);
+    this.router.post('/signout', SignOut.prototype.user);
     return this.router;
   }
 }
