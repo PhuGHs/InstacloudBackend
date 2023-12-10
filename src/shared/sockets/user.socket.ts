@@ -15,7 +15,7 @@ export class SocketIOUserHandler {
   }
 
   public listen(): void {
-    this.io.on('connection', (socket: Socket) => {
+    this.io.on('connect', (socket: Socket) => {
       socket.on('setup', (data: ILogin) => {
         this.addClientToServer(data.userId, socket.id);
         this.addUser(data.userId);

@@ -6,6 +6,7 @@ import { Delete } from '@post/controllers/delete-post';
 import { Get } from '@post/controllers/get-posts';
 import { Save } from '@post/controllers/save-post';
 import { Search } from '@post/controllers/search-posts';
+import { GetSavedPost } from '@post/controllers/get-savedPosts';
 
 class PostRoutes {
   private router: Router;
@@ -17,6 +18,7 @@ class PostRoutes {
     this.router.get('/post/images/:page', authMiddleware.checkAuthentication, Get.prototype.postsWithImage);
     this.router.get('/post/videos/:page', authMiddleware.checkAuthentication, Get.prototype.postsWithVideo);
     this.router.get('/post/:postId', authMiddleware.checkAuthentication, Get.prototype.getSinglePost);
+    this.router.get('/saved-posts', authMiddleware.checkAuthentication, GetSavedPost.prototype.posts);
 
     this.router.get('/post/search', authMiddleware.checkAuthentication, Search.prototype.posts);
 

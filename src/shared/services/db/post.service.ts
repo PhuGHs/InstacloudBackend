@@ -49,6 +49,16 @@ class PostService {
     await SavedPostModel.create(post);
   }
 
+  public async removeSavedPostFromDB(postId: string, userId: string): Promise<void> {
+    await SavedPostModel.deleteOne({ userId: userId, postId: postId }).exec();
+  }
+
+  public async checkIfPostExisted(postId: string, userId: string): Promise<boolean> {
+    const savedPost = await SavedPostModel.findOne({ postId: postId, userId: userId });
+    if(savedPost) return true;
+    return false;
+  }
+
   public async getSavedPostsFromDB(userId: string): Promise<ISavePostDocument[]> {
     const savedPosts: ISavePostDocument[] = await SavedPostModel.aggregate([
       {

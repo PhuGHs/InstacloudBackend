@@ -32,6 +32,8 @@ export interface ISavePostDocument extends Document {
 
 export interface ISavePostJob {
   key: ISavePostDocument;
+  keyOne?: string;
+  keyTwo?: string;
 }
 
 export interface IGetPostsQuery {
