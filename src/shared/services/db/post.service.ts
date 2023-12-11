@@ -54,8 +54,8 @@ class PostService {
   }
 
   public async checkIfPostExisted(postId: string, userId: string): Promise<boolean> {
-    const savedPost = await SavedPostModel.findOne({ postId: postId, userId: userId });
-    if(savedPost) return true;
+    const number: number = await SavedPostModel.countDocuments({ postId: postId, userId: userId});
+    if(number != 0) return true;
     return false;
   }
 

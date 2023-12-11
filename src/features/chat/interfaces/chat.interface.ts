@@ -37,6 +37,8 @@ export interface IMessageData {
   senderProfilePicture: string;
   body: string;
   isRead: boolean;
+  isVideoCall: boolean;
+  isAudioCall: boolean;
   gifUrl: string;
   selectedImage: string;
   reaction: IReaction[];
@@ -84,6 +86,12 @@ export interface ISenderReceiver {
   receiverId: string;
   senderName: string;
   receiverName: string;
+}
+
+export interface ICall {
+  signal: IMessageData,
+  from: string;
+  name: string;
 }
 
 export interface IGetMessageFromCache {
