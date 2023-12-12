@@ -64,8 +64,12 @@ export class Get {
 
   public async getSinglePost(req: Request, res: Response): Promise<void> {
     const { postId } = req.params;
-    const post: IPostDocument = await postCache.getAPostFromCache(postId);
-    const result = post ? post : await postService.getSinglePost(postId);
-    res.status(STATUS_CODE.OK).json({ post: result });
+    const posts: IPostDocument[] = await postCache.getAPostFromCache(postId);
+    const result = posts.length > 0 ? posts[0] : await postService.getSinglePost(postId);
+    if(!result) {
+      res.status(STATUS_CODE.NOT_FOUND).json({ message: 'Post had been deleted or not existed!'});
+    } else {
+      res.status(STATUS_CODE.OK).json({ post: result });
+    }
   }
 }

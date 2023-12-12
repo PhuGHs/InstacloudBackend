@@ -165,20 +165,29 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async getAPostFromCache(postId: string): Promise<IPostDocument> {
+  public async getAPostFromCache(postId: string): Promise<IPostDocument[]> {
     try {
       if (!this.client.isOpen) {
         this.client.connect();
       }
-      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
-      multi.HGETALL(`posts:${postId}`);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const reply = (await multi.exec()) as any as IPostDocument[];
-      reply[0].commentsCount = SupportiveMethods.parseJson(`${reply[0].commentsCount}`) as number;
-      reply[0].reactions = SupportiveMethods.parseJson(`${reply[0].reactions}`) as IReactions;
-      reply[0].createdAt = new Date(SupportiveMethods.parseJson(`${reply[0].createdAt}`)) as Date;
-
-      return reply[0];
+      const post: string = await this.client.HGET(`posts:${postId}`, 'pId') as string;
+      const posts: IPostDocument[] = [];
+      if(post) {
+        const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+        multi.HGETALL(`posts:${postId}`);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const posts: IPostDocument[] = [];
+        const reply = (await multi.exec()) as any as IPostDocument[];
+        if(reply.length > 0) {
+          reply[0].commentsCount = SupportiveMethods.parseJson(`${reply[0].commentsCount}`) as number;
+          reply[0].reactions = SupportiveMethods.parseJson(`${reply[0].reactions}`) as IReactions;
+          reply[0].createdAt = new Date(SupportiveMethods.parseJson(`${reply[0].createdAt}`)) as Date;
+          posts.push(reply[0] as IPostDocument);
+        }
+        return posts;
+      } else {
+        return posts;
+      }
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');

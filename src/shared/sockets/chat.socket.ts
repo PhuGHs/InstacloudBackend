@@ -26,6 +26,7 @@ export class SocketIOChatHandler {
         const receiverSocketId: string = connectedUserMap.get(data.message.receiverUsername) as string;
         console.log('there is a call from ', data.message.senderUsername);
         this.io.to(receiverSocketId).emit('call user', { signal: data.signal, message: data.message});
+        console.log('receive socket', receiverSocketId);
       });
 
       socket.on('answer call', (data) => {
