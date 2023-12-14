@@ -55,10 +55,12 @@ export class Get {
     const followers: IFollowerData[] = await Get.prototype.followers(userId);
     const following: IFollowerData[] = await Get.prototype.following(userId);
 
-    const image: IFileImageDocument[] = await imageService.getImagesFromDB(req.currentUser!.userId);
-    const savedPosts: ISavePostDocument[] = await postService.getSavedPostsFromDB(req.currentUser!.userId);
-
-    res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image, savedPosts });
+    const image: IFileImageDocument[] = await imageService.getImagesFromDB(userId);
+    if (userId === req.currentUser!.userId) {
+      const savedPosts: ISavePostDocument[] = await postService.getSavedPostsFromDB(userId);
+      res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image, savedPosts });
+    }
+    res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image });
   }
 
   public async userSuggestion(req: Request, res: Response): Promise<void> {
