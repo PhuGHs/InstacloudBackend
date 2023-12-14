@@ -90,3 +90,8 @@ export interface IAllUsers {
   users: IUserDocument[];
   totalUsers: number;
 }
+
+export interface IPeerUser {
+  userId: string;
+  peerId: string;
+}

@@ -49,7 +49,7 @@ export class Get {
       ? cachedPosts
       : await postService.getPosts({ username: userName }, 0, 100, { createdAt: -1 });
 
-    const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(userId)) as IUserDocument;
     const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(userId);
 
     const followers: IFollowerData[] = await Get.prototype.followers(userId);
