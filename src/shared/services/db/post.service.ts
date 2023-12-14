@@ -61,14 +61,40 @@ class PostService {
 
   public async getSavedPostsFromDB(userId: string): Promise<ISavePostDocument[]> {
     const savedPosts: ISavePostDocument[] = await SavedPostModel.aggregate([
-      {
-        $match: { userId: new mongoose.Types.ObjectId(userId) }
-      },
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      { $lookup: { from: 'Post', localField: 'postId', foreignField: '_id', as: 'post' }},
+      { $unwind: '$post' },
+      { $project: this.aggregateProject()},
       {
         $sort: { createdAt: -1 }
       }
     ]);
     return savedPosts;
+  }
+
+  private aggregateProject() {
+    return {
+      _id: 1,
+      userId: 1,
+      postId: '$post._id',
+      username: 1,
+      createdAt: 1,
+      authorId: '$post.userId',
+      authorEmail: '$post.email',
+      pId: '$post.pId',
+      authorName: '$post.username',
+      authorProfilePicture: '$post.profilePicture',
+      post: '$post.post',
+      commentsCount: '$post.commentsCount',
+      imgVersion: '$post.imgVersion',
+      imgId: '$post.imgId',
+      videoId: '$post.videoId',
+      videoVersion: '$post.videoVersion',
+      gifUrl: '$post.gifUrl',
+      privacy: '$post.privacy',
+      reactions: '$post.reactions',
+      postCreatedDate: '$post.createdAt',
+    };
   }
 
   public async searchPosts(query: string): Promise<IPostDocument[]> {
