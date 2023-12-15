@@ -237,8 +237,9 @@ export class PostCache extends BaseCache {
 
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
+      console.log('call from cache');
       for (const post of replies as IPostDocument[]) {
-        if ((post.imgId && post.imgVersion) || post.gifUrl) {
+        if (post.imgId && post.imgVersion) {
           post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
           post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
           post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
@@ -309,7 +310,7 @@ export class PostCache extends BaseCache {
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for (const post of replies as IPostDocument[]) {
-        if ((post.imgId && post.imgVersion) || post.gifUrl) {
+        if (post.imgId && post.imgVersion) {
           post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
           post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
           post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
