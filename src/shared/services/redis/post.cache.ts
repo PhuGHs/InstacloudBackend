@@ -201,6 +201,7 @@ export class PostCache extends BaseCache {
       }
       const posts: IPostDocument[] = [];
       const reply: string[] = await this.client.ZRANGEBYSCORE(key, uId, uId);
+      reply.reverse();
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
         multi.HGETALL(`posts:${value}`);
@@ -217,6 +218,37 @@ export class PostCache extends BaseCache {
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again!');
+    }
+  }
+
+  public async getPostsWithImagesOfAUserFromCache(key: string, uId: number): Promise<IPostDocument[]> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      const reply: string[] = await this.client.ZRANGEBYSCORE(key, uId, uId);
+      reply.reverse();
+
+      const multi: ReturnType<typeof this.client.multi> = this.client.multi();
+      for (const value of reply) {
+        multi.HGETALL(`posts:${value}`);
+      }
+
+      const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
+      const postReplies: IPostDocument[] = [];
+      for (const post of replies as IPostDocument[]) {
+        if ((post.imgId && post.imgVersion) || post.gifUrl) {
+          post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
+          post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
+          post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
+          postReplies.push(post);
+        }
+      }
+      return postReplies;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('|getPostsWithImagesOfAUserFromCache| Server error. Try again');
     }
   }
 

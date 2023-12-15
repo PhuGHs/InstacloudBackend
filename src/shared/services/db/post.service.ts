@@ -110,6 +110,15 @@ class PostService {
     ]);
     return posts;
   }
+
+  public async getPostWithImageOfAUser(userId: string): Promise<IPostDocument[]> {
+    const posts: IPostDocument[] = await PostModel.aggregate([
+      { $match: { $and: [ { userId: new mongoose.Types.ObjectId(userId) }, { imgId: { $ne: '' }}]}},
+      { $limit: 100 },
+      { $sort: { createdAt: -1 }}
+    ]);
+    return posts;
+  }
 }
 
 export const postService: PostService = new PostService();
