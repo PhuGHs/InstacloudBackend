@@ -20,13 +20,15 @@ export class CommentCache extends BaseCache {
         this.client.connect();
       }
       const { commentId, commentData } = data;
-      const { _id, username, postId, profilePicture, comment, createdAt, reactions, userTo } = commentData;
+      const { _id, username, postId, profilePicture, comment, createdAt, reactions, userTo, userId } = commentData;
 
       const dataToSave: string[] = [
         '_id',
         `${_id}`,
         'username',
         `${username}`,
+        'userId',
+        `${userId}`,
         'postId',
         `${postId}`,
         'profilePicture',

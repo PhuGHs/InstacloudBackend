@@ -142,7 +142,7 @@ export class Create {
     await postCache.savePostToCache(data);
     postQueue.addPostJob('savePostWithImageToDB', { key: req.currentUser!.userId, value: userPost });
     imageQueue.addImageJob('addImageToDB', {
-      key: req.currentUser!.userId,
+      userId: req.currentUser!.userId,
       imgId: result.public_id,
       imgVersion: result.version.toString()
     });

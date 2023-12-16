@@ -22,18 +22,18 @@ export class SocketIOChatHandler {
         socket.join(receiverSocketId);
       });
 
-      socket.on('call user', (data) => {
-        const receiverSocketId: string = connectedUserMap.get(data.message.receiverUsername) as string;
-        console.log('there is a call from ', data.message.senderUsername);
-        this.io.to(receiverSocketId).emit('call user', { signal: data.signal, message: data.message});
-        console.log('receive socket', receiverSocketId);
-      });
+      // socket.on('call user', (data) => {
+      //   const receiverSocketId: string = connectedUserMap.get(data.message.receiverUsername) as string;
+      //   console.log('there is a call from ', data.message.senderUsername);
+      //   this.io.to(receiverSocketId).emit('call user', { signal: data.signal, message: data.message});
+      //   console.log('receive socket', receiverSocketId);
+      // });
 
-      socket.on('answer call', (data) => {
-        const senderSocketId: string = connectedUserMap.get(data.message.senderUsername) as string;
-        console.log('answer call from', data.message.receiverUsername);
-        this.io.to(senderSocketId).emit('call accepted', data.signal);
-      });
+      // socket.on('answer call', (data) => {
+      //   const senderSocketId: string = connectedUserMap.get(data.message.senderUsername) as string;
+      //   console.log('answer call from', data.message.receiverUsername);
+      //   this.io.to(senderSocketId).emit('call accepted', data.signal);
+      // });
     });
   }
 }

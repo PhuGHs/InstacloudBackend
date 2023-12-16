@@ -105,6 +105,7 @@ export class Add {
       deleteForEveryone: false
     } as IMessageData;
 
+    chatSocketIOObject.emit('call user', data);
     Add.prototype.emitSocketIOEvent(data);
 
     await chatCache.addNewConversationToCache(senderId, receiverId, `${conversationObjectId}`);

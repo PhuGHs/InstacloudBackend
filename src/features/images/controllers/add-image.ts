@@ -23,10 +23,10 @@ export class Add {
     const cachedUser = await userCache.updateSingleItemInCache(req.currentUser!.userId, 'profilePicture', createdUrl);
     socketIOImageObject.emit('update user', cachedUser);
     imageQueue.addImageJob('addImageToDB', {
-      key: req.currentUser!.userId,
+      userId: req.currentUser!.userId,
       imgId: result.public_id!,
       imgVersion: result.version.toString()
     });
-    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated ' });
+    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated' });
   }
 }

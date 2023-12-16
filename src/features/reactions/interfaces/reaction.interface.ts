@@ -4,6 +4,7 @@ import { Document } from 'mongoose';
 export interface IReactionDocument extends Document {
   _id?: string | ObjectId;
   username: string;
+  userId: string;
   postId: string;
   commentId?: string;
   profilePicture: string;
@@ -30,6 +31,7 @@ export interface IQueryReaction {
   postId?: string | ObjectId;
   commentId?: string | ObjectId;
   username?: string;
+  userId?: string;
 }
 
 export interface IReaction {

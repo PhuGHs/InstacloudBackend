@@ -13,6 +13,7 @@ class CommentService {
   public async addCommentToDB(data: ICommentJob): Promise<void> {
     const { postId, userTo, userFrom, username, comment } = data;
     const promisedComment: Promise<ICommentDocument> = CommentsModel.create(comment);
+    console.log(postId);
     const promisedPost: Query<IPostDocument, IPostDocument> = PostModel.findOneAndUpdate(
       { _id: postId },
       { $inc: { commentsCount: 1 } },

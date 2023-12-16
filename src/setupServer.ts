@@ -20,6 +20,7 @@ import { SocketIOChatHandler } from '@socket/chat.socket';
 import { SocketIOImageHandler } from '@socket/image.socket';
 import { SocketIOUserHandler } from '@socket/user.socket';
 import { SocketIONotificationHandler } from '@socket/notification.socket';
+import { ExpressPeerServer } from 'peer';
 
 const PORT = 5000;
 const log: Logger = config.createLogger('SETUP SERVER');
@@ -88,6 +89,11 @@ export class MidCloudServer {
     try {
       const httpServer: http.Server = new http.Server(app);
       const socketIO: Server = await this.createSocketIO(httpServer);
+      const peerServer = ExpressPeerServer(app.listen(9000), {
+        path: '/social-media'
+      });
+
+      app.use('/peerjs', peerServer);
       this.socketIOConnection(socketIO);
       this.startHttpServer(httpServer);
     } catch (error) {

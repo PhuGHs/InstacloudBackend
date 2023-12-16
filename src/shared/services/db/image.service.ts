@@ -3,8 +3,12 @@ import { ImageModel } from '@image/models/image.schema';
 import mongoose from 'mongoose';
 
 class ImageService {
-  public async addImageToDB(data: IFileImageDocument): Promise<void> {
-    await ImageModel.create(data);
+  public async addImageToDB(userId: string, imgId: string, imgVersion: string): Promise<void> {
+    await ImageModel.create({
+      userId,
+      imgId,
+      imgVersion
+    });
   }
 
   public async getImagesFromDB(userId: string): Promise<IFileImageDocument[]> {

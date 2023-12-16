@@ -7,7 +7,7 @@ const log: Logger = config.createLogger('imageWorker');
 class ImageWorker {
   async addImageToDB(job: Job, done: DoneCallback): Promise<void> {
     try {
-      await imageService.addImageToDB(job.data);
+      await imageService.addImageToDB(job.data.userId, job.data.imgId, job.data.imgVersion);
       job.progress(100);
       done(null, job.data);
     } catch (error) {

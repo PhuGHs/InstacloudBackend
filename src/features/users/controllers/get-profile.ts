@@ -60,8 +60,9 @@ export class Get {
     if (userId === req.currentUser!.userId) {
       const savedPosts: ISavePostDocument[] = await postService.getSavedPostsFromDB(userId);
       res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image: imagePosts, savedPosts });
+    } else {
+      res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image: imagePosts });
     }
-    res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image: imagePosts });
   }
 
   public async userSuggestion(req: Request, res: Response): Promise<void> {

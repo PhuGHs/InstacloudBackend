@@ -16,6 +16,7 @@ export class Add {
     const reactionDocument: IReactionDocument = {
       _id: reactionObjectId,
       username: req.currentUser!.username,
+      userId: req.currentUser!.userId,
       postId,
       profilePicture,
       createdAt: new Date(),
@@ -40,6 +41,7 @@ export class Add {
     const reactionDocument: IReactionDocument = {
       _id: reactionObjectId,
       username: req.currentUser!.username,
+      userId: req.currentUser!.userId,
       commentId,
       profilePicture,
       createdAt: new Date(),

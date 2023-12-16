@@ -17,6 +17,7 @@ export class Add {
     const data: ICommentDocument = {
       _id: commentObjectId,
       username: req.currentUser!.username,
+      userId: req.currentUser!.userId,
       postId,
       userTo,
       profilePicture,

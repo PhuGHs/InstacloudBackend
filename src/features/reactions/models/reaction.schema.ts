@@ -4,6 +4,7 @@ import mongoose, { model, Model, Schema } from 'mongoose';
 const reactionSchema: Schema = new Schema({
   postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', index: true },
   commentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment', index: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
   username: { type: String, default: '' },
   type: { type: String },
   profilePicture: { type: String, default: '' },

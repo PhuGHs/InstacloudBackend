@@ -3,13 +3,14 @@ import { Request, Response } from 'express';
 import { IAuthDocument } from '../interfaces/auth.interface';
 import { authService } from '@root/shared/services/db/auth.service';
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
-import { IUserDocument } from '@root/features/users/interfaces/user.interface';
+import { ILogin, IUserDocument } from '@root/features/users/interfaces/user.interface';
 import { userService } from '@root/shared/services/db/user.service';
 import jwt from 'jsonwebtoken';
 import { config } from '@root/config';
 import STATUS_CODE from 'http-status-codes';
 import { joiValidation } from '@global/decorators/joi.validation';
 import { signinSchema } from '@auth/schemes/signin.schema';
+import { socketIOUserObject } from '@socket/user.socket';
 
 export class SignIn {
   @joiValidation(signinSchema)
@@ -46,7 +47,6 @@ export class SignIn {
       fullname: existedUser.fullname,
       createdAt: existedUser.createdAt
     } as IUserDocument;
-
     res.status(STATUS_CODE.OK).json({ message: 'User logged in successfully', user: userDocument, token: userToken });
   }
 }
