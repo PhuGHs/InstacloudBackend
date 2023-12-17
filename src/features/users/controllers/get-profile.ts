@@ -44,13 +44,18 @@ export class Get {
   public async profileMaterials(req: Request, res: Response): Promise<void> {
     const { userId, username, uId } = req.params;
     const userName: string = SupportiveMethods.lowercase(username) as string;
+
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(userId);
+
+    if(user.blockedBy.toString().includes(req.currentUser!.userId) || user.blocked.toString().includes(req.currentUser!.userId)) {
+      res.status(STATUS_CODE.NOT_FOUND).json({ message: 'user not found or you blocked this user'});
+      return;
+    }
     const cachedPosts: IPostDocument[] = await postCache.getPostsFromCacheOfAUser('post', parseInt(uId, 10));
     const posts: IPostDocument[] = cachedPosts.length
       ? cachedPosts
       : await postService.getPosts({ username: userName }, 0, 100, { createdAt: -1 });
-
-    const cachedUser: IUserDocument = (await userCache.getUserFromCache(userId)) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(userId);
 
     const followers: IFollowerData[] = await Get.prototype.followers(userId);
     const following: IFollowerData[] = await Get.prototype.following(userId);

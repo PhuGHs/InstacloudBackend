@@ -14,8 +14,8 @@ export interface IUserDocument extends Document {
   school: string;
   quote: string;
   location: string;
-  blocked: mongoose.Types.ObjectId[];
-  blockedBy: mongoose.Types.ObjectId[];
+  blocked: string | mongoose.Types.ObjectId[];
+  blockedBy: string | mongoose.Types.ObjectId[];
   followersCount: number;
   followingCount: number;
   notifications: INotificationSettings;
