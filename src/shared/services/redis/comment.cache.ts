@@ -66,7 +66,7 @@ export class CommentCache extends BaseCache {
       }
       const comments: ICommentDocument[] = [];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
-      const reply: string[] = await this.client.ZRANGEBYSCORE(key, Number(pId[0]), Number(pId[0]));
+      const reply: string[] = await this.client.sendCommand(['zrevrange', key, pId[0], pId[0]]);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
         multi.HGETALL(`comments:${value}`);
@@ -91,7 +91,7 @@ export class CommentCache extends BaseCache {
       }
       const list: Set<string> = new Set();
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
-      const reply: string[] = await this.client.ZRANGEBYSCORE(key, Number(pId[0]), Number(pId[0]));
+      const reply: string[] = await this.client.sendCommand(['zrevrange', key, pId[0], pId[0]]);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
         multi.HGETALL(`comments:${value}`);
@@ -120,7 +120,7 @@ export class CommentCache extends BaseCache {
       }
       const comments: ICommentDocument[] = [];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
-      const reply: string[] = await this.client.ZRANGEBYSCORE('comment', pId[0], pId[0]);
+      const reply: string[] = await this.client.sendCommand(['zrevrange', 'comment', pId[0], pId[0]]);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
         multi.HGETALL(`comments:${value}`);

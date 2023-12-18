@@ -3,7 +3,7 @@ import { SavedPostModel } from '@post/models/savedPost.schema';
 import { PostModel } from '@root/features/posts/models/post.schema';
 import { IUserDocument } from '@root/features/users/interfaces/user.interface';
 import { UserModel } from '@root/features/users/models/user.schema';
-import mongoose, { Query, UpdateQuery } from 'mongoose';
+import mongoose, { ObjectId, Query, UpdateQuery } from 'mongoose';
 
 class PostService {
   public async savePostToDB(userId: string, post: IPostDocument): Promise<void> {
@@ -22,14 +22,27 @@ class PostService {
     await Promise.all([promiseDeletedPost, promiseUpdatedUser]);
   }
 
-  public async getPosts(query: IGetPostsQuery, skip = 0, limit = 0, sort: Record<string, 1 | -1>): Promise<IPostDocument[]> {
+  public async getPosts(query: IGetPostsQuery, blockedUsers: mongoose.Types.ObjectId[],  skip = 0, limit = 0, sort: Record<string, 1 | -1>): Promise<IPostDocument[]> {
     let postQuery = {};
     if (query?.imgId && query.gifUrl) {
-      postQuery = { $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' } }] };
+      postQuery = { $and: [
+        { $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' } }] },
+        { userId: { $nin: blockedUsers } }
+      ] };
     } else if (query?.videoId) {
-      postQuery = { $or: [{ videoId: { $ne: '' } }] };
+      postQuery = { $and: [
+        { $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' } }] },
+        { userId: { $nin: blockedUsers } }
+      ] };
     } else {
-      postQuery = query;
+      if(Object.keys(query).length === 0) {
+        postQuery = { userId: { $nin: blockedUsers } };
+      } else {
+        postQuery = { $and: [
+          query,
+          { userId: { $nin: blockedUsers } }
+        ] };
+      }
     }
 
     const posts: IPostDocument[] = await PostModel.aggregate([{ $match: postQuery }, { $sort: sort }, { $skip: skip }, { $limit: limit }]);

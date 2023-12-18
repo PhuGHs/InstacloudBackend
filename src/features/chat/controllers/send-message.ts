@@ -68,6 +68,47 @@ export class Add {
     res.status(STATUS_CODE.OK).json({ message: 'message has been sent', data });
   }
 
+  public async callVideoSocketReq(req: Request, res: Response): Promise<void> {
+    const { conversationId, receiverId, receiverUsername, receiverProfilePicture, body, gifUrl, selectedImage } = req.body;
+    const messageObjectId: ObjectId = new ObjectId();
+    const conversationObjectId: ObjectId = !conversationId ? new ObjectId() : new mongoose.Types.ObjectId(conversationId);
+    let image = '';
+    const cachedSender: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const Sender: IUserDocument = cachedSender ? cachedSender : await userService.getUserById(req.currentUser!.userId);
+    const senderId: string = req.currentUser!.userId;
+    if (selectedImage) {
+      const result1: UploadApiResponse = (await upload(selectedImage, `${req.currentUser!.userId}`, true, true)) as UploadApiResponse;
+      if (!result1?.public_id) {
+        throw new BadRequestError('File upload error. Please try again!');
+      }
+      image = `https://res.cloudinary.com/daszajz9a/image/upload/v${result1.version}/${result1.public_id}`;
+    }
+
+    const data: IMessageData = {
+      _id: `${messageObjectId}`,
+      conversationId: new mongoose.Types.ObjectId(conversationObjectId),
+      receiverId,
+      receiverUsername,
+      receiverProfilePicture,
+      senderId: req.currentUser!.userId,
+      senderUsername: req.currentUser!.username,
+      senderProfilePicture: Sender.profilePicture,
+      body,
+      isRead: false,
+      isVideoCall: true,
+      isAudioCall: false,
+      gifUrl,
+      selectedImage: image,
+      reaction: [],
+      createdAt: new Date(),
+      deleteForMe: false,
+      deleteForEveryone: false
+    } as IMessageData;
+
+    chatSocketIOObject.emit('call user', data);
+    res.status(STATUS_CODE.OK).json({ message: 'message has been sent' });
+  }
+
   public async callVideo(req: Request, res: Response): Promise<void> {
     const { conversationId, receiverId, receiverUsername, receiverProfilePicture, body, gifUrl, selectedImage } = req.body;
     const messageObjectId: ObjectId = new ObjectId();
@@ -117,6 +158,46 @@ export class Add {
   }
 
 
+  public async callAudioSocketReq(req: Request, res: Response): Promise<void> {
+    const { conversationId, receiverId, receiverUsername, receiverProfilePicture, body, gifUrl, selectedImage } = req.body;
+    const messageObjectId: ObjectId = new ObjectId();
+    const conversationObjectId: ObjectId = !conversationId ? new ObjectId() : new mongoose.Types.ObjectId(conversationId);
+    let image = '';
+    const cachedSender: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const Sender: IUserDocument = cachedSender ? cachedSender : await userService.getUserById(req.currentUser!.userId);
+    const senderId: string = req.currentUser!.userId;
+    if (selectedImage) {
+      const result1: UploadApiResponse = (await upload(selectedImage, `${req.currentUser!.userId}`, true, true)) as UploadApiResponse;
+      if (!result1?.public_id) {
+        throw new BadRequestError('File upload error. Please try again!');
+      }
+      image = `https://res.cloudinary.com/daszajz9a/image/upload/v${result1.version}/${result1.public_id}`;
+    }
+
+    const data: IMessageData = {
+      _id: `${messageObjectId}`,
+      conversationId: new mongoose.Types.ObjectId(conversationObjectId),
+      receiverId,
+      receiverUsername,
+      receiverProfilePicture,
+      senderId: req.currentUser!.userId,
+      senderUsername: req.currentUser!.username,
+      senderProfilePicture: Sender.profilePicture,
+      body,
+      isRead: false,
+      isVideoCall: false,
+      isAudioCall: true,
+      gifUrl,
+      selectedImage: image,
+      reaction: [],
+      createdAt: new Date(),
+      deleteForMe: false,
+      deleteForEveryone: false
+    } as IMessageData;
+    chatSocketIOObject.emit('call user', data);
+    res.status(STATUS_CODE.OK).json({ message: 'message has been sent', data });
+  }
+
   public async callAudio(req: Request, res: Response): Promise<void> {
     const { conversationId, receiverId, receiverUsername, receiverProfilePicture, body, gifUrl, selectedImage } = req.body;
     const messageObjectId: ObjectId = new ObjectId();
@@ -153,7 +234,6 @@ export class Add {
       deleteForMe: false,
       deleteForEveryone: false
     } as IMessageData;
-
     Add.prototype.emitSocketIOEvent(data);
 
     await chatCache.addNewConversationToCache(senderId, receiverId, `${conversationObjectId}`);

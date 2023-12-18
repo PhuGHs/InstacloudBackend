@@ -6,6 +6,8 @@ import { ServerError } from '@root/shared/globals/helpers/error-handler';
 import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-methods';
 import { IReactions } from '@root/features/reactions/interfaces/reaction.interface';
 import { RedisCommandRawReply } from '@redis/client/dist/lib/commands';
+import { Request } from 'express';
+import { IUserDocument } from '@user/interfaces/user.interface';
 
 const log: Logger = config.createLogger('postCache');
 export type PostCacheMultiType = string | number | Buffer | RedisCommandRawReply[] | IPostDocument | IPostDocument[];
@@ -227,8 +229,7 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      const reply: string[] = await this.client.ZRANGEBYSCORE(key, uId, uId);
-      reply.reverse();
+      const reply: string[] = await this.client.sendCommand((['zrevrange', key, `${uId}`, `${uId}`]));
 
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -253,14 +254,13 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async getPostsFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
+  public async getPostsFromCache(key: string, start: number, end: number, user: IUserDocument): Promise<IPostDocument[]> {
     try {
       if (!this.client.isOpen) {
         this.client.connect();
       }
       const posts: IPostDocument[] = [];
-      const reply: string[] = await this.client.ZRANGEBYSCORE(key, start, end);
-      reply.reverse();
+      const reply: string[] = await this.client.sendCommand(['zrevrange', key, `${start}`, `${end}`]);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
         multi.HGETALL(`posts:${value}`);
@@ -268,10 +268,12 @@ export class PostCache extends BaseCache {
 
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       for (const post of replies as IPostDocument[]) {
-        post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`);
-        post.reactions = SupportiveMethods.parseJson(`${post.reactions}`);
-        post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
-        posts.push(post);
+        if(!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
+          post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`);
+          post.reactions = SupportiveMethods.parseJson(`${post.reactions}`);
+          post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
+          posts.push(post);
+        }
       }
       return posts;
     } catch (error) {
@@ -293,14 +295,13 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async getPostsWithImagesFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
+  public async getPostsWithImagesFromCache(key: string, start: number, end: number, user: IUserDocument): Promise<IPostDocument[]> {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
 
-      const reply: string[] = await this.client.ZRANGEBYSCORE(key, start, end);
-      reply.reverse();
+      const reply: string[] = await this.client.sendCommand((['zrevrange', key, `${start}`, `${end}`]));
 
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -310,11 +311,13 @@ export class PostCache extends BaseCache {
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for (const post of replies as IPostDocument[]) {
-        if (post.imgId && post.imgVersion) {
-          post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
-          post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
-          post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
-          postReplies.push(post);
+        if(!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
+          if (post.imgId && post.imgVersion) {
+            post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
+            post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
+            post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
+            postReplies.push(post);
+          }
         }
       }
       return postReplies;
@@ -338,14 +341,13 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async getPostsWithVideoFromCache(key: string, start: number, end: number): Promise<IPostDocument[]> {
+  public async getPostsWithVideoFromCache(key: string, start: number, end: number, user: IUserDocument): Promise<IPostDocument[]> {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
 
-      const reply: string[] = await this.client.ZRANGEBYSCORE(key, start, end);
-      reply.reverse();
+      const reply: string[] = await this.client.sendCommand((['zrevrange', key, `${start}`, `${end}`]));
 
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -355,11 +357,13 @@ export class PostCache extends BaseCache {
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for (const post of replies as IPostDocument[]) {
-        if (post.videoId && post.videoVersion) {
-          post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
-          post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
-          post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
-          postReplies.push(post);
+        if(!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
+          if (post.videoId && post.videoVersion) {
+            post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
+            post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
+            post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
+            postReplies.push(post);
+          }
         }
       }
       return postReplies;

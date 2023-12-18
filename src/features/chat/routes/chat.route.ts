@@ -18,7 +18,9 @@ class ChatRoutes {
 
     this.router.post('/chat/send-message', authMiddleware.checkAuthentication, Add.prototype.message);
     this.router.post('/chat/call-video', authMiddleware.checkAuthentication, Add.prototype.callVideo);
+    this.router.post('/chat/call-video-socket', authMiddleware.checkAuthentication, Add.prototype.callVideoSocketReq);
     this.router.post('/chat/call-audio', authMiddleware.checkAuthentication, Add.prototype.callAudio);
+    this.router.post('/chat/call-audio-socket', authMiddleware.checkAuthentication, Add.prototype.callAudioSocketReq);
     this.router.put('/chat/mark-as-seen', authMiddleware.checkAuthentication, Update.prototype.markAsSeen);
     this.router.put('/chat/mark-as-deleted', authMiddleware.checkAuthentication, Delete.prototype.message);
 

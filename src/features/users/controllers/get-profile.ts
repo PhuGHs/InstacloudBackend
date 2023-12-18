@@ -53,9 +53,13 @@ export class Get {
       return;
     }
     const cachedPosts: IPostDocument[] = await postCache.getPostsFromCacheOfAUser('post', parseInt(uId, 10));
+    const userIds: mongoose.Types.ObjectId[] = [];
+    for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
+      userIds.push(new mongoose.Types.ObjectId(blockedUser));
+    }
     const posts: IPostDocument[] = cachedPosts.length
       ? cachedPosts
-      : await postService.getPosts({ username: userName }, 0, 100, { createdAt: -1 });
+      : await postService.getPosts({ username: userName }, userIds, 0, 100, { createdAt: -1 });
 
     const followers: IFollowerData[] = await Get.prototype.followers(userId);
     const following: IFollowerData[] = await Get.prototype.following(userId);

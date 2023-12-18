@@ -37,6 +37,7 @@ export interface ICommentNameList {
 export interface IQueryComment {
   _id?: string | ObjectId;
   postId?: string | ObjectId;
+  userId?: unknown;
 }
 
 export interface IQuerySort {
