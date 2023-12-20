@@ -10,6 +10,7 @@ import { chatQueue } from '@service/queues/chat.queue';
 import { ChatCache } from '@service/redis/chat.cache';
 import { UserCache } from '@service/redis/user.cache';
 import { SocketIOChatHandler, chatSocketIOObject } from '@socket/chat.socket';
+import { connectedUserMap } from '@socket/user.socket';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { UploadApiResponse } from 'cloudinary';
 import { Request, Response } from 'express';
@@ -146,7 +147,6 @@ export class Add {
       deleteForEveryone: false
     } as IMessageData;
 
-    chatSocketIOObject.emit('call user', data);
     Add.prototype.emitSocketIOEvent(data);
 
     await chatCache.addNewConversationToCache(senderId, receiverId, `${conversationObjectId}`);

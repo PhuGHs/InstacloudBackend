@@ -21,7 +21,6 @@ export class ChatCache extends BaseCache {
       const images: IImages[] = [];
       const conversationsOfUser = await this.client.LRANGE(`conversations:${senderId}`, 0, -1);
       const data = { receiverId, conversationId, links, images };
-      console.log(data);
       if (conversationsOfUser.length === 0) {
         await this.client.RPUSH(`conversations:${senderId}`, JSON.stringify(data));
       } else {
@@ -150,7 +149,7 @@ export class ChatCache extends BaseCache {
         await this.client.connect();
       }
 
-      const userChatList: string[] = await this.client.LRANGE(`chatList:${senderId}`, 0, -1);
+      const userChatList: string[] = await this.client.LRANGE(`conversations:${senderId}`, 0, -1);
       const receiver: string = find(userChatList, (listItem: string) => listItem.includes(receiverId)) as string;
 
       const parsedReceiver: IChatList = SupportiveMethods.parseJson(receiver) as IChatList;
@@ -198,8 +197,6 @@ export class ChatCache extends BaseCache {
       if (!this.client.isOpen) {
         this.client.connect();
       }
-      log.info(`senderId: ${senderId}`);
-      log.info(`receiverId: ${receiverId}`);
       const userConversation: string[] = await this.client.LRANGE(`conversations:${senderId}`, 0, -1);
       const cachedReceiver: string = find(userConversation, (item: string) => item.includes(receiverId)) as string;
       const receiver: IChatList = SupportiveMethods.parseJson(cachedReceiver) as IChatList;

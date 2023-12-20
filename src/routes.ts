@@ -10,6 +10,7 @@ import { followerRoutes } from '@follower/routes/followers.route';
 import { notificationRoute } from '@notification/routes/notification.route';
 import { chatRoutes } from '@chat/routes/chat.route';
 import { userRoutes } from '@user/routes/user.route';
+import { imageRoutes } from '@image/routes/image.route';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BASE_PATH = '/api/v1';
@@ -28,6 +29,7 @@ export default (app: Application) => {
     app.use(BASE_PATH, authMiddleware.verifyUser, notificationRoute.routes());
     app.use(BASE_PATH, authMiddleware.verifyUser, chatRoutes.routes());
     app.use(BASE_PATH, authMiddleware.verifyUser, userRoutes.routes());
+    app.use(BASE_PATH, authMiddleware.verifyUser, imageRoutes.routes());
   };
   routes();
 };

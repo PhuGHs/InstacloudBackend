@@ -26,9 +26,6 @@ export class SocketIOUserHandler {
 
       socket.on('peer connect', (data: IPeerUser) => {
         this.addPeerToServer(data.userId, data.peerId);
-        for(const key of connectedUserPeerMap.keys()) {
-          console.log(key, connectedUserPeerMap.get(key));
-        }
       });
 
       socket.on('get peerId', data => {

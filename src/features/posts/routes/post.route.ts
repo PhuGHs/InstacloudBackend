@@ -21,7 +21,7 @@ class PostRoutes {
     this.router.get('/saved-posts', authMiddleware.checkAuthentication, GetSavedPost.prototype.posts);
     this.router.get('/saved-posts/:postId', authMiddleware.checkAuthentication, GetSavedPost.prototype.checkIfExisted);
 
-    this.router.get('/post/search', authMiddleware.checkAuthentication, Search.prototype.posts);
+    this.router.get('/search/post', authMiddleware.checkAuthentication, Search.prototype.posts);
 
     this.router.post('/post', authMiddleware.checkAuthentication, Create.prototype.post);
     this.router.post('/post-with-image', authMiddleware.checkAuthentication, Create.prototype.postWithImage);

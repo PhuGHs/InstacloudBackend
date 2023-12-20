@@ -17,7 +17,7 @@ export class Get {
     const { receiverId } = req.params;
     let messages: IMessageData[] = [];
     const cachedMessages: IMessageData[] = await chatCache.getChatMessagesFromCache(req.currentUser!.userId, receiverId);
-    if (cachedMessages.length) {
+    if (cachedMessages.length > 0) {
       messages = cachedMessages;
     } else {
       messages = await chatService.getMessages(
@@ -26,12 +26,6 @@ export class Get {
         { createdAt: 1 }
       );
     }
-
-    messages = await chatService.getMessages(
-      new mongoose.Types.ObjectId(req.currentUser!.userId),
-      new mongoose.Types.ObjectId(receiverId),
-      { createdAt: 1 }
-    );
 
     res.status(STATUS_CODE.OK).json({ message: 'conversation messages', messages });
   }

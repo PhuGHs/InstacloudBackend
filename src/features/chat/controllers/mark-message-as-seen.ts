@@ -2,6 +2,7 @@ import { IMessageData } from '@chat/interfaces/chat.interface';
 import { chatQueue } from '@service/queues/chat.queue';
 import { ChatCache } from '@service/redis/chat.cache';
 import { chatSocketIOObject } from '@socket/chat.socket';
+import { connectedUserMap } from '@socket/user.socket';
 import { Request, Response } from 'express';
 import STATUS_CODE from 'http-status-codes';
 

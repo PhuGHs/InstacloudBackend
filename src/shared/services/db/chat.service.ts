@@ -75,13 +75,6 @@ class ChatService {
         $sort: { createdAt: 1 }
       }
     ]);
-
-    // const conversations = await ConversationModel.find( {
-    //   $or: [
-    //     { senderId: userId, receiverId: { $in: list}},
-    //     { receiverId: userId, senderId: { $in: list}},
-    //   ]
-    // });
     return conversations;
   }
 
