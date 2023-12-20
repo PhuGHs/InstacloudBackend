@@ -21,12 +21,13 @@ export class Add {
     }
     const createdUrl: string = `https://res.cloudinary.com/daszajz9a/image/upload/v${result.version}/${result.public_id}`;
     const cachedUser = await userCache.updateSingleItemInCache(req.currentUser!.userId, 'profilePicture', createdUrl);
+    console.log(cachedUser.profilePicture);
     socketIOImageObject.emit('update user', cachedUser);
     imageQueue.addImageJob('addImageToDB', {
       userId: req.currentUser!.userId,
       imgId: result.public_id!,
       imgVersion: result.version.toString()
     });
-    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated' });
+    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated'});
   }
 }

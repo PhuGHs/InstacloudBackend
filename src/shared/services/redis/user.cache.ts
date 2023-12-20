@@ -4,6 +4,7 @@ import { BaseCache } from './base.cache';
 import { INotificationSettings, ISocialLinks, IUserDocument } from '@user/interfaces/user.interface';
 import { ServerError } from '@global/helpers/error-handler';
 import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-methods';
+import { string } from 'joi';
 
 type UserItem = string | ISocialLinks | INotificationSettings;
 
@@ -120,8 +121,11 @@ export class UserCache extends BaseCache {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
-
-      await this.client.HSET(`users:${userId}`, prop, JSON.stringify(value));
+      if(typeof value === 'string') {
+        await this.client.HSET(`users:${userId}`, prop, value);
+      } else {
+        await this.client.HSET(`users:${userId}`, prop, JSON.stringify(value));
+      }
       const user: IUserDocument = (await this.getUserFromCache(userId)) as IUserDocument;
       return user;
     } catch (error) {
