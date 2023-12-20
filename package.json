@@ -51,6 +51,7 @@
     "mongoose": "^7.5.2",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.5",
+    "nodemon": "^3.0.2",
     "peer": "^1.0.2",
     "redis": "^4.6.8",
     "redis-commander": "^0.8.0",
