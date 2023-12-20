@@ -96,6 +96,9 @@ export class UserCache extends BaseCache {
       }
 
       const response: IUserDocument = (await this.client.hGetAll(`users:${userId}`)) as unknown as IUserDocument;
+      if (Object.keys(response).length === 0) {
+        return null;
+      }
       response.createdAt = new Date(SupportiveMethods.parseJson(`${response.createdAt}`));
       response.social = SupportiveMethods.parseJson(`${response.social}`);
       response.postsCount = SupportiveMethods.parseJson(`${response.postsCount}`);
