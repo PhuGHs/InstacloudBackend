@@ -89,11 +89,11 @@ export class MidCloudServer {
     try {
       const httpServer: http.Server = new http.Server(app);
       const socketIO: Server = await this.createSocketIO(httpServer);
-      const peerServer = ExpressPeerServer(app.listen(9000), {
-        path: '/social-media'
-      });
+      // const peerServer = ExpressPeerServer(app.listen(9000), {
+      //   path: '/social-media'
+      // });
 
-      app.use('/peerjs', peerServer);
+      // app.use('/peerjs', peerServer);
       this.socketIOConnection(socketIO);
       this.startHttpServer(httpServer);
     } catch (error) {
