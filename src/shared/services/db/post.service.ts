@@ -110,24 +110,41 @@ class PostService {
     };
   }
 
-  public async searchPosts(query: string, date: Date): Promise<IPostDocument[]> {
-    const posts: IPostDocument[] = await PostModel.aggregate([
-      {
-        $search: {
-          index: 'post_search',
-          autocomplete: {
-            query: query,
-            path: 'post',
-            tokenOrder: 'sequential',
+  public async searchPosts(query: string, date: string): Promise<IPostDocument[]> {
+    let posts: IPostDocument[] = [];
+    if(date) {
+      posts = await PostModel.aggregate([
+        {
+          $search: {
+            index: 'post_search',
+            autocomplete: {
+              query: query,
+              path: 'post',
+              tokenOrder: 'sequential',
+            },
           },
         },
-      },
-      {
-        $match: {
-          createdAt: { $lte: date }
+        {
+          $match: {
+            createdAt: { $lte: new Date(date) }
+          }
         }
-      }
-    ]).limit(100).sort({ score: -1 });
+      ]).limit(100).sort({ score: -1 });
+    } else {
+      posts = await PostModel.aggregate([
+        {
+          $search: {
+            index: 'post_search',
+            autocomplete: {
+              query: query,
+              path: 'post',
+              tokenOrder: 'sequential',
+            },
+          },
+        }
+      ]).limit(100).sort({ score: -1 });
+    }
+
 
     return posts;
   }
