@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node build/src/index.js",
+    "start": "SET NODE_ENV=production & pm2 start ./build/src/index.js -i 5 --attach --watch | bunyan",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts | bunyan",
     "lint:check": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
