@@ -111,7 +111,7 @@ export class MidCloudServer {
 
   private startHttpServer(httpServer: http.Server): void {
     log.info(`Server has started with process ${process.pid}`);
-    httpServer.listen(PORT, () => {
+    httpServer.listen(PORT, '0.0.0.0', () => {
       log.info(`Server is currently running on port ${PORT}`);
     });
   }
