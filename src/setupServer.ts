@@ -21,6 +21,7 @@ import { SocketIOImageHandler } from '@socket/image.socket';
 import { SocketIOUserHandler } from '@socket/user.socket';
 import { SocketIONotificationHandler } from '@socket/notification.socket';
 import { ExpressPeerServer } from 'peer';
+import apiStats from 'swagger-stats';
 
 const PORT = 5000;
 const log: Logger = config.createLogger('SETUP SERVER');
@@ -36,6 +37,7 @@ export class MidCloudServer {
     this.securityMiddleware(this.app);
     this.standardMiddleware(this.app);
     this.routeMiddleware(this.app);
+    this.apiMonitoring(this.app);
     this.globalErrorHandler(this.app);
     this.startServer(this.app);
   }
@@ -70,6 +72,12 @@ export class MidCloudServer {
 
   private routeMiddleware(app: Application): void {
     appRoutes(app);
+  }
+
+  private apiMonitoring(app: Application): void {
+    app.use(apiStats.getMiddleware({
+      uriPath: '/api-monitoring'
+    }));
   }
 
   private globalErrorHandler(app: Application): void {

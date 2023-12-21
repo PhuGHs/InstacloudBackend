@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "NODE_ENV=production pm2 start ./build/src/index.js -i 5 --watch | ./node_modules/.bin/bunyan",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts | bunyan",
     "lint:check": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
@@ -56,6 +57,7 @@
     "redis": "^4.6.8",
     "redis-commander": "^0.8.0",
     "socket.io": "^4.7.2",
+    "swagger-stats": "^0.99.7",
     "typescript-transform-paths": "^3.4.6",
     "urllib": "^3.19.3"
   },
@@ -73,6 +75,7 @@
     "@types/lodash": "^4.14.199",
     "@types/nodemailer": "^6.4.11",
     "@types/redis-info": "^3.0.3",
+    "@types/swagger-stats": "^0.95.11",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "eslint": "^8.49.0",
