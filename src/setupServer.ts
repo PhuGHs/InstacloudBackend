@@ -97,11 +97,11 @@ export class MidCloudServer {
     try {
       const httpServer: http.Server = new http.Server(app);
       const socketIO: Server = await this.createSocketIO(httpServer);
-      // const peerServer = ExpressPeerServer(app.listen(9000), {
-      //   path: '/social-media'
-      // });
+      const peerServer = ExpressPeerServer(app.listen(9000), {
+        path: '/social-media'
+      });
 
-      // app.use('/peerjs', peerServer);
+      app.use('/peerjs', peerServer);
       this.socketIOConnection(socketIO);
       this.startHttpServer(httpServer);
     } catch (error) {
@@ -111,7 +111,7 @@ export class MidCloudServer {
 
   private startHttpServer(httpServer: http.Server): void {
     log.info(`Server has started with process ${process.pid}`);
-    httpServer.listen(PORT, '0.0.0.0', () => {
+    httpServer.listen(PORT, () => {
       log.info(`Server is currently running on port ${PORT}`);
     });
   }
@@ -123,7 +123,7 @@ export class MidCloudServer {
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       }
     });
-    const pubClient = createClient({ url: config.REDIS_HOST });
+    const pubClient = createClient({ url: config.REDIS_CLOUD });
     const subClient = pubClient.duplicate();
     await Promise.all([pubClient.connect(), subClient.connect()]);
     io.adapter(createAdapter(pubClient, subClient));

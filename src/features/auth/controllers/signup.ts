@@ -30,7 +30,7 @@ export class SignUp {
     const authObjectId: ObjectId = new ObjectId();
     const userObjectId: ObjectId = new ObjectId();
     const uId: string = `${SupportiveMethods.generateRandomIntegers(12)}`;
-    const authData: IAuthDocument = await SignUp.prototype.formSignUpData({
+    const authData: IAuthDocument = SignUp.prototype.formSignUpData({
       _id: authObjectId,
       uId,
       username,
