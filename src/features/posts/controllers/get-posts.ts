@@ -6,7 +6,6 @@ import STATUS_CODE from 'http-status-codes';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import { UserCache } from '@service/redis/user.cache';
 import { userService } from '@service/db/user.service';
-import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 
 const postCache: PostCache = new PostCache();
@@ -29,19 +28,13 @@ export class Get {
     for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
       userIds.push(new mongoose.Types.ObjectId(blockedUser));
     }
-    // posts = cachedPosts;
-    // totalPosts = await postCache.getTotalPostsFromCache();
-    posts = await postService.getPosts({}, userIds, skip, limit, { createdAt: -1 });
-    totalPosts = await postService.postsCount();
-    // posts = await postService.getPosts({}, user, skip, limit, { createdAt: -1 });
-    // totalPosts = await postService.postsCount();
-    // if (cachedPosts.length) {
-    //   posts = cachedPosts;
-    //   totalPosts = await postCache.getTotalPostsFromCache();
-    // } else {
-    //   posts = await postService.getPosts({}, userIds, skip, limit, { createdAt: -1 });
-    //   totalPosts = await postService.postsCount();
-    // }
+    if (cachedPosts.length) {
+      posts = cachedPosts;
+      totalPosts = await postCache.getTotalPostsFromCache();
+    } else {
+      posts = await postService.getPosts({}, userIds, skip, limit, { createdAt: -1 });
+      totalPosts = await postService.postsCount();
+    }
     res.status(STATUS_CODE.OK).json({ message: 'All posts', posts, totalPosts });
   }
 

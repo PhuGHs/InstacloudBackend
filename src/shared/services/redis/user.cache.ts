@@ -95,23 +95,22 @@ export class UserCache extends BaseCache {
         await this.client.connect();
       }
       const response: IUserDocument = (await this.client.hGetAll(`users:${userId}`)) as unknown as IUserDocument;
-      if (Object.keys(response).length === 0) {
+      if(Object.keys(response).length === 0) {
         return null;
       }
       response.createdAt = new Date(SupportiveMethods.parseJson(`${response.createdAt}`));
-      response.social = SupportiveMethods.parseJson(`${response.social}`);
-      response.postsCount = SupportiveMethods.parseJson(`${response.postsCount}`);
-      response.blocked = SupportiveMethods.parseJson(`${response.blocked}`);
-      response.blockedBy = SupportiveMethods.parseJson(`${response.blockedBy}`);
-      response.work = SupportiveMethods.parseJson(`${response.work}`);
-      response.school = SupportiveMethods.parseJson(`${response.school}`);
-      response.location = SupportiveMethods.parseJson(`${response.location}`);
-      response.quote = SupportiveMethods.parseJson(`${response.quote}`);
-      response.notifications = SupportiveMethods.parseJson(`${response.notifications}`);
-      response.followersCount = SupportiveMethods.parseJson(`${response.followersCount}`);
-      response.followingCount = SupportiveMethods.parseJson(`${response.followingCount}`);
-
-      return response;
+        response.social = SupportiveMethods.parseJson(`${response.social}`);
+        response.postsCount = SupportiveMethods.parseJson(`${response.postsCount}`);
+        response.blocked = SupportiveMethods.parseJson(`${response.blocked}`);
+        response.blockedBy = SupportiveMethods.parseJson(`${response.blockedBy}`);
+        response.work = SupportiveMethods.parseJson(`${response.work}`);
+        response.school = SupportiveMethods.parseJson(`${response.school}`);
+        response.location = SupportiveMethods.parseJson(`${response.location}`);
+        response.quote = SupportiveMethods.parseJson(`${response.quote}`);
+        response.notifications = SupportiveMethods.parseJson(`${response.notifications}`);
+        response.followersCount = SupportiveMethods.parseJson(`${response.followersCount}`);
+        response.followingCount = SupportiveMethods.parseJson(`${response.followingCount}`);
+        return response;
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again later');

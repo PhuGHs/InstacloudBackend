@@ -70,7 +70,6 @@ async function seedUserData(count: number): Promise<void> {
         lastname,
         email: faker.internet.email(),
         password: 'qwerty',
-        avatarImage: avatar
       };
       console.log(`****ADDING USER TO DATABASE**** - ${i + 1} of ${count} - ${username}`);
       await axios.post('http://localhost:5000/api/v1/signup', body);
@@ -164,4 +163,4 @@ async function seedPostsForUsers() {
   }
 }
 
-seedUserData(50);
+seedUserData(100);
