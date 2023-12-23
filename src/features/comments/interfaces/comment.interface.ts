@@ -18,6 +18,7 @@ export interface ICommentJob {
   postId: string;
   userTo: string;
   userFrom: string;
+  userFromProfilePicture: string;
   username: string;
   comment: ICommentDocument;
 }

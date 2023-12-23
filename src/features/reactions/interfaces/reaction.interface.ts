@@ -23,6 +23,7 @@ export interface IReactionJob {
   username: string;
   userTo?: string;
   userFrom?: string;
+  userFromProfilePicture?: string;
   reactionObject?: IReactionDocument;
 }
 

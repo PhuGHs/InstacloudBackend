@@ -8,6 +8,7 @@ import { IUserDocument } from '@user/interfaces/user.interface';
 import { UserModel } from '@user/models/user.schema';
 import { ObjectId } from 'mongodb';
 import mongoose, { Query } from 'mongoose';
+import { userService } from './user.service';
 
 const userCache: UserCache = new UserCache();
 class FollowerService {
@@ -36,9 +37,10 @@ class FollowerService {
       }
     ]);
 
-    const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null] = await Promise.all([
+    const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null, IUserDocument | null] = await Promise.all([
       users,
-      userCache.getUserFromCache(followeeId)
+      userService.getUserById(followeeId),
+      userService.getUserById(userId),
     ]);
 
     //send notification
@@ -46,6 +48,7 @@ class FollowerService {
       const notificationModel: INotificationDocument = new NotificationModel();
       const notification = await notificationModel.insertNotification({
         userFrom: userId,
+        userFromProfilePicture: response[2]!.profilePicture,
         userTo: followeeId,
         message: `${username} is following you now!`,
         notificationType: 'follows',

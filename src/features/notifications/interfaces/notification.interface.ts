@@ -4,6 +4,7 @@ export interface INotificationDocument extends Document {
   _id?: mongoose.Types.ObjectId | string;
   userTo: string;
   userFrom: string;
+  userFromProfilePicture: string;
   message: string;
   notificationType: string;
   entityId: mongoose.Types.ObjectId;
@@ -22,6 +23,7 @@ export interface INotificationDocument extends Document {
 export interface INotification {
   userTo: string;
   userFrom: string;
+  userFromProfilePicture: string;
   message: string;
   notificationType: string;
   entityId: mongoose.Types.ObjectId;

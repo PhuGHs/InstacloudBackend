@@ -122,12 +122,15 @@ export class UserCache extends BaseCache {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
-      if(typeof value === 'string') {
-        await this.client.HSET(`users:${userId}`, prop, value);
-      } else {
-        await this.client.HSET(`users:${userId}`, prop, JSON.stringify(value));
-      }
       const user: IUserDocument = (await this.getUserFromCache(userId)) as IUserDocument;
+      if(user !== null) {
+        console.log('not null');
+        if(typeof value === 'string') {
+          await this.client.HSET(`users:${userId}`, prop, value);
+        } else {
+          await this.client.HSET(`users:${userId}`, prop, JSON.stringify(value));
+        }
+      }
       return user;
     } catch (error) {
       log.error(error);

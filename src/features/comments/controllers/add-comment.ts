@@ -31,6 +31,7 @@ export class Add {
       postId: postId,
       userTo,
       userFrom: req.currentUser!.userId,
+      userFromProfilePicture: profilePicture,
       username: req.currentUser!.username
     };
     await commentCache.addCommentToCache({ commentId: `${commentObjectId}`, commentData: data });

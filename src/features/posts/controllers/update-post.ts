@@ -10,6 +10,7 @@ import { upload, vidUpload } from '@root/shared/globals/helpers/cloudinary-uploa
 import { BadRequestError } from '@root/shared/globals/helpers/error-handler';
 import { imageQueue } from '@service/queues/image.queue';
 import { socketIOPostObject } from '@socket/post.socket';
+import { postService } from '@service/db/post.service';
 
 const postCache: PostCache = new PostCache();
 export class Update {
@@ -28,11 +29,12 @@ export class Update {
       profilePicture
     } as IPostDocument;
 
-    const postInCacheAfterBeingUpdated: IPostDocument = await postCache.updatePostInCache(postId, updatedPost);
+    const postInCacheAfterBeingUpdated: IPostDocument | null = await postCache.updatePostInCache(postId, updatedPost);
     //call socketIO to update in the UI.
     socketIOPostObject.emit('update post', postInCacheAfterBeingUpdated, 'posts');
     postQueue.addPostJob('updatePostInDB', { key: postId, value: updatedPost });
-    res.status(STATUS_CODE.OK).json({ message: 'Post has been updated successfully!', post: postInCacheAfterBeingUpdated });
+    const returnedPost: IPostDocument = postInCacheAfterBeingUpdated ? postInCacheAfterBeingUpdated : await postService.getSinglePost(postId);
+    res.status(STATUS_CODE.OK).json({ message: 'Post has been updated successfully!', post: returnedPost });
   }
 
   @joiValidation(postWithImageSchema)
@@ -80,9 +82,10 @@ export class Update {
       videoVersion: videoVersion ? videoVersion : ''
     } as IPostDocument;
 
-    const postUpdated: IPostDocument = await postCache.updatePostInCache(postId, updatedPost);
+    const postUpdated: IPostDocument | null = await postCache.updatePostInCache(postId, updatedPost);
     socketIOPostObject.emit('update post', postUpdated, 'posts');
-    postQueue.addPostJob('updatePostInDB', { key: postId, value: postUpdated });
+    const returnedPost: IPostDocument = postUpdated ? postUpdated : await postService.getSinglePost(postId);
+    postQueue.addPostJob('updatePostInDB', { key: postId, value: returnedPost });
   }
 
   private async addNewFile(req: Request): Promise<UploadApiResponse> {
@@ -110,8 +113,9 @@ export class Update {
       profilePicture
     } as IPostDocument;
 
-    const postUpdated: IPostDocument = await postCache.updatePostInCache(postId, updatedPost);
-    postQueue.addPostJob('updatePostInDB', { key: postId, value: postUpdated });
+    const postUpdated: IPostDocument | null = await postCache.updatePostInCache(postId, updatedPost);
+    const returnedPost: IPostDocument = postUpdated ? postUpdated : await postService.getSinglePost(postId);
+    postQueue.addPostJob('updatePostInDB', { key: postId, value: returnedPost });
     if (image) {
       imageQueue.addImageJob('addImageToDB', {
         key: req.currentUser!.userId,

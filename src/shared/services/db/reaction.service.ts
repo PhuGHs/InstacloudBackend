@@ -9,15 +9,16 @@ import { ReactionModel } from '@reaction/models/reaction.schema';
 import { UserCache } from '@service/redis/user.cache';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import mongoose from 'mongoose';
+import { userService } from './user.service';
 
 const userCache: UserCache = new UserCache();
 
 class ReactionService {
   public async addPostReactionToDB(reactionData: IReactionJob): Promise<void> {
-    const { postId, username, userTo, userFrom, reactionObject } = reactionData;
+    const { postId, username, userTo, userFrom, userFromProfilePicture, reactionObject } = reactionData;
     const reactionDocument: IReactionDocument = reactionObject as IReactionDocument;
     const response: [IUserDocument, IReactionDocument, IPostDocument] = (await Promise.all([
-      userCache.getUserFromCache(`${userTo}`),
+      userService.getUserById(userTo!),
       ReactionModel.replaceOne({ postId, username }, reactionDocument, { upsert: true }),
       PostModel.findOneAndUpdate(
         { _id: postId },
@@ -37,6 +38,7 @@ class ReactionService {
       const notificationModel: INotificationDocument = new NotificationModel();
       const notification = await notificationModel.insertNotification({
         userFrom: userFrom!,
+        userFromProfilePicture: userFromProfilePicture!,
         userTo: userTo!,
         message: `${username} liked your post!`,
         notificationType: 'reactions',
@@ -55,10 +57,10 @@ class ReactionService {
   }
 
   public async addCommentReactionToDB(reactionData: IReactionJob): Promise<void> {
-    const { commentId, username, userTo, userFrom, reactionObject } = reactionData;
+    const { commentId, username, userTo, userFrom, userFromProfilePicture, reactionObject } = reactionData;
     const reactionDocument: IReactionDocument = reactionObject as IReactionDocument;
     const response: [IUserDocument, IReactionDocument, ICommentDocument] = (await Promise.all([
-      userCache.getUserFromCache(`${userTo}`),
+      userService.getUserById(userTo!),
       ReactionModel.replaceOne({ commentId, username }, reactionDocument, { upsert: true }),
       CommentsModel.findOneAndUpdate(
         { _id: commentId },
@@ -78,6 +80,7 @@ class ReactionService {
       const notificationModel: INotificationDocument = new NotificationModel();
       const notification = await notificationModel.insertNotification({
         userFrom: userFrom!,
+        userFromProfilePicture: userFromProfilePicture!,
         userTo: userTo!,
         message: `${username} liked a comment you wrote on a post!`,
         notificationType: 'reactions',

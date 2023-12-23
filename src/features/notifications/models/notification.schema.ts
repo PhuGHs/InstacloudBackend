@@ -5,6 +5,7 @@ import mongoose, { model, Model, Schema } from 'mongoose';
 const notificationSchema: Schema = new Schema({
   userTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
   userFrom: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  userFromProfilePicture: { type: String, default: '' },
   read: { type: Boolean, default: false },
   message: { type: String, default: '' },
   notificationType: String,
@@ -23,6 +24,7 @@ notificationSchema.methods.insertNotification = async function (body: INotificat
   const {
     userTo,
     userFrom,
+    userFromProfilePicture,
     message,
     notificationType,
     entityId,
@@ -39,6 +41,7 @@ notificationSchema.methods.insertNotification = async function (body: INotificat
   await NotificationModel.create({
     userTo,
     userFrom,
+    userFromProfilePicture,
     message,
     notificationType,
     entityId,

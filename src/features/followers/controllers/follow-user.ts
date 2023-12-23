@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import STATUS_CODE from 'http-status-codes';
+import { userService } from '@service/db/user.service';
 
 const followerCache: FollowerCache = new FollowerCache();
 const userCache: UserCache = new UserCache();
@@ -19,12 +20,13 @@ export class Add {
     const followersCount: Promise<void> = followerCache.updateFollowersCountInCache(followerId, 'followersCount', 1);
     await Promise.all([followingCount, followersCount]);
 
-    const cachedFollowee: Promise<IUserDocument> = userCache.getUserFromCache(req.currentUser!.userId) as Promise<IUserDocument>;
-    const cachedFollower: Promise<IUserDocument> = userCache.getUserFromCache(followerId) as Promise<IUserDocument>;
+    const cachedFollowee: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
+    const followee: IUserDocument = cachedFollowee ? cachedFollowee : await userService.getUserById(req.currentUser!.userId);
+    const cachedFollower: IUserDocument = await userCache.getUserFromCache(followerId) as IUserDocument;
+    const follower: IUserDocument = cachedFollower ? cachedFollower : await userService.getUserById(followerId);
 
-    const response: [IUserDocument, IUserDocument] = await Promise.all([cachedFollowee, cachedFollower]);
     const followerObjectId: ObjectId = new ObjectId();
-    const addFoloweeData: IFollowerData = Add.prototype.userData(response[0]);
+    const addFoloweeData: IFollowerData = Add.prototype.userData(followee);
 
     //send addFolloweeData to client with SOCKETIO
 

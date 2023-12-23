@@ -27,6 +27,7 @@ export class Add {
       username: req.currentUser!.username,
       userTo,
       userFrom: req.currentUser!.userId,
+      userFromProfilePicture: profilePicture,
       reactionObject: reactionDocument
     };
     await reactionCache.addPostReactionToCache(postId, reactionDocument, postReactions);
@@ -52,6 +53,7 @@ export class Add {
       username: req.currentUser!.username,
       userTo,
       userFrom: req.currentUser!.userId,
+      userFromProfilePicture: profilePicture,
       reactionObject: reactionDocument
     };
     await reactionCache.addCommentReactionToCache(commentId, reactionDocument, postReactions);

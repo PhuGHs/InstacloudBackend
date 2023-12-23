@@ -7,11 +7,12 @@ import mongoose, { Query, UpdateQuery } from 'mongoose';
 import { UserCache } from '@service/redis/user.cache';
 import { INotificationDocument } from '@notification/interfaces/notification.interface';
 import { NotificationModel } from '@notification/models/notification.schema';
+import { userService } from './user.service';
 
 const userCache: UserCache = new UserCache();
 class CommentService {
   public async addCommentToDB(data: ICommentJob): Promise<void> {
-    const { postId, userTo, userFrom, username, comment } = data;
+    const { postId, userTo, userFrom, username, comment, userFromProfilePicture } = data;
     const promisedComment: Promise<ICommentDocument> = CommentsModel.create(comment);
     console.log(postId);
     const promisedPost: Query<IPostDocument, IPostDocument> = PostModel.findOneAndUpdate(
@@ -19,14 +20,17 @@ class CommentService {
       { $inc: { commentsCount: 1 } },
       { new: true }
     ) as Query<IPostDocument, IPostDocument>;
-    const promisedUser: Promise<IUserDocument> = userCache.getUserFromCache(userTo) as Promise<IUserDocument>;
-    const response: [ICommentDocument, IPostDocument, IUserDocument] = await Promise.all([promisedComment, promisedPost, promisedUser]);
+    const promisedUser: IUserDocument = await userCache.getUserFromCache(userTo) as IUserDocument;
+    const user: IUserDocument = promisedUser ? promisedUser : await userService.getUserById(userTo) as IUserDocument;
+
+    const response: [ICommentDocument, IPostDocument] = await Promise.all([promisedComment, promisedPost]);
 
     // add comment notification
-    if (response[2]?.notifications.comments && userTo !== userFrom) {
+    if (user.notifications.comments && userTo !== userFrom) {
       const notificationModel: INotificationDocument = new NotificationModel();
       const notification = await notificationModel.insertNotification({
         userFrom: userFrom,
+        userFromProfilePicture: userFromProfilePicture!,
         userTo: userTo,
         message: `${username} commented on a post you wrote!`,
         notificationType: 'comments',

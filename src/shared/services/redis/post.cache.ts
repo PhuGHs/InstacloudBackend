@@ -95,7 +95,7 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async updatePostInCache(key: string, updatedPost: IPostDocument): Promise<IPostDocument> {
+  public async updatePostInCache(key: string, updatedPost: IPostDocument): Promise<IPostDocument | null> {
     const { post, feelings, privacy, gifUrl, imgId, imgVersion, profilePicture, videoId, videoVersion } = updatedPost;
 
     const dataToSave: string[] = [
@@ -122,6 +122,11 @@ export class PostCache extends BaseCache {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
+      }
+
+      const post: IPostDocument[] = await this.getAPostFromCache(key);
+      if(post.length === 0) {
+        return null;
       }
 
       for (let i = 0; i < dataToSave.length; i += 2) {
@@ -238,7 +243,6 @@ export class PostCache extends BaseCache {
 
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
-      console.log('call from cache');
       for (const post of replies as IPostDocument[]) {
         if (post.imgId && post.imgVersion) {
           post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
