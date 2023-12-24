@@ -10,6 +10,7 @@ import { UserCache } from '@service/redis/user.cache';
 import { IUserDocument } from '@user/interfaces/user.interface';
 import mongoose from 'mongoose';
 import { userService } from './user.service';
+import { socketIONotificationObject } from '@socket/notification.socket';
 
 const userCache: UserCache = new UserCache();
 
@@ -52,8 +53,9 @@ class ReactionService {
         gifUrl: response[2].gifUrl!,
         createdAt: new Date()
       });
+
+      socketIONotificationObject.emit('insert notification', notification, { userTo });
     }
-    //send to client using socketIO
   }
 
   public async addCommentReactionToDB(reactionData: IReactionJob): Promise<void> {
@@ -94,9 +96,8 @@ class ReactionService {
         gifUrl: '',
         createdAt: new Date()
       });
+      socketIONotificationObject.emit('insert notification', notification, { userTo });
     }
-
-    //send to client using socketIO
   }
 
   public async removeReactionFromCache(reactionData: IReactionJob): Promise<void> {

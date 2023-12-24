@@ -8,13 +8,13 @@ import { UserCache } from '@service/redis/user.cache';
 import { INotificationDocument } from '@notification/interfaces/notification.interface';
 import { NotificationModel } from '@notification/models/notification.schema';
 import { userService } from './user.service';
+import { socketIONotificationObject } from '@socket/notification.socket';
 
 const userCache: UserCache = new UserCache();
 class CommentService {
   public async addCommentToDB(data: ICommentJob): Promise<void> {
     const { postId, userTo, userFrom, username, comment, userFromProfilePicture } = data;
     const promisedComment: Promise<ICommentDocument> = CommentsModel.create(comment);
-    console.log(postId);
     const promisedPost: Query<IPostDocument, IPostDocument> = PostModel.findOneAndUpdate(
       { _id: postId },
       { $inc: { commentsCount: 1 } },
@@ -44,6 +44,7 @@ class CommentService {
         gifUrl: response[1].gifUrl!,
         createdAt: new Date()
       });
+      socketIONotificationObject.emit('insert notification', notification, { userTo });
     }
 
     // send to client with SOCKETIO

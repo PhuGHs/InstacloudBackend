@@ -37,7 +37,6 @@ export class Update {
     res.status(STATUS_CODE.OK).json({ message: 'Post has been updated successfully!', post: returnedPost });
   }
 
-  @joiValidation(postWithImageSchema)
   public async postWithImage(req: Request, res: Response): Promise<void> {
     const { imgId, imgVersion } = req.body;
     if (imgId && imgVersion) {
@@ -52,7 +51,6 @@ export class Update {
     res.status(STATUS_CODE.OK).json({ message: 'post with image has been updated successfully' });
   }
 
-  @joiValidation(postWithVideoSchema)
   public async postWithVideo(req: Request, res: Response): Promise<void> {
     const { videoId, videoVersion } = req.body;
     if (videoId && videoVersion) {

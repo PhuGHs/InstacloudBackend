@@ -104,19 +104,19 @@ export class PostCache extends BaseCache {
       'post',
       `${post}`,
       'feelings',
-      `${feelings}`,
+      `${feelings ? feelings: ''}`,
       'privacy',
-      `${privacy}`,
+      `${privacy ? privacy : ''}`,
       'gifUrl',
-      `${gifUrl}`,
+      `${gifUrl ? gifUrl : ''}`,
       'imgVersion',
-      `${imgVersion}`,
+      `${imgVersion ? imgVersion : ''}`,
       'imgId',
-      `${imgId}`,
+      `${imgId ? imgId : ''}`,
       'videoVersion',
-      `${videoVersion}`,
+      `${videoVersion ? videoVersion : ''}`,
       'videoId',
-      `${videoId}`
+      `${videoId ? videoId : '' }`
     ];
 
     try {

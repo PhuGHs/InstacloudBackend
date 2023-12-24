@@ -17,7 +17,7 @@ export interface INotificationDocument extends Document {
   gifUrl: string;
   read?: boolean;
   createdAt?: Date;
-  insertNotification(data: INotification): Promise<void>;
+  insertNotification(data: INotification): Promise<INotificationDocument[]>;
 }
 
 export interface INotification {

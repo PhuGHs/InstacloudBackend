@@ -15,7 +15,7 @@ const postSchema: ObjectSchema = Joi.object().keys({
 });
 
 const postWithImageSchema: ObjectSchema = Joi.object().keys({
-  image: Joi.string().required().messages({
+  image: Joi.string().optional().messages({
     'any.required': 'Image is a required field',
     'string.empty': 'Image property is not allowed to be empty'
   }),

@@ -9,6 +9,7 @@ import { UserModel } from '@user/models/user.schema';
 import { ObjectId } from 'mongodb';
 import mongoose, { Query } from 'mongoose';
 import { userService } from './user.service';
+import { socketIONotificationObject } from '@socket/notification.socket';
 
 const userCache: UserCache = new UserCache();
 class FollowerService {
@@ -62,8 +63,8 @@ class FollowerService {
         gifUrl: '',
         createdAt: new Date()
       });
+      socketIONotificationObject.emit('insert notification', notification, { followeeId });
     }
-    //send to client with socketIO
 
     //send to email queue
   }
