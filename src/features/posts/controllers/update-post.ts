@@ -33,7 +33,9 @@ export class Update {
     //call socketIO to update in the UI.
     socketIOPostObject.emit('update post', postInCacheAfterBeingUpdated, 'posts');
     postQueue.addPostJob('updatePostInDB', { key: postId, value: updatedPost });
-    const returnedPost: IPostDocument = postInCacheAfterBeingUpdated ? postInCacheAfterBeingUpdated : await postService.getSinglePost(postId);
+    const returnedPost: IPostDocument = postInCacheAfterBeingUpdated
+      ? postInCacheAfterBeingUpdated
+      : await postService.getSinglePost(postId);
     res.status(STATUS_CODE.OK).json({ message: 'Post has been updated successfully!', post: returnedPost });
   }
 

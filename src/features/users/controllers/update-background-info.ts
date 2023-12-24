@@ -14,8 +14,8 @@ export class BackgroundInformation {
     for (const [key, value] of Object.entries(req.body)) {
       await userCache.updateSingleItemInCache(req.currentUser!.userId, key, `${value}`);
     }
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(req.currentUser!.userId) as IUserDocument;
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : ((await userService.getUserById(req.currentUser!.userId)) as IUserDocument);
     userQueue.addUserJob('updateBackgroundInformation', {
       key: req.currentUser!.userId,
       value: req.body

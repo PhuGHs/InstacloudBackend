@@ -21,22 +21,26 @@ export const postMockResponse = (): Response => {
 export const post: IPostBody = {
   post: 'hello',
   privacy: 'public',
-  profilePicture: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
-  gifUrl: '',
+  profilePicture:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
+  gifUrl: ''
 };
 
 export const postWithImage: IPostBody = {
   post: 'hello',
   privacy: 'public',
-  profilePicture: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
+  profilePicture:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
   gifUrl: '',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png'
+  image:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png'
 };
 
 export const postWithImageFieldEmpty: IPostBody = {
   post: 'hello',
   privacy: 'public',
-  profilePicture: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
+  profilePicture:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
   gifUrl: '',
   image: ''
 };
@@ -44,7 +48,8 @@ export const postWithImageFieldEmpty: IPostBody = {
 export const postWithVideo: IPostBody = {
   post: 'hello',
   privacy: 'public',
-  profilePicture: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
+  profilePicture:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
   gifUrl: '',
   video: 'https://www.youtube.com/watch?v=t5sFkGk8GY8&ab_channel=AnsontheDeveloper'
 };
@@ -52,7 +57,8 @@ export const postWithVideo: IPostBody = {
 export const postWithVideoFieldEmpty: IPostBody = {
   post: 'hello',
   privacy: 'public',
-  profilePicture: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
+  profilePicture:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
   gifUrl: '',
   video: ''
 };
@@ -88,7 +94,6 @@ export const postMockData: IPostDocument = {
   }
 } as unknown as IPostDocument;
 
-
 export const updatedPost = {
   profilePicture: postMockData.profilePicture,
   post: postMockData.post,
@@ -96,7 +101,7 @@ export const updatedPost = {
   privacy: 'Private',
   gifUrl: '',
   imgId: '',
-  imgVersion: '',
+  imgVersion: ''
 };
 
 export const updatedPostWithImage = {
@@ -109,8 +114,6 @@ export const updatedPostWithImage = {
   imgVersion: '',
   image: ''
 };
-
-
 
 export interface IPostBody {
   post: string;

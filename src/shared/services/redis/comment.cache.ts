@@ -43,6 +43,10 @@ export class CommentCache extends BaseCache {
         `${userTo}`
       ];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
+      console.log(pId);
+      if (pId[0] === null) {
+        return;
+      }
       await this.client.ZADD('comment', { score: parseInt(pId[0], 10), value: commentId });
       for (let i = 0; i < dataToSave.length; i += 2) {
         const field = dataToSave[i];
@@ -66,6 +70,9 @@ export class CommentCache extends BaseCache {
       }
       const comments: ICommentDocument[] = [];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
+      if (pId[0] === null) {
+        return comments;
+      }
       const reply: string[] = await this.client.sendCommand(['zrevrange', key, pId[0], pId[0]]);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -120,6 +127,9 @@ export class CommentCache extends BaseCache {
       }
       const comments: ICommentDocument[] = [];
       const pId: string[] = await this.client.HMGET(`posts:${postId}`, 'pId');
+      if (pId[0] === null) {
+        return comments;
+      }
       const reply: string[] = await this.client.sendCommand(['zrevrange', 'comment', pId[0], pId[0]]);
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -142,12 +152,17 @@ export class CommentCache extends BaseCache {
     }
   }
 
-  public async updateACommentInCache(commentId: string, updatedComment: ICommentDocument): Promise<ICommentDocument> {
+  public async updateACommentInCache(commentId: string, updatedComment: ICommentDocument): Promise<ICommentDocument | null> {
     const { comment, profilePicture } = updatedComment;
     const dataToSave: string[] = ['profilePicture', `${profilePicture}`, 'comment', `${comment}`];
     try {
       if (!this.client.isOpen) {
         this.client.connect();
+      }
+
+      const comment: ICommentDocument[] = await this.getSingleCommentFromAPostFromCache('', commentId);
+      if (comment.length === 0) {
+        return null;
       }
       for (let i = 0; i < dataToSave.length; i += 2) {
         const field = dataToSave[i];

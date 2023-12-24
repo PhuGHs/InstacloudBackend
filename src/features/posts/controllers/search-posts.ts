@@ -7,6 +7,6 @@ export class Search {
   public async posts(req: Request, res: Response): Promise<void> {
     const query: string = req.query.query as string;
     const posts: IPostDocument[] = await postService.searchPosts(query, req.query.date as string);
-    res.status(STATUS_CODES.OK).json({ message: 'posts found', posts});
+    res.status(STATUS_CODES.OK).json({ message: 'posts found', posts });
   }
 }

@@ -20,21 +20,22 @@ export class Get {
     const newSkip: number = skip === 0 ? skip : skip + 1;
     let posts: IPostDocument[] = [];
     let totalPosts: number = 0;
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(req.currentUser!.userId) as IUserDocument;
-    const cachedPosts: IPostDocument[] = await postCache.getPostsFromCache('post', newSkip, limit, user);
-    console.log(user.blocked);
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : ((await userService.getUserById(req.currentUser!.userId)) as IUserDocument);
+    // const cachedPosts: IPostDocument[] = await postCache.getPostsFromCache('post', newSkip, limit, user);
+    // console.log(user.blocked);
     const userIds: mongoose.Types.ObjectId[] = [];
-    for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
+    for (const blockedUser of [...user.blocked, ...user.blockedBy]) {
       userIds.push(new mongoose.Types.ObjectId(blockedUser));
     }
-    if (cachedPosts.length) {
-      posts = cachedPosts;
-      totalPosts = await postCache.getTotalPostsFromCache();
-    } else {
-      posts = await postService.getPosts({}, userIds, skip, limit, { createdAt: -1 });
-      totalPosts = await postService.postsCount();
-    }
+    // if (cachedPosts.length) {
+    //   posts = cachedPosts;
+    //   totalPosts = await postCache.getTotalPostsFromCache();
+    // } else {
+
+    // }
+    posts = await postService.getPosts({}, userIds, skip, limit, { createdAt: -1 });
+    totalPosts = await postService.postsCount();
     res.status(STATUS_CODE.OK).json({ message: 'All posts', posts, totalPosts });
   }
 
@@ -43,24 +44,23 @@ export class Get {
     const skip: number = (parseInt(page) - 1) * PAGE_SIZE;
     const limit: number = PAGE_SIZE * parseInt(page);
     const newSkip: number = skip === 0 ? skip : skip + 1;
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(req.currentUser!.userId) as IUserDocument;
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : ((await userService.getUserById(req.currentUser!.userId)) as IUserDocument);
     let posts: IPostDocument[] = [];
     let totalPosts: number = 0;
     const userIds: mongoose.Types.ObjectId[] = [];
-    for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
+    for (const blockedUser of [...user.blocked, ...user.blockedBy]) {
       userIds.push(new mongoose.Types.ObjectId(blockedUser));
     }
-    const cachedPosts: IPostDocument[] = await postCache.getPostsWithImagesFromCache('post', newSkip, limit, user);
-    posts = cachedPosts;
-    totalPosts = cachedPosts.length;
-    if (cachedPosts.length) {
-      posts = cachedPosts;
-      totalPosts = cachedPosts.length;
-    } else {
-      posts = await postService.getPosts({ imgId: '$ne', gifUrl: '$ne' }, userIds, skip, limit, { createdAt: -1 });
-      totalPosts = posts.length;
-    }
+    // const cachedPosts: IPostDocument[] = await postCache.getPostsWithImagesFromCache('post', newSkip, limit, user);
+    // if (cachedPosts.length) {
+    //   posts = cachedPosts;
+    //   totalPosts = cachedPosts.length;
+    // } else {
+
+    // }
+    posts = await postService.getPosts({ imgId: '$ne', gifUrl: '$ne' }, userIds, skip, limit, { createdAt: -1 });
+    totalPosts = posts.length;
     res.status(STATUS_CODE.OK).json({ message: 'All posts with images', posts, totalPosts });
   }
 
@@ -71,20 +71,21 @@ export class Get {
     const newSkip: number = skip === 0 ? skip : skip + 1;
     let posts: IPostDocument[] = [];
     let totalPosts: number = 0;
-    const cachedUser: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
-    const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(req.currentUser!.userId) as IUserDocument;
+    const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
+    const user: IUserDocument = cachedUser ? cachedUser : ((await userService.getUserById(req.currentUser!.userId)) as IUserDocument);
     const userIds: mongoose.Types.ObjectId[] = [];
-    for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
+    for (const blockedUser of [...user.blocked, ...user.blockedBy]) {
       userIds.push(new mongoose.Types.ObjectId(blockedUser));
     }
-    const cachedPosts: IPostDocument[] = await postCache.getPostsWithVideoFromCache('post', newSkip, limit, user);
-    if (cachedPosts.length) {
-      posts = cachedPosts;
-      totalPosts = posts.length;
-    } else {
-      posts = await postService.getPosts({ videoId: '$ne' }, userIds, skip, limit, { createdAt: -1 });
-      totalPosts = posts.length;
-    }
+    // const cachedPosts: IPostDocument[] = await postCache.getPostsWithVideoFromCache('post', newSkip, limit, user);
+    // if (cachedPosts.length) {
+    //   posts = cachedPosts;
+    //   totalPosts = posts.length;
+    // } else {
+
+    // }
+    posts = await postService.getPosts({ videoId: '$ne' }, userIds, skip, limit, { createdAt: -1 });
+    totalPosts = posts.length;
     res.status(STATUS_CODE.OK).json({ message: 'All posts with video', posts, totalPosts });
   }
 
@@ -92,8 +93,8 @@ export class Get {
     const { postId } = req.params;
     const posts: IPostDocument[] = await postCache.getAPostFromCache(postId);
     const result = posts.length > 0 ? posts[0] : await postService.getSinglePost(postId);
-    if(!result) {
-      res.status(STATUS_CODE.NOT_FOUND).json({ message: 'Post had been deleted or not existed!'});
+    if (!result) {
+      res.status(STATUS_CODE.NOT_FOUND).json({ message: 'Post had been deleted or not existed!' });
     } else {
       res.status(STATUS_CODE.OK).json({ post: result });
     }

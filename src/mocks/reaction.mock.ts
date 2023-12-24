@@ -50,7 +50,7 @@ export const reaction: IBody = {
   postId: '6568049ff9ecc21f63864821',
   userTo: '6567fd23ec30e86a7dc57d1a',
   postReactions: {
-    like: 1,
+    like: 1
   },
   profilePicture: 'https://res.cloudinary.com/daszajz9a/image/upload/v1701313830/6567fd25ec30e86a7dc57d1c'
 };
@@ -59,7 +59,7 @@ export const commentReaction: IBody = {
   commentId: '656de496dda93886cb4b703a',
   userTo: '6567fd23ec30e86a7dc57d1a',
   postReactions: {
-    like: 1,
+    like: 1
   },
   profilePicture: 'https://res.cloudinary.com/daszajz9a/image/upload/v1701313830/6567fd25ec30e86a7dc57d1c'
 };

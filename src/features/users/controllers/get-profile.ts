@@ -45,16 +45,16 @@ export class Get {
     const { userId, username, uId } = req.params;
     const userName: string = SupportiveMethods.lowercase(username) as string;
 
-    const cachedUser: IUserDocument = (await userCache.getUserFromCache(userId)) as IUserDocument;
+    const cachedUser: IUserDocument | null = await userCache.getUserFromCache(userId);
     const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(userId);
 
-    if(user.blockedBy.toString().includes(req.currentUser!.userId) || user.blocked.toString().includes(req.currentUser!.userId)) {
-      res.status(STATUS_CODE.NOT_FOUND).json({ message: 'user not found or you blocked this user'});
+    if (user.blockedBy.toString().includes(req.currentUser!.userId) || user.blocked.toString().includes(req.currentUser!.userId)) {
+      res.status(STATUS_CODE.NOT_FOUND).json({ message: 'user not found or you blocked this user' });
       return;
     }
     const cachedPosts: IPostDocument[] = await postCache.getPostsFromCacheOfAUser('post', parseInt(uId, 10));
     const userIds: mongoose.Types.ObjectId[] = [];
-    for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
+    for (const blockedUser of [...user.blocked, ...user.blockedBy]) {
       userIds.push(new mongoose.Types.ObjectId(blockedUser));
     }
     const posts: IPostDocument[] = cachedPosts.length
@@ -65,18 +65,15 @@ export class Get {
     const following: IFollowerData[] = await Get.prototype.following(userId);
 
     const imagePostsFromCache: IPostDocument[] = await postCache.getPostsWithImagesOfAUserFromCache('post', parseInt(uId, 10));
-    const imagePosts: IPostDocument[] = imagePostsFromCache.length ? imagePostsFromCache : await postService.getPostWithImageOfAUser(userId);
+    const imagePosts: IPostDocument[] = imagePostsFromCache.length
+      ? imagePostsFromCache
+      : await postService.getPostWithImageOfAUser(userId);
     if (userId === req.currentUser!.userId) {
       const savedPosts: ISavePostDocument[] = await postService.getSavedPostsFromDB(userId);
       res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image: imagePosts, savedPosts });
     } else {
       res.status(STATUS_CODE.OK).json({ message: 'user materials: ', user, posts, followers, following, image: imagePosts });
     }
-  }
-
-  public async userSuggestion(req: Request, res: Response): Promise<void> {
-    const users: IUserDocument[] = await userService.recommendUsers(req.currentUser!.userId);
-    res.status(STATUS_CODE.OK).json({ message: 'user recommendation', users });
   }
 
   private async followers(userId: string): Promise<IFollowerData[]> {

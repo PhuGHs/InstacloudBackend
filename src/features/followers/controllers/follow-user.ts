@@ -20,9 +20,9 @@ export class Add {
     const followersCount: Promise<void> = followerCache.updateFollowersCountInCache(followerId, 'followersCount', 1);
     await Promise.all([followingCount, followersCount]);
 
-    const cachedFollowee: IUserDocument = await userCache.getUserFromCache(req.currentUser!.userId) as IUserDocument;
+    const cachedFollowee: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
     const followee: IUserDocument = cachedFollowee ? cachedFollowee : await userService.getUserById(req.currentUser!.userId);
-    const cachedFollower: IUserDocument = await userCache.getUserFromCache(followerId) as IUserDocument;
+    const cachedFollower: IUserDocument = (await userCache.getUserFromCache(followerId)) as IUserDocument;
     const follower: IUserDocument = cachedFollower ? cachedFollower : await userService.getUserById(followerId);
 
     const followerObjectId: ObjectId = new ObjectId();

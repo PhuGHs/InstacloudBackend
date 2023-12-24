@@ -26,7 +26,7 @@ const postSchema: Schema = new Schema({
 
 postSchema.pre('deleteOne', async function (next: () => void) {
   const doc = await this.model.findOne(this.getQuery());
-  if(doc) {
+  if (doc) {
     await ReactionModel.deleteMany({ postId: doc._id });
     await CommentsModel.deleteMany({ postId: doc._id });
   }

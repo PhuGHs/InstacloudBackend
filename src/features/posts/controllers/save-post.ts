@@ -10,12 +10,12 @@ export class Save {
     const { postId } = req.body;
     const isExisted: boolean = await postService.checkIfPostExisted(postId, req.currentUser!.userId);
     console.log(isExisted);
-    if(isExisted) {
+    if (isExisted) {
       postQueue.addPostJob('removeASavedPostFromDB', {
         keyOne: postId,
         keyTwo: req.currentUser!.userId
       });
-      res.status(STATUS_CODE.OK).json({ message: 'Post has been removed from saved collections'});
+      res.status(STATUS_CODE.OK).json({ message: 'Post has been removed from saved collections' });
     } else {
       const data: ISavePostDocument = {
         userId: new mongoose.Types.ObjectId(req.currentUser!.userId),

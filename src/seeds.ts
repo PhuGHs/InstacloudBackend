@@ -7,7 +7,6 @@ import { UserModel } from './features/users/models/user.schema';
 import { AuthModel } from './features/auth/models/auth.schema';
 import { IAuthDocument } from './features/auth/interfaces/auth.interface';
 
-
 function avatarColor(): string {
   const colors: string[] = [
     '#f44336',
@@ -33,7 +32,7 @@ function avatarColor(): string {
     '#6a1b9a',
     '#1a237e',
     '#1de9b6',
-    '#d84315',
+    '#d84315'
   ];
   return colors[floor(random(0.9) * colors.length)];
 }
@@ -57,7 +56,7 @@ function generateAvatar(text: string, backgroundColor: string, foregroundColor =
 async function seedUserData(count: number): Promise<void> {
   let i = 0;
   try {
-    for(i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
       const username: string = faker.internet.userName();
       const firstname: string = faker.person.firstName();
       const lastname: string = faker.person.lastName();
@@ -69,18 +68,20 @@ async function seedUserData(count: number): Promise<void> {
         firstname,
         lastname,
         email: faker.internet.email(),
-        password: 'qwerty',
+        password: 'qwerty'
       };
       console.log(`****ADDING USER TO DATABASE**** - ${i + 1} of ${count} - ${username}`);
       await axios.post('http://localhost:5000/api/v1/signup', body);
     }
-  } catch(error: any) {
+  } catch (error: any) {
     console.log(error?.response?.data);
   }
 }
 
 async function getAllUsers(): Promise<IAuthDocument[]> {
-  const auths: IAuthDocument[] = await AuthModel.find({}).limit(10).maxTimeMS(1000 * 1000 * 1000);
+  const auths: IAuthDocument[] = await AuthModel.find({})
+    .limit(10)
+    .maxTimeMS(1000 * 1000 * 1000);
   return auths;
 }
 
@@ -94,7 +95,6 @@ async function getAllUsers(): Promise<IAuthDocument[]> {
 //   };
 // }
 
-
 async function seedUserPost(count: number, user: IAuthDocument): Promise<void> {
   try {
     for (let i = 0; i < count; i++) {
@@ -107,7 +107,7 @@ async function seedUserPost(count: number, user: IAuthDocument): Promise<void> {
         post,
         privacy: 'public',
         gifUrl: '',
-        profilePicture: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQgByBT5IiAT_a2x9pUVb4VMoOrlzHH7Jrzj-HB5jzHlR4lNLMS',
+        profilePicture: 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQgByBT5IiAT_a2x9pUVb4VMoOrlzHH7Jrzj-HB5jzHlR4lNLMS'
       };
       console.log(`****ADDING POST TO DATABASE**** - ${i + 1} of ${count}`);
       await axios.post('http://localhost:5000/api/v1/post/seeds', body);
@@ -120,10 +120,10 @@ async function seedUserPost(count: number, user: IAuthDocument): Promise<void> {
 async function getUsers(): Promise<void> {
   const users: IAuthDocument[] = await getAllUsers();
   console.log(users);
-    for (const user of users) {
-      await seedUserPost(1, user);
-    }
-    console.log('All posts seeded successfully!');
+  for (const user of users) {
+    await seedUserPost(1, user);
+  }
+  console.log('All posts seeded successfully!');
 }
 
 async function seedPostsForUsers() {
@@ -150,9 +150,9 @@ async function seedPostsForUsers() {
             profilePicture: 'a path',
             post: faker.lorem.sentence(),
             privacy: 'public',
-            gifUrl: '',
+            gifUrl: ''
           };
-            await axios.post('http://localhost:5000/api/v1/post/seeds', postData);
+          await axios.post('http://localhost:5000/api/v1/post/seeds', postData);
         }
       }
 

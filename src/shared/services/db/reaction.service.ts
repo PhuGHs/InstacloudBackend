@@ -122,7 +122,6 @@ class ReactionService {
     return reactions;
   }
 
-
   public async getSingleReaction(query: IQueryReaction, sort: Record<string, 1 | -1>): Promise<IReactionDocument> {
     const reactions: IReactionDocument[] = await ReactionModel.aggregate([{ $match: query }, { $sort: sort }]);
 

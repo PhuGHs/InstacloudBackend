@@ -81,34 +81,48 @@ class UserService {
       }
     ).exec();
   }
-  public async recommendUsers(userId: string): Promise<IUserDocument[]> {
+  public async recommendUsers(userId: string, userBlockedIds: mongoose.Types.ObjectId[]): Promise<IUserDocument[]> {
     const followersOfCurrentUser = await FollowerModel.find({ followeeId: userId });
     const followersId = followersOfCurrentUser.map((item) => item.followerId);
 
-    const followeesOfFollowers = await FollowerModel.find({ followerId: { $in: followersId } });
+    const followeesOfFollowers = await FollowerModel.aggregate([
+      { $match: { followerId: { $in: followersId, $ne: new mongoose.Types.ObjectId(userId) } } }
+    ]);
     const recommendUserIds = followeesOfFollowers.map((item) => item.followeeId);
 
-    const recommendedUsers = await UserModel.find({ _id: { $in: recommendUserIds } });
+    let recommendedUsers = await UserModel.aggregate([
+      { $match: { _id: { $in: recommendUserIds, $ne: new mongoose.Types.ObjectId(userId), $nin: userBlockedIds } } },
+      { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
+      { $unwind: '$authId' },
+      { $project: this.aggregateProject() }
+    ]).limit(10);
+
+    if (recommendedUsers.length < 10) {
+      const length = 10 - recommendedUsers.length;
+      const users: IUserDocument[] = await UserModel.aggregate([
+        { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId), $nin: userBlockedIds } } },
+        { $sample: { size: length } },
+        { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
+        { $unwind: '$authId' },
+        { $project: this.aggregateProject() }
+      ]);
+      recommendedUsers = [...recommendedUsers, ...users];
+    }
 
     return recommendedUsers;
   }
   public async searchUsers(query: string, userId: ObjectId, location: string): Promise<IUserDocument[]> {
     let matchOperator;
-    if(location) {
+    if (location) {
       matchOperator = {
         $match: {
-          $and: [
-            {'user._id': { $ne: userId }},
-            {'user.location': {$eq: location }}
-          ]
+          $and: [{ 'user._id': { $ne: userId } }, { 'user.location': { $eq: location } }]
         }
       };
     } else {
       matchOperator = {
         $match: {
-          $and: [
-            {'user._id': { $ne: userId }},
-          ]
+          $and: [{ 'user._id': { $ne: userId } }]
         }
       };
     }
@@ -122,14 +136,14 @@ class UserService {
                 autocomplete: {
                   query: query,
                   path: 'username',
-                  tokenOrder: 'sequential',
+                  tokenOrder: 'sequential'
                 }
               },
               {
                 autocomplete: {
                   query: query,
                   path: 'fullname',
-                  tokenOrder: 'sequential',
+                  tokenOrder: 'sequential'
                 }
               }
             ]
@@ -181,13 +195,15 @@ class UserService {
       { $match: {} },
       { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } }, // this returns an array
       { $unwind: '$authId' }, // use this so that we can access to the property.
-      { $project: {
-        _id: 1,
-        username: '$authId.username',
-        uId: '$authId.uId',
-        email: '$authId.email',
-        profilePicture: 1,
-      } } // to exclude properties that you want to remove. properties which were set to 1 means that the object includes it.
+      {
+        $project: {
+          _id: 1,
+          username: '$authId.username',
+          uId: '$authId.uId',
+          email: '$authId.email',
+          profilePicture: 1
+        }
+      } // to exclude properties that you want to remove. properties which were set to 1 means that the object includes it.
     ]);
 
     return users;

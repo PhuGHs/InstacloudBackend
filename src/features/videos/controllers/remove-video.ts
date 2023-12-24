@@ -9,6 +9,6 @@ export class Remove {
       key1: videoId,
       key2: videoVersion
     });
-    res.status(STATUS_CODES.OK).json({ message: 'remove video from DB successfully!'});
+    res.status(STATUS_CODES.OK).json({ message: 'remove video from DB successfully!' });
   }
 }

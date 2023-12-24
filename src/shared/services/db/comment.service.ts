@@ -20,8 +20,8 @@ class CommentService {
       { $inc: { commentsCount: 1 } },
       { new: true }
     ) as Query<IPostDocument, IPostDocument>;
-    const promisedUser: IUserDocument = await userCache.getUserFromCache(userTo) as IUserDocument;
-    const user: IUserDocument = promisedUser ? promisedUser : await userService.getUserById(userTo) as IUserDocument;
+    const promisedUser: IUserDocument = (await userCache.getUserFromCache(userTo)) as IUserDocument;
+    const user: IUserDocument = promisedUser ? promisedUser : ((await userService.getUserById(userTo)) as IUserDocument);
 
     const response: [ICommentDocument, IPostDocument] = await Promise.all([promisedComment, promisedPost]);
 
@@ -76,6 +76,11 @@ class CommentService {
     const promisedDeleteComment: Query<IQueryComplete & IQueryDeleted, ICommentDocument> = CommentsModel.deleteOne({ _id: commentId });
     const promisedUpdatedComment: UpdateQuery<IPostDocument> = PostModel.updateOne({ _id: postId }, { $inc: { commentsCount: -1 } });
     await Promise.all([promisedDeleteComment, promisedUpdatedComment]);
+  }
+
+  public async getSingleComment(commentId: string): Promise<ICommentDocument> {
+    const comment: ICommentDocument = (await CommentsModel.findOne({ _id: commentId })) as ICommentDocument;
+    return comment;
   }
 }
 

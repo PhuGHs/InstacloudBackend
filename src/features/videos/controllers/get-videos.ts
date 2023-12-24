@@ -7,6 +7,6 @@ export class Get {
   public async videos(req: Request, res: Response): Promise<void> {
     const { userId } = req.params;
     const videos: IFileVideoDocument[] = await videoService.getVideos(userId);
-    res.status(STATUS_CODES.OK).json({ message: 'get video successfully!', videos});
+    res.status(STATUS_CODES.OK).json({ message: 'get video successfully!', videos });
   }
 }

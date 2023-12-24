@@ -95,10 +95,10 @@ export class UserCache extends BaseCache {
         await this.client.connect();
       }
       const response: IUserDocument = (await this.client.hGetAll(`users:${userId}`)) as unknown as IUserDocument;
-      if(Object.keys(response).length === 0) {
+      if (Object.keys(response).length < 17) {
         return null;
-      }
-      response.createdAt = new Date(SupportiveMethods.parseJson(`${response.createdAt}`));
+      } else {
+        response.createdAt = new Date(SupportiveMethods.parseJson(`${response.createdAt}`));
         response.social = SupportiveMethods.parseJson(`${response.social}`);
         response.postsCount = SupportiveMethods.parseJson(`${response.postsCount}`);
         response.blocked = SupportiveMethods.parseJson(`${response.blocked}`);
@@ -111,6 +111,7 @@ export class UserCache extends BaseCache {
         response.followersCount = SupportiveMethods.parseJson(`${response.followersCount}`);
         response.followingCount = SupportiveMethods.parseJson(`${response.followingCount}`);
         return response;
+      }
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again later');
@@ -123,9 +124,9 @@ export class UserCache extends BaseCache {
         await this.client.connect();
       }
       const user: IUserDocument = (await this.getUserFromCache(userId)) as IUserDocument;
-      if(user !== null) {
+      if (user !== null) {
         console.log('not null');
-        if(typeof value === 'string') {
+        if (typeof value === 'string') {
           await this.client.HSET(`users:${userId}`, prop, value);
         } else {
           await this.client.HSET(`users:${userId}`, prop, JSON.stringify(value));

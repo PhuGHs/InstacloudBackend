@@ -41,7 +41,7 @@ class FollowerService {
     const response: [mongoose.mongo.BulkWriteResult, IUserDocument | null, IUserDocument | null] = await Promise.all([
       users,
       userService.getUserById(followeeId),
-      userService.getUserById(userId),
+      userService.getUserById(userId)
     ]);
 
     //send notification

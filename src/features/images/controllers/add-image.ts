@@ -28,6 +28,6 @@ export class Add {
       imgId: result.public_id!,
       imgVersion: result.version.toString()
     });
-    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated'});
+    res.status(STATUS_CODE.OK).json({ message: 'profile image has been updated' });
   }
 }

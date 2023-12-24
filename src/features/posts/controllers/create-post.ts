@@ -64,7 +64,7 @@ export class Create {
   public async seedPosts(req: Request, res: Response): Promise<void> {
     // const { uId, userId, username, email, post, privacy, gifUrl, profilePicture, feelings } = req.body;
     const users: IUserDocument[] = await userService.getAllUsers();
-    for(const user of users) {
+    for (const user of users) {
       const postObjectId: ObjectId = new ObjectId();
       const pId: string = `${SupportiveMethods.generateRandomIntegers(14)}`;
       const userPost: IPostDocument = {

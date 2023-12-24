@@ -89,7 +89,7 @@ export interface ISenderReceiver {
 }
 
 export interface ICall {
-  signal: IMessageData,
+  signal: IMessageData;
   from: string;
   name: string;
 }

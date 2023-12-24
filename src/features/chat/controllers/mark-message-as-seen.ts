@@ -14,7 +14,7 @@ export class Update {
 
     const lastUpdatedMessage: IMessageData = (await chatCache.markMessagesAsSeen(senderId, receiverId)) as IMessageData;
     chatSocketIOObject.emit('message read', lastUpdatedMessage);
-    chatSocketIOObject.emit('chat list', lastUpdatedMessage);
+    chatSocketIOObject.emit('chat conversation', lastUpdatedMessage);
     //update chat list with and send to client
     chatQueue.addChatJob('markMessagesAsSeen', {
       senderId,

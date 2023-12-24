@@ -29,5 +29,5 @@ export const userdata: IUserDocument = {
   uId: '1621613119252066',
   fullname: 'Phu Le',
   createdAt: '2023-11-30T03:10:32.539Z',
-  email: 'phule@gmail.com',
+  email: 'phule@gmail.com'
 } as unknown as IUserDocument;

@@ -22,26 +22,23 @@ class PostService {
     await Promise.all([promiseDeletedPost, promiseUpdatedUser]);
   }
 
-  public async getPosts(query: IGetPostsQuery, blockedUsers: mongoose.Types.ObjectId[],  skip = 0, limit = 0, sort: Record<string, 1 | -1>): Promise<IPostDocument[]> {
+  public async getPosts(
+    query: IGetPostsQuery,
+    blockedUsers: mongoose.Types.ObjectId[],
+    skip = 0,
+    limit = 0,
+    sort: Record<string, 1 | -1>
+  ): Promise<IPostDocument[]> {
     let postQuery = {};
     if (query?.imgId && query.gifUrl) {
-      postQuery = { $and: [
-        { $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' } }] },
-        { userId: { $nin: blockedUsers } }
-      ] };
+      postQuery = { $and: [{ $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' } }] }, { userId: { $nin: blockedUsers } }] };
     } else if (query?.videoId) {
-      postQuery = { $and: [
-        { $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' } }] },
-        { userId: { $nin: blockedUsers } }
-      ] };
+      postQuery = { $and: [{ $or: [{ imgId: { $ne: '' } }, { gifUrl: { $ne: '' } }] }, { userId: { $nin: blockedUsers } }] };
     } else {
-      if(Object.keys(query).length === 0) {
+      if (Object.keys(query).length === 0) {
         postQuery = { userId: { $nin: blockedUsers } };
       } else {
-        postQuery = { $and: [
-          query,
-          { userId: { $nin: blockedUsers } }
-        ] };
+        postQuery = { $and: [query, { userId: { $nin: blockedUsers } }] };
       }
     }
 
@@ -50,7 +47,7 @@ class PostService {
   }
 
   public async getSinglePost(postId: string): Promise<IPostDocument> {
-    const post: IPostDocument = await PostModel.findOne({ _id: postId }).exec() as IPostDocument;
+    const post: IPostDocument = (await PostModel.findOne({ _id: postId }).exec()) as IPostDocument;
     return post;
   }
 
@@ -67,17 +64,17 @@ class PostService {
   }
 
   public async checkIfPostExisted(postId: string, userId: string): Promise<boolean> {
-    const number: number = await SavedPostModel.countDocuments({ postId: postId, userId: userId});
-    if(number != 0) return true;
+    const number: number = await SavedPostModel.countDocuments({ postId: postId, userId: userId });
+    if (number != 0) return true;
     return false;
   }
 
   public async getSavedPostsFromDB(userId: string): Promise<ISavePostDocument[]> {
     const savedPosts: ISavePostDocument[] = await SavedPostModel.aggregate([
       { $match: { userId: new mongoose.Types.ObjectId(userId) } },
-      { $lookup: { from: 'Post', localField: 'postId', foreignField: '_id', as: 'post' }},
+      { $lookup: { from: 'Post', localField: 'postId', foreignField: '_id', as: 'post' } },
       { $unwind: '$post' },
-      { $project: this.aggregateProject()},
+      { $project: this.aggregateProject() },
       {
         $sort: { createdAt: -1 }
       }
@@ -106,13 +103,13 @@ class PostService {
       gifUrl: '$post.gifUrl',
       privacy: '$post.privacy',
       reactions: '$post.reactions',
-      postCreatedDate: '$post.createdAt',
+      postCreatedDate: '$post.createdAt'
     };
   }
 
   public async searchPosts(query: string, date: string): Promise<IPostDocument[]> {
     let posts: IPostDocument[] = [];
-    if(date) {
+    if (date) {
       posts = await PostModel.aggregate([
         {
           $search: {
@@ -120,16 +117,18 @@ class PostService {
             autocomplete: {
               query: query,
               path: 'post',
-              tokenOrder: 'sequential',
-            },
-          },
+              tokenOrder: 'sequential'
+            }
+          }
         },
         {
           $match: {
             createdAt: { $lte: new Date(date) }
           }
         }
-      ]).limit(100).sort({ score: -1 });
+      ])
+        .limit(100)
+        .sort({ score: -1 });
     } else {
       posts = await PostModel.aggregate([
         {
@@ -138,22 +137,23 @@ class PostService {
             autocomplete: {
               query: query,
               path: 'post',
-              tokenOrder: 'sequential',
-            },
-          },
+              tokenOrder: 'sequential'
+            }
+          }
         }
-      ]).limit(100).sort({ score: -1 });
+      ])
+        .limit(100)
+        .sort({ score: -1 });
     }
-
 
     return posts;
   }
 
   public async getPostWithImageOfAUser(userId: string): Promise<IPostDocument[]> {
     const posts: IPostDocument[] = await PostModel.aggregate([
-      { $match: { $and: [ { userId: new mongoose.Types.ObjectId(userId) }, { imgId: { $ne: '' }}]}},
+      { $match: { $and: [{ userId: new mongoose.Types.ObjectId(userId) }, { imgId: { $ne: '' } }] } },
       { $limit: 100 },
-      { $sort: { createdAt: -1 }}
+      { $sort: { createdAt: -1 } }
     ]);
     return posts;
   }

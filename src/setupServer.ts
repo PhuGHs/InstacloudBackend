@@ -48,7 +48,7 @@ export class MidCloudServer {
         name: 'session',
         keys: [config.SECRET_KEY_ONE!, config.SECRET_KEY_TWO!],
         maxAge: 30 * 24 * 60 * 60 * 1000, // 1 month
-        secure: false,
+        secure: false
       })
     );
 
@@ -75,9 +75,11 @@ export class MidCloudServer {
   }
 
   private apiMonitoring(app: Application): void {
-    app.use(apiStats.getMiddleware({
-      uriPath: '/api-monitoring'
-    }));
+    app.use(
+      apiStats.getMiddleware({
+        uriPath: '/api-monitoring'
+      })
+    );
   }
 
   private globalErrorHandler(app: Application): void {

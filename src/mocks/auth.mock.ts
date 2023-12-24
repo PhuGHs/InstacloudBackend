@@ -36,7 +36,7 @@ export const authMock = {
 } as unknown as IAuthDocument;
 
 export interface IJWT {
-  jwt?: string,
+  jwt?: string;
 }
 
 export interface IAuthMock {

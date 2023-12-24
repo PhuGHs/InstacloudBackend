@@ -2,7 +2,7 @@ import { config } from '@root/config';
 import { IAuthDocument, ISignUpData } from '@root/features/auth/interfaces/auth.interface';
 import { AuthModel } from '@auth/models/auth.schema';
 import Logger from 'bunyan';
-import {faker} from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import { SupportiveMethods } from '@root/shared/globals/helpers/supportive-methods';
 import axios from 'axios';
 
@@ -60,9 +60,9 @@ class AuthService {
               profilePicture: 'a path',
               post: faker.lorem.sentence(),
               privacy: 'public',
-              gifUrl: '',
+              gifUrl: ''
             };
-              await axios.post('http://localhost:5000/api/v1/post/seeds', postData);
+            await axios.post('http://localhost:5000/api/v1/post/seeds', postData);
           }
         }
 

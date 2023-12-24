@@ -28,7 +28,7 @@ export class SocketIOUserHandler {
         this.addPeerToServer(data.userId, data.peerId);
       });
 
-      socket.on('get peerId', data => {
+      socket.on('get peerId', (data) => {
         const userWhoAskSocketId: string = connectedUserMap.get(data.userWhoAsk) as string;
         const userToGetPeerId: string = connectedUserPeerMap.get(data.userToGet) as string;
         this.io.to(userWhoAskSocketId).emit('receive id', userToGetPeerId);

@@ -104,7 +104,7 @@ export class PostCache extends BaseCache {
       'post',
       `${post}`,
       'feelings',
-      `${feelings ? feelings: ''}`,
+      `${feelings ? feelings : ''}`,
       'privacy',
       `${privacy ? privacy : ''}`,
       'gifUrl',
@@ -116,7 +116,7 @@ export class PostCache extends BaseCache {
       'videoVersion',
       `${videoVersion ? videoVersion : ''}`,
       'videoId',
-      `${videoId ? videoId : '' }`
+      `${videoId ? videoId : ''}`
     ];
 
     try {
@@ -125,7 +125,7 @@ export class PostCache extends BaseCache {
       }
 
       const post: IPostDocument[] = await this.getAPostFromCache(key);
-      if(post.length === 0) {
+      if (post.length === 0) {
         return null;
       }
 
@@ -177,15 +177,15 @@ export class PostCache extends BaseCache {
       if (!this.client.isOpen) {
         this.client.connect();
       }
-      const post: string = await this.client.HGET(`posts:${postId}`, 'pId') as string;
+      const post: string = (await this.client.HGET(`posts:${postId}`, 'pId')) as string;
       const posts: IPostDocument[] = [];
-      if(post) {
+      if (post) {
         const multi: ReturnType<typeof this.client.multi> = this.client.multi();
         multi.HGETALL(`posts:${postId}`);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const posts: IPostDocument[] = [];
         const reply = (await multi.exec()) as any as IPostDocument[];
-        if(reply.length > 0) {
+        if (reply.length > 0) {
           reply[0].commentsCount = SupportiveMethods.parseJson(`${reply[0].commentsCount}`) as number;
           reply[0].reactions = SupportiveMethods.parseJson(`${reply[0].reactions}`) as IReactions;
           reply[0].createdAt = new Date(SupportiveMethods.parseJson(`${reply[0].createdAt}`)) as Date;
@@ -234,7 +234,7 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      const reply: string[] = await this.client.sendCommand((['zrevrange', key, `${uId}`, `${uId}`]));
+      const reply: string[] = await this.client.sendCommand(['zrevrange', key, `${uId}`, `${uId}`]);
 
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -272,7 +272,7 @@ export class PostCache extends BaseCache {
 
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       for (const post of replies as IPostDocument[]) {
-        if(!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
+        if (!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
           post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`);
           post.reactions = SupportiveMethods.parseJson(`${post.reactions}`);
           post.createdAt = new Date(SupportiveMethods.parseJson(`${post.createdAt}`));
@@ -305,7 +305,7 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      const reply: string[] = await this.client.sendCommand((['zrevrange', key, `${start}`, `${end}`]));
+      const reply: string[] = await this.client.sendCommand(['zrevrange', key, `${start}`, `${end}`]);
 
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -315,7 +315,7 @@ export class PostCache extends BaseCache {
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for (const post of replies as IPostDocument[]) {
-        if(!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
+        if (!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
           if (post.imgId && post.imgVersion) {
             post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
             post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;
@@ -351,7 +351,7 @@ export class PostCache extends BaseCache {
         await this.client.connect();
       }
 
-      const reply: string[] = await this.client.sendCommand((['zrevrange', key, `${start}`, `${end}`]));
+      const reply: string[] = await this.client.sendCommand(['zrevrange', key, `${start}`, `${end}`]);
 
       const multi: ReturnType<typeof this.client.multi> = this.client.multi();
       for (const value of reply) {
@@ -361,7 +361,7 @@ export class PostCache extends BaseCache {
       const replies: PostCacheMultiType = (await multi.exec()) as PostCacheMultiType;
       const postReplies: IPostDocument[] = [];
       for (const post of replies as IPostDocument[]) {
-        if(!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
+        if (!user.blocked.toString().includes(post.userId) && !user.blockedBy.toString().includes(post.userId)) {
           if (post.videoId && post.videoVersion) {
             post.commentsCount = SupportiveMethods.parseJson(`${post.commentsCount}`) as number;
             post.reactions = SupportiveMethods.parseJson(`${post.reactions}`) as IReactions;

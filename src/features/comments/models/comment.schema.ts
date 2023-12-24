@@ -14,16 +14,16 @@ const commentSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now() }
 });
 
-commentSchema.pre('deleteOne', async function (next: () => void ) {
+commentSchema.pre('deleteOne', async function (next: () => void) {
   const doc = await this.model.findOne(this.getQuery());
   await ReactionModel.deleteMany({ commentId: doc._id });
   next();
 });
 
-commentSchema.pre('deleteMany', async function (next: () => void ) {
+commentSchema.pre('deleteMany', async function (next: () => void) {
   const deletedDocs = await this.model.find(this.getQuery());
   const commentIds = deletedDocs.map((item) => item._id);
-  await ReactionModel.deleteMany({ commentId: { $in: commentIds }});
+  await ReactionModel.deleteMany({ commentId: { $in: commentIds } });
   next();
 });
 

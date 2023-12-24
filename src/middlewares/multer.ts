@@ -1,4 +1,4 @@
-import multer, { StorageEngine, Multer} from 'multer';
+import multer, { StorageEngine, Multer } from 'multer';
 
 const storage: StorageEngine = multer.memoryStorage();
 const imageUpload = multer({ storage }).single('image');

@@ -157,7 +157,6 @@ export class Add {
     res.status(STATUS_CODE.OK).json({ message: 'message has been sent', data });
   }
 
-
   public async callAudioSocketReq(req: Request, res: Response): Promise<void> {
     const { conversationId, receiverId, receiverUsername, receiverProfilePicture, body, gifUrl, selectedImage } = req.body;
     const messageObjectId: ObjectId = new ObjectId();

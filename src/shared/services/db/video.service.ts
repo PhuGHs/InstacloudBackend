@@ -8,7 +8,7 @@ class VideoService {
   }
 
   public async removeVideo(videoId: string, videoVersion: string): Promise<void> {
-    await VideoModel.deleteOne({ videoId, videoVersion});
+    await VideoModel.deleteOne({ videoId, videoVersion });
   }
 
   public async addVideo(data: IFileVideoDocument): Promise<void> {

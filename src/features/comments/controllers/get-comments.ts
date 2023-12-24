@@ -19,13 +19,16 @@ export class Get {
     const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
     const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(req.currentUser!.userId);
     const userIds: mongoose.Types.ObjectId[] = [];
-    for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
+    for (const blockedUser of [...user.blocked, ...user.blockedBy]) {
       userIds.push(new mongoose.Types.ObjectId(blockedUser));
     }
     const cachedComment: ICommentDocument[] = await commentCache.getCommentsFromCache('comment', postId);
     const comments: ICommentDocument[] = cachedComment.length
       ? cachedComment
-      : await commentService.getCommentsFromDB({ postId: new mongoose.Types.ObjectId(postId), userId: { $nin: userIds } }, { createdAt: -1 });
+      : await commentService.getCommentsFromDB(
+          { postId: new mongoose.Types.ObjectId(postId), userId: { $nin: userIds } },
+          { createdAt: -1 }
+        );
 
     res.status(STATUS_CODE.OK).json({ message: 'Post comments', comments });
   }
@@ -35,13 +38,16 @@ export class Get {
     const cachedUser: IUserDocument = (await userCache.getUserFromCache(req.currentUser!.userId)) as IUserDocument;
     const user: IUserDocument = cachedUser ? cachedUser : await userService.getUserById(req.currentUser!.userId);
     const userIds: mongoose.Types.ObjectId[] = [];
-    for(const blockedUser of [...user.blocked, ...user.blockedBy]) {
+    for (const blockedUser of [...user.blocked, ...user.blockedBy]) {
       userIds.push(new mongoose.Types.ObjectId(blockedUser));
     }
     const cachedComment: ICommentNameList[] = await commentCache.getCommentUsernamesFromCache('comment', postId);
     const commentNames: ICommentNameList[] = cachedComment[0].names.length
       ? cachedComment
-      : await commentService.getCommentNamesFromDB({ postId: new mongoose.Types.ObjectId(postId), userId: { $nin: userIds } }, { createdAt: -1 });
+      : await commentService.getCommentNamesFromDB(
+          { postId: new mongoose.Types.ObjectId(postId), userId: { $nin: userIds } },
+          { createdAt: -1 }
+        );
 
     res.status(STATUS_CODE.OK).json({ message: 'Post comment names', commentNames });
   }
