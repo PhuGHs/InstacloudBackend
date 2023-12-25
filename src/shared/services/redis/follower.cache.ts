@@ -61,7 +61,10 @@ export class FollowerCache extends BaseCache {
       const list: IFollowerData[] = [];
       const response: string[] = await this.client.LRANGE(key, 0, -1);
       for (const item of response) {
-        const user: IUserDocument = (await userCache.getUserFromCache(item)) as IUserDocument;
+        const user: IUserDocument | null = (await userCache.getUserFromCache(item));
+        if(!user) {
+          return list;
+        }
         const data: IFollowerData = {
           _id: new mongoose.Types.ObjectId(user._id),
           uId: user.uId!,

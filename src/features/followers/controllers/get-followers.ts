@@ -12,8 +12,8 @@ export class Get {
     const userId = req.params.userId;
     const userObjectId: ObjectId = new mongoose.Types.ObjectId(userId);
 
-    const cachedFollowerList: IFollowerData[] = await followerCache.getFollowerFromCache(`followers:${userId}`);
-    const followers: IFollowerData[] = cachedFollowerList.length ? cachedFollowerList : await followerService.getFollowers(userObjectId);
+    // const cachedFollowerList: IFollowerData[] = await followerCache.getFollowerFromCache(`followers:${userId}`);
+    const followers: IFollowerData[] = await followerService.getFollowers(userObjectId);
     res.status(STATUS_CODE.OK).json({ message: 'followers list', followers });
   }
 
@@ -21,10 +21,8 @@ export class Get {
     const userId = req.params.userId;
     const userObjectId: ObjectId = new mongoose.Types.ObjectId(userId);
 
-    const cachedFollowerList: IFollowerData[] = await followerCache.getFollowerFromCache(`following:${userId}`);
-    const followingList: IFollowerData[] = cachedFollowerList.length
-      ? cachedFollowerList
-      : await followerService.getFollowingList(userObjectId);
+    // const cachedFollowerList: IFollowerData[] = await followerCache.getFollowerFromCache(`following:${userId}`);
+    const followingList: IFollowerData[] = await followerService.getFollowingList(userObjectId);
     res.status(STATUS_CODE.OK).json({ message: 'following list', followingList });
   }
 }

@@ -86,19 +86,20 @@ class FollowerService {
     const followee = await FollowerModel.aggregate([
       { $match: { followeeId: userObjectId } },
       { $lookup: { from: 'User', localField: 'followerId', foreignField: '_id', as: 'followerId' } },
-      { $unwind: '$follower' },
-      { $lookup: { from: 'Auth', localField: 'follower.authId', foreignField: '_id', as: 'authId' } },
-      { $unwind: '$auth' },
+      { $unwind: '$followerId' },
+      { $lookup: { from: 'Auth', localField: 'followerId.authId', foreignField: '_id', as: 'authId' } },
+      { $unwind: '$authId' },
       {
         $addFields: {
-          _id: '$follower._id',
-          username: '$auth.username',
-          uId: '$auth.username',
-          userProfle: '$follower',
-          postCount: '$follower.postsCount',
-          followersCount: '$follower.followersCount',
-          followingCount: '$follower.followingCount',
-          profilePicture: '$follower.profilePicture'
+          _id: '$followerId._id',
+          username: '$authId.username',
+          fullname: '$authId.fullname',
+          uId: '$authId.uId',
+          userProfle: '$followerId',
+          postCount: '$followerId.postsCount',
+          followersCount: '$followerId.followersCount',
+          followingCount: '$followerId.followingCount',
+          profilePicture: '$followerId.profilePicture'
         }
       },
       {
@@ -118,19 +119,20 @@ class FollowerService {
     const followingList = await FollowerModel.aggregate([
       { $match: { followerId: userObjectId } },
       { $lookup: { from: 'User', localField: 'followeeId', foreignField: '_id', as: 'followeeId' } },
-      { $unwind: '$followee' },
-      { $lookup: { from: 'Auth', localField: 'followee.authId', foreignField: '_id', as: 'authId' } },
-      { $unwind: '$auth' },
+      { $unwind: '$followeeId' },
+      { $lookup: { from: 'Auth', localField: 'followeeId.authId', foreignField: '_id', as: 'authId' } },
+      { $unwind: '$authId' },
       {
         $addFields: {
-          _id: '$followee._id',
-          username: '$auth.username',
-          uId: '$auth.username',
-          userProfle: '$followee',
-          postCount: '$followee.postsCount',
-          followersCount: '$followee.followersCount',
-          followingCount: '$followee.followingCount',
-          profilePicture: '$followee.profilePicture'
+          _id: '$followeeId._id',
+          username: '$authId.username',
+          fullname: '$authId.fullname',
+          uId: '$authId.uId',
+          userProfle: '$followeeId',
+          postCount: '$followeeId.postsCount',
+          followersCount: '$followeeId.followersCount',
+          followingCount: '$followeeId.followingCount',
+          profilePicture: '$followeeId.profilePicture'
         }
       },
       {

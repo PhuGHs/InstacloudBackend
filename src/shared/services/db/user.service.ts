@@ -86,12 +86,12 @@ class UserService {
     const followersId = followersOfCurrentUser.map((item) => item.followerId);
 
     const followeesOfFollowers = await FollowerModel.aggregate([
-      { $match: { followerId: { $in: followersId, $ne: new mongoose.Types.ObjectId(userId) } } }
+      { $match: { followeeId: { $in: followersId, $ne: new mongoose.Types.ObjectId(userId) } } }
     ]);
-    const recommendUserIds = followeesOfFollowers.map((item) => item.followeeId);
+    const recommendUserIds = [...new Set(followeesOfFollowers.map((item) => item.followeeId))];
 
     let recommendedUsers = await UserModel.aggregate([
-      { $match: { _id: { $in: recommendUserIds, $ne: new mongoose.Types.ObjectId(userId), $nin: userBlockedIds } } },
+      { $match: { _id: { $in: recommendUserIds, $ne: new mongoose.Types.ObjectId(userId), $nin: userBlockedIds  } } },
       { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
       { $unwind: '$authId' },
       { $project: this.aggregateProject() }
@@ -100,7 +100,7 @@ class UserService {
     if (recommendedUsers.length < 10) {
       const length = 10 - recommendedUsers.length;
       const users: IUserDocument[] = await UserModel.aggregate([
-        { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId), $nin: userBlockedIds } } },
+        { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId), $nin: [...userBlockedIds, ...recommendUserIds] } } },
         { $sample: { size: length } },
         { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
         { $unwind: '$authId' },

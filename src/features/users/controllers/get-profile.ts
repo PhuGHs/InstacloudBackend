@@ -77,16 +77,14 @@ export class Get {
   }
 
   private async followers(userId: string): Promise<IFollowerData[]> {
-    const cachedFollowers: IFollowerData[] = await followerCache.getFollowerFromCache(`followers:${userId}`);
-    const followers: IFollowerData[] =
-      cachedFollowers.length > 0 ? cachedFollowers : await followerService.getFollowers(new mongoose.Types.ObjectId(userId));
+    // const cachedFollowers: IFollowerData[] = await followerCache.getFollowerFromCache(`followers:${userId}`);
+    const followers: IFollowerData[] = await followerService.getFollowers(new mongoose.Types.ObjectId(userId));
     return followers;
   }
 
   private async following(userId: string): Promise<IFollowerData[]> {
-    const cachedFollowerList: IFollowerData[] = await followerCache.getFollowerFromCache(`following:${userId}`);
-    const followingList: IFollowerData[] =
-      cachedFollowerList.length > 0 ? cachedFollowerList : await followerService.getFollowingList(new mongoose.Types.ObjectId(userId));
+    // const cachedFollowerList: IFollowerData[] = await followerCache.getFollowerFromCache(`following:${userId}`);
+    const followingList: IFollowerData[] = await followerService.getFollowingList(new mongoose.Types.ObjectId(userId));
     return followingList;
   }
 }
